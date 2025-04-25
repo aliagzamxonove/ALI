@@ -1,0 +1,166 @@
+/* Base styling */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(45deg, #1c2e4a, #162a3f);
+  animation: gradient 15s ease infinite;
+  color: #ffffff;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 40px;
+}
+
+@keyframes gradient {
+  0% { background: linear-gradient(45deg, #1c2e4a, #162a3f); }
+  50% { background: linear-gradient(45deg, #162a3f, #1c2e4a); }
+  100% { background: linear-gradient(45deg, #1c2e4a, #162a3f); }
+}
+
+.container {
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 35px;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 100%;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+}
+
+header h1 {
+  font-size: 26px;
+  margin-bottom: 30px;
+  text-align: center;
+  color: #ffffff;
+}
+
+/* Form layout */
+.input-group {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.input-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #d6dce5;
+}
+
+.input-group input,
+.input-group textarea {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 15px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  color: #333;
+  background-color: #f9f9f9;
+  box-sizing: border-box;
+}
+
+textarea {
+  height: 130px;
+  resize: vertical;
+}
+
+.input-group.with-button .inline-btn {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  background-color: #1c2e4a;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.input-group.with-button .inline-btn:hover {
+  background-color: #223b60;
+}
+
+.primary-btn {
+  width: 100%;
+  background-color: #1c2e4a;
+  color: white;
+  padding: 14px;
+  border: none;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.primary-btn:hover {
+  background-color: #223b60;
+}
+
+/* Spinner Overlay */
+.spinner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background-color: rgba(28, 46, 74, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.spinner .loader {
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid #ffffff;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+}
+
+.spinner p {
+  margin-top: 15px;
+  color: white;
+  font-size: 18px;
+}
+
+.hidden {
+  display: none;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.input-group.horizontal-group {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.input-group.horizontal-group .field-with-label {
+  flex-grow: 1;
+}
+
+.remove-btn {
+  background-color: #b23b3b;
+  color: white;
+  padding: 10px 16px;
+  font-size: 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  height: 42px;
+}
+
+.remove-btn:hover {
+  background-color: #912f2f;
+}
