@@ -93,11 +93,12 @@ textarea {
   font-size: 16px;
   border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .primary-btn:hover {
   background-color: #223b60;
+  transform: translateY(-2px);
 }
 
 /* Spinner Overlay */
@@ -157,10 +158,37 @@ textarea {
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.3s ease;
   height: 42px;
 }
 
 .remove-btn:hover {
   background-color: #912f2f;
+  transform: translateY(-2px);
+}
+
+/* Mobile-friendly */
+@media (max-width: 768px) {
+  .container {
+    padding: 25px;
+    max-width: 90%;
+  }
+
+  header h1 {
+    font-size: 22px;
+  }
+
+  .input-group input,
+  .input-group textarea {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .primary-btn {
+    padding: 12px;
+  }
+
+  .remove-btn {
+    padding: 8px 12px;
+  }
 }
