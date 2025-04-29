@@ -1,4 +1,4 @@
-/* Base styling */
+  /* Base styling */
 body {
   font-family: 'Segoe UI', sans-serif;
   margin: 0;
@@ -77,20 +77,21 @@ textarea {
   font-size: 16px;
   cursor: pointer;
   border-radius: 4px;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease, transform 0.3s ease;
 }
 
 .input-group.with-button .inline-btn:hover {
   background-color: #223b60;
+  transform: translateY(-3px);
 }
 
 .primary-btn {
   width: 100%;
   background-color: #1c2e4a;
   color: white;
-  padding: 14px;
+  padding: 16px;
   border: none;
-  font-size: 16px;
+  font-size: 18px;
   border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.3s ease;
@@ -98,7 +99,11 @@ textarea {
 
 .primary-btn:hover {
   background-color: #223b60;
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+}
+
+.primary-btn:active {
+  transform: translateY(0);
 }
 
 /* Spinner Overlay */
@@ -140,6 +145,7 @@ textarea {
   100% { transform: rotate(360deg); }
 }
 
+/* Horizontal Group */
 .input-group.horizontal-group {
   display: flex;
   align-items: flex-end;
@@ -153,18 +159,22 @@ textarea {
 .remove-btn {
   background-color: #b23b3b;
   color: white;
-  padding: 10px 16px;
-  font-size: 14px;
+  padding: 12px 20px;
+  font-size: 16px;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.3s ease;
-  height: 42px;
+  height: 50px;
 }
 
 .remove-btn:hover {
   background-color: #912f2f;
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+}
+
+.remove-btn:active {
+  transform: translateY(0);
 }
 
 /* Mobile-friendly */
@@ -185,10 +195,446 @@ textarea {
   }
 
   .primary-btn {
-    padding: 12px;
+    padding: 14px;
+    font-size: 16px;
   }
 
   .remove-btn {
-    padding: 8px 12px;
+    padding: 10px 16px;
+    font-size: 14px;
   }
+}
+
+
+/* General Layout */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(45deg, #1c2e4a, #162a3f);
+  animation: gradient 15s ease infinite;
+  color: #ffffff;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+@keyframes gradient {
+  0% { background: linear-gradient(45deg, #1c2e4a, #162a3f); }
+  50% { background: linear-gradient(45deg, #162a3f, #1c2e4a); }
+  100% { background: linear-gradient(45deg, #1c2e4a, #162a3f); }
+}
+
+/* Login Page */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+}
+
+.login-box {
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+  width: 100%;
+  max-width: 400px;
+}
+
+h2 {
+  text-align: center;
+  color: white;
+  margin-bottom: 20px;
+}
+
+.input-group {
+  margin-bottom: 15px;
+}
+
+.input-group label {
+  display: block;
+  color: #d6dce5;
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px;
+  font-size: 15px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  color: #333;
+  background-color: #f9f9f9;
+}
+
+input[type="submit"] {
+  background-color: #1c2e4a;
+  color: white;
+  padding: 14px;
+  width: 100%;
+  border: none;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+input[type="submit"]:hover {
+  background-color: #223b60;
+}
+
+#error-popup {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 20px;
+  border-radius: 10px;
+  color: white;
+  font-size: 18px;
+  text-align: center;
+}
+
+#error-popup button {
+  background-color: red;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+
+/* Dashboard Page */
+.dashboard-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+}
+
+.dashboard-box {
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+}
+
+h2 {
+  color: white;
+  margin-bottom: 20px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.center-btn {
+  background-color: #1c2e4a;
+  color: white;
+  padding: 14px 30px;
+  border: none;
+  font-size: 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.center-btn:hover {
+  background-color: #223b60;
+  transform: translateY(-2px);
+}
+
+/* Logout Button */
+.logout-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background-color: #b23b3b;
+  color: white;
+  padding: 10px 16px;
+  font-size: 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.logout-btn:hover {
+  background-color: #912f2f;
+  transform: translateY(-2px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .login-box, .dashboard-box {
+    padding: 20px;
+    width: 90%;
+  }
+
+  .center-btn {
+    padding: 12px 25px;
+  }
+}
+/* Center the login button and improve overall design */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(45deg, #1c2e4a, #162a3f);
+  animation: gradient 15s ease infinite;
+  color: #ffffff;
+}
+
+.login-box {
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+  width: 100%;
+  max-width: 400px;
+}
+
+h2 {
+  text-align: center;
+  color: #ffffff;
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #d6dce5;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  color: #333;
+  background-color: #f9f9f9;
+}
+
+.password-container {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #1c2e4a;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.password-toggle:hover {
+  color: #223b60;
+}
+
+.btn.login-btn {
+  width: 100%;
+  background-color: #1c2e4a;
+  color: white;
+  padding: 14px;
+  border: none;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.btn.login-btn:hover {
+  background-color: #223b60;
+  transform: translateY(-2px);
+}
+
+.error-message {
+  text-align: center;
+  color: #ff0000;
+  margin-top: 10px;
+}
+
+/* Animation for the gradient */
+@keyframes gradient {
+  0% { background: linear-gradient(45deg, #1c2e4a, #162a3f); }
+  50% { background: linear-gradient(45deg, #162a3f, #1c2e4a); }
+  100% { background: linear-gradient(45deg, #1c2e4a, #162a3f); }
+}
+
+.dashboard-buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.dashboard-btn {
+  padding: 14px 30px;
+  background-color: #1f2937; /* dark gray background */
+  color: #f9fafb; /* light text */
+  border: 1px solid #4b5563; /* soft border */
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  text-decoration: none; /* Remove underline */
+  transition: all 0.3s ease;
+}
+
+.dashboard-btn:hover {
+  background-color: #374151; /* slightly lighter gray on hover */
+  border-color: #6b7280; /* lighter border on hover */
+  transform: translateY(-2px);
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* Modal background */
+.modal {
+  display: none; 
+  position: fixed;
+  z-index: 1000;
+  padding-top: 120px;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* Modal box */
+.modal-content {
+  background-color: #1f2937; /* dark background */
+  margin: auto;
+  padding: 30px;
+  border: 1px solid #4b5563;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  color: #f9fafb;
+}
+
+/* Buttons inside modal */
+.modal-buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.modal-btn {
+  padding: 10px 20px;
+  border: 1px solid #4b5563;
+  background-color: #374151;
+  color: #f9fafb;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.modal-btn:hover {
+  background-color: #4b5563;
+}
+
+/* Dashboard Page */
+.dashboard-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+}
+
+.dashboard-box {
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+}
+
+h2 {
+  color: white;
+  margin-bottom: 20px;
+  font-size: 32px; /* Увеличиваем размер заголовка */
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+/* Center the 'Generate Report' button */
+.button-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 30px;
+}
+
+.center-btn {
+  background-color: #1c2e4a;
+  color: white;
+  padding: 16px 40px; /* Увеличиваем размер кнопки */
+  border: none;
+  font-size: 20px; /* Увеличиваем размер шрифта */
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.center-btn:hover {
+  background-color: #223b60;
+  transform: translateY(-2px);
+}
+
+.center-btn:active {
+  transform: translateY(0);
+}
+
+/* Logout Button */
+.logout-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background-color: #b23b3b;
+  color: white;
+  padding: 10px 16px;
+  font-size: 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.logout-btn:hover {
+  background-color: #912f2f;
+  transform: translateY(-2px);
 }
