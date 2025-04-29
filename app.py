@@ -1,35 +1,63 @@
-from flask import Flask, request, send_file, render_template, after_this_request
+from flask import Flask, request, render_template, redirect, url_for, session, send_file, after_this_request, flash
 from fpdf import FPDF
 import os
+import hashlib
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)  # for sessions
 GENERATED_FOLDER = 'generated'
 os.makedirs(GENERATED_FOLDER, exist_ok=True)
 
-@app.route('/')
-def form():
-    return render_template('index.html')
+# Mock user credentials with hashed password
+USER_CREDENTIALS = {'username': 'admin', 'password': hashlib.sha256('password'.encode()).hexdigest()}
 
-@app.route('/generate_report', methods=['POST'])
+# Main page, redirects to login
+@app.route('/')
+def home():
+    return redirect(url_for('login'))
+
+# Login page
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        if username == USER_CREDENTIALS['username'] and hashlib.sha256(password.encode()).hexdigest() == USER_CREDENTIALS['password']:
+            session['username'] = username
+            return redirect(url_for('dashboard'))
+        else:
+            flash('Invalid credentials, please try again.', 'error')
+            return redirect(url_for('login'))  # Ensure to redirect after flashing the message
+    return render_template('login.html')
+
+# Dashboard page
+@app.route('/dashboard')
+def dashboard():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    username = session['username']
+    return render_template('dashboard.html', username=username)
+
+# Report generation page
+@app.route('/generate_report', methods=['GET', 'POST'])
 def generate_report():
-    try:
-        # Получаем данные из формы
+    if request.method == 'POST':
+        # Get form data
         company = request.form['company']
         period = request.form['period']
         truck_number = request.form['truck_number']
         mileage_data_raw = request.form['mileage_data']
         logo_file = request.files.get('logo')
 
-        # Парсим данные о пробеге
+        # Parse mileage data
         mileage_data = {}
         for line in mileage_data_raw.strip().split('\n'):
             cleaned_line = line.strip().replace('\t', ' ')
             parts = [p for p in cleaned_line.split(' ') if p]
             if len(parts) >= 2:
                 state = parts[0]
-                miles_str = parts[1]
+                miles_str = parts[1].lower().replace('mi', '').replace(',', '').strip()
                 try:
-                    miles_str = miles_str.lower().replace('mi', '').replace(',', '').strip()
                     miles = float(miles_str)
                     mileage_data[state] = mileage_data.get(state, 0) + miles
                 except ValueError:
@@ -39,14 +67,13 @@ def generate_report():
 
         class StyledPDF(FPDF):
             def header(self):
-                # Увеличиваем размер логотипа
                 if logo_file and logo_file.filename != '':
                     logo_path = os.path.join(GENERATED_FOLDER, "temp_logo.png")
                     logo_file.save(logo_path)
-                    self.image(logo_path, x=10, y=8, h=30)  # Увеличена высота логотипа
+                    self.image(logo_path, x=10, y=8, h=30)
 
                 self.set_font("Helvetica", "B", 18)
-                self.set_text_color(0, 51, 102)
+                self.set_text_color(0, 51, 102)  # Official color theme
                 self.ln(10)
                 self.cell(0, 10, "IFTA REPORT", ln=True, align="C")
                 self.ln(5)
@@ -62,7 +89,7 @@ def generate_report():
                 self.cell(0, 10, f"Truck Number: {truck_number}", ln=True, align="L")
                 self.ln(4)
 
-                self.set_fill_color(230, 230, 230)
+                self.set_fill_color(230, 230, 230)  # Subtle background shading for readability
                 self.set_text_color(0)
                 self.set_draw_color(180, 180, 180)
                 col_width = 90
@@ -90,6 +117,7 @@ def generate_report():
         filepath = os.path.join(GENERATED_FOLDER, filename)
         pdf.output(filepath)
 
+        # Cleanup logo file after report generation
         if logo_file and logo_file.filename != '':
             logo_temp_path = os.path.join(GENERATED_FOLDER, "temp_logo.png")
             if os.path.exists(logo_temp_path):
@@ -105,9 +133,18 @@ def generate_report():
 
         return send_file(filepath, mimetype='application/pdf', as_attachment=True, download_name=filename)
 
-    except Exception as e:
-        print(f"Error occurred: {e}")
-        return f"An error occurred while generating the report: {e}"
+    return render_template('generate_report.html')
+
+# Time zone page
+@app.route('/timezones')
+def timezones():
+    return render_template('timezones.html')
+
+# Logout page
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    return redirect(url_for('login'))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
