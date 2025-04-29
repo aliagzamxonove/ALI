@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard - IFTA Report Generator</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  <link rel="icon" href="{{ url_for('static', filename='IFTA5458.png') }}" type="image/png" />
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Header with the welcome message -->
+    <header>
+      <h1 class="welcome-message">Welcome, {{ username }}!</h1>
+    </header>
+
+    <!-- Button for generating a report -->
+    <div class="dashboard-buttons">
+      <a href="{{ url_for('generate_report') }}" class="btn dashboard-btn">Generate Report</a>
+    </div>
+
+    <!-- Button for logging out, positioned at the top-right -->
+    <a id="logoutBtn" class="btn logout-btn" aria-label="Logout">Logout</a>
+
+    <!-- Pop-up Modal for Confirming Logout -->
+    <div id="logoutModal" class="modal" aria-labelledby="logoutModalLabel" aria-describedby="logoutModalDescription">
+      <div class="modal-content">
+        <h2 id="logoutModalLabel">Confirm Logout</h2>
+        <p id="logoutModalDescription">Are you sure you want to log out?</p>
+        <div class="modal-buttons">
+          <button id="confirmLogout" class="btn modal-btn">Yes, Logout</button>
+          <button id="cancelLogout" class="btn modal-btn">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Open the logout confirmation modal when the Logout button is clicked
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+      document.getElementById('logoutModal').style.display = 'block';
+    });
+
+    // Close the modal if the Cancel button is clicked
+    document.getElementById('cancelLogout').addEventListener('click', function() {
+      document.getElementById('logoutModal').style.display = 'none';
+    });
+
+    // Perform logout if the Yes button is clicked
+    document.getElementById('confirmLogout').addEventListener('click', function() {
+      window.location.href = "{{ url_for('logout') }}";
+    });
+
+    // Close the modal if the user clicks outside of it
+    window.onclick = function(event) {
+      var modal = document.getElementById('logoutModal');
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+  </script>
+</body>
+</html>
