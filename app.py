@@ -127,7 +127,7 @@ def generate_report():
 
     return render_template('generate_report.html')
 
-@app.route('/eld-malfunction-letter', methods=['GET', 'POST'])
+@app.route('/eld_malfunction_letter', methods=['GET', 'POST'])
 def eld_malfunction_letter():
     if request.method == 'GET':
         return render_template('eld_malfunction_letter.html')
