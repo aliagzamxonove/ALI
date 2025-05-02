@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tutorial Viewer</title>
+  <link rel="icon" href="{{ url_for('static', filename='IFTA5458.png') }}" type="image/png" />
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(to bottom right, #0a1f44, #101e3c);
+      font-family: 'Segoe UI', sans-serif;
+      overflow: hidden;
+      color: white;
+      height: 100vh; /* Обеспечиваем, чтобы body заполняло весь экран */
+    }
+
+    .pdf-container {
+      position: relative;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .pdf-layer-wrapper {
+      position: relative;
+      display: inline-block;
+      transform-origin: center center;
+      transition: transform 0.3s ease;
+    }
+
+    canvas {
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+      transition: transform 0.3s ease;
+    }
+
+    .textLayer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      color: transparent;
+      z-index: 10;
+    }
+
+    .highlight {
+      background: yellow;
+      color: black !important;
+    }
+
+    .controls, .zoom-controls, .scroll-controls, .search-bar {
+      position: absolute;
+      display: flex;
+      gap: 10px;
+    }
+
+    .controls {
+      top: 50%;
+      left: 0;
+      right: 0;
+      justify-content: space-between;
+      padding: 0 20px;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    .zoom-controls {
+      top: 20px;
+      right: 20px;
+    }
+
+.scroll-controls {
+  position: fixed;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.search-bar {
+  position: fixed;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+
+    .button {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 8px 14px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background 0.3s ease, transform 0.2s ease;
+      pointer-events: auto;
+      font-size: 14px;
+      color: white;
+    }
+
+    .button:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: scale(1.05);
+    }
+
+    input[type="text"] {
+      padding: 6px 10px;
+      border-radius: 5px;
+      border: none;
+      width: 200px;
+      font-size: 14px;
+    }
+
+    .page-indicator {
+      position: absolute;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    #match-info {
+      position: absolute;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 14px;
+      opacity: 0.8;
+    }
+   
+ .back-icon {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background-color: #151c29; 
+  color: white;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.back-icon:hover {
+  background-color: #000000;
+}
+
+.back-icon::before {
+  content: "←";
+  font-size: 18px;
+  margin-right: 8px;
+}
+
+  </style>
+</head>
+<body>
+  <a href="{{ url_for('dashboard') }}" class="back-icon">Back</a>
+  <div class="pdf-container">
+    <div class="pdf-layer-wrapper" id="pdf-wrapper">
+      <canvas id="pdf-render"></canvas>
+      <div class="textLayer" id="text-layer"></div>
+    </div>
+    <div class="controls">
+      <div class="button" id="prev-page">Prev</div>
+      <div class="button" id="next-page">Next</div>
+    </div>
+    <div class="zoom-controls">
+      <div class="button" id="zoom-in">+</div>
+      <div class="button" id="zoom-out">-</div>
+    </div>
+<div class="search-bar">
+  <input type="text" id="searchInput" placeholder="Search text..." />
+  <div class="button" id="searchBtn">Search</div>
+  <div class="button" id="scroll-up">▲</div>
+  <div class="button" id="scroll-down">▼</div>
+</div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
+  <script>
+    const url = '/static/tutorial.pdf';
+    const pdfjsLib = window['pdfjs-dist/build/pdf'];
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.worker.min.js';
+
+    let pdfDoc = null,
+        pageNum = 1,
+        scale = 1.5,
+        scrollOffset = 0,
+        canvas = document.getElementById('pdf-render'),
+        ctx = canvas.getContext('2d'),
+        textLayerDiv = document.getElementById('text-layer'),
+        matches = [],
+        currentMatchIndex = 0;
+
+    const renderPage = async (num) => {
+      const page = await pdfDoc.getPage(num);
+      const viewport = page.getViewport({ scale });
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+      textLayerDiv.style.width = `${viewport.width}px`;
+      textLayerDiv.style.height = `${viewport.height}px`;
+
+      const renderCtx = {
+        canvasContext: ctx,
+        viewport
+      };
+
+      await page.render(renderCtx).promise;
+
+      const textContent = await page.getTextContent();
+      textLayerDiv.innerHTML = '';
+      pdfjsLib.renderTextLayer({
+        textContent,
+        container: textLayerDiv,
+        viewport,
+        textDivs: []
+      });
+
+      document.getElementById('page-info').textContent = `Page ${num} of ${pdfDoc.numPages}`;
+      highlightMatches();
+    };
+
+    const queueRenderPage = (num) => {
+      pageNum = num;
+      renderPage(num);
+    };
+
+    const showPrevPage = () => {
+      if (pageNum <= 1) return;
+      pageNum--;
+      queueRenderPage(pageNum);
+    };
+
+    const showNextPage = () => {
+      if (pageNum >= pdfDoc.numPages) return;
+      pageNum++;
+      queueRenderPage(pageNum);
+    };
+
+    const zoomIn = () => {
+      scale += 0.2;
+      centerZoom(scale);  // Центрируем зум
+      renderPage(pageNum);  // Перерисовываем страницу с новым зумом
+    };
+
+    const zoomOut = () => {
+      if (scale > 0.5) {
+        scale -= 0.2;
+        centerZoom(scale);  // Центрируем зум
+        renderPage(pageNum);  // Перерисовываем страницу с новым зумом
+      }
+    };
+
+    const centerZoom = (scale) => {
+      const pdfWrapper = document.getElementById('pdf-wrapper');
+      pdfWrapper.style.transform = `scale(${scale})`;  // Применяем зум к контейнеру
+      const wrapperRect = pdfWrapper.getBoundingClientRect();
+      const windowWidth = window.innerWidth;
+      const windowHeight = window.innerHeight;
+
+      // Центрируем контейнер
+      const offsetX = (windowWidth - wrapperRect.width) / 2;
+      const offsetY = (windowHeight - wrapperRect.height) / 2;
+
+      pdfWrapper.style.transformOrigin = `${(offsetX / windowWidth) * 100}% ${(offsetY / windowHeight) * 100}%`;
+    };
+
+    const scrollPage = (direction) => {
+      scrollOffset += direction * 100; // Сдвиг на 100px
+      const pdfWrapper = document.getElementById('pdf-wrapper');
+      pdfWrapper.style.transform = `translateY(${scrollOffset}px)`;
+    };
+
+    const searchInDocument = async (term) => {
+      matches = [];
+      currentMatchIndex = 0;
+      for (let i = 1; i <= pdfDoc.numPages; i++) {
+        const page = await pdfDoc.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map(item => item.str).join(' ');
+        const regex = new RegExp(term, 'gi');
+        let result;
+        while ((result = regex.exec(pageText)) !== null) {
+          matches.push({ page: i, match: result[0] });
+        }
+      }
+      if (matches.length > 0) {
+        pageNum = matches[0].page;
+        queueRenderPage(pageNum);
+        updateMatchInfo();
+      } else {
+        document.getElementById('match-info').textContent = 'No matches found';
+      }
+    };
+
+    const updateMatchInfo = () => {
+      if (matches.length > 0) {
+        document.getElementById('match-info').textContent = `Match ${currentMatchIndex + 1} of ${matches.length}`;
+      } else {
+        document.getElementById('match-info').textContent = '';
+      }
+    };
+
+    const highlightMatches = () => {
+      const term = document.getElementById('searchInput').value.trim();
+      if (!term) return;
+
+      const regex = new RegExp(term, 'gi');
+      document.querySelectorAll('.textLayer div').forEach(span => {
+        if (regex.test(span.textContent)) {
+          span.classList.add('highlight');
+        }
+      });
+    };
+
+    document.getElementById('prev-page').addEventListener('click', showPrevPage);
+    document.getElementById('next-page').addEventListener('click', showNextPage);
+    document.getElementById('zoom-in').addEventListener('click', zoomIn);
+    document.getElementById('zoom-out').addEventListener('click', zoomOut);
+
+document.getElementById('searchBtn').addEventListener('click', () => {
+  const searchTerm = document.getElementById('searchInput').value.trim();
+  if (searchTerm) {
+    searchInDocument(searchTerm);
+  }
+});
+
+document.getElementById('searchInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    document.getElementById('searchBtn').click();
+  }
+});
+
+
+    document.getElementById('scroll-up').addEventListener('click', () => {
+      scrollPage(1);
+    });
+
+    document.getElementById('scroll-down').addEventListener('click', () => {
+      scrollPage(-1);
+    });
+
+    // Обработчик события колесика мыши
+    window.addEventListener('wheel', (e) => {
+      if (e.ctrlKey) {
+        // Зум колесиком мыши
+        e.preventDefault();
+        if (e.deltaY < 0) {
+          zoomIn();
+        } else {
+          zoomOut();
+        }
+      } else {
+        // Прокрутка страницы колесиком мыши
+        e.preventDefault();
+        scrollPage(e.deltaY < 0 ? 1 : -1);
+      }
+    });
+
+    (async () => {
+      pdfDoc = await pdfjsLib.getDocument(url).promise;
+      renderPage(pageNum);
+    })();
+
+window.addEventListener('keydown', (event) => {
+  switch (event.key) {
+    case 'ArrowLeft':
+    case 'PageUp':
+      showPrevPage();
+      break;
+    case 'ArrowRight':
+    case 'PageDown':
+      showNextPage();
+      break;
+    case '+':
+    case '=':
+      zoomIn();
+      break;
+    case '-':
+      zoomOut();
+      break;
+  }
+});
+
+
+  </script>
+</body>
+</html>
