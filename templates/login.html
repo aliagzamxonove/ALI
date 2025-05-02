@@ -10,7 +10,6 @@
     function togglePassword() {
       const passwordField = document.getElementById('password');
       const toggleButton = document.querySelector('.password-toggle');
-      
       if (passwordField.type === 'password') {
         passwordField.type = 'text';
         toggleButton.textContent = 'Hide';
@@ -35,27 +34,25 @@
     }
   </script>
   <style>
-    /* Button Style */
     .password-toggle {
-      background-color: transparent; /* No background */
-      color: #003366; /* Dark blue color */
+      background-color: transparent;
+      color: #003366;
       padding: 0;
       font-size: 14px;
       cursor: pointer;
-      border: none; /* No border */
-      outline: none; /* No outline on focus */
-      transition: color 0.3s ease; /* Smooth color transition */
+      border: none;
+      outline: none;
+      transition: color 0.3s ease;
     }
 
     .password-toggle:hover {
-      color: #00509e; /* Lighter blue on hover */
+      color: #00509e;
     }
 
     .password-toggle:focus {
-      outline: none; /* Ensure no outline appears on focus */
+      outline: none;
     }
 
-    /* Flash message styling */
     .flashes {
       color: red;
       font-size: 14px;
@@ -66,14 +63,34 @@
     .flashes li {
       margin-bottom: 10px;
     }
+
+    .login-logo {
+      display: block;
+      margin: 0 auto 10px auto;
+      width: 50px;
+      height: auto;
+    }
+
+    .login-heading {
+      text-align: center;
+      font-size: 22px;
+      color: white;
+      margin-top: 15px;
+      margin-bottom: 15px;
+      font-family: 'Inter', sans-serif;
+    }
   </style>
 </head>
 <body>
   <div class="login-container">
     <div class="login-box">
-      <h2>Login</h2>
+      <!-- Логотип -->
+      <img src="{{ url_for('static', filename='IFTA5458.png') }}" alt="IFTA Logo" class="login-logo" />
 
-      <!-- Display Flash Messages -->
+      <!-- Заголовок под логотипом -->
+      <div class="login-heading">Log in to your Account</div>
+
+      <!-- Flash messages -->
       {% with messages = get_flashed_messages() %}
         {% if messages %}
           <ul class="flashes">
@@ -85,13 +102,11 @@
       {% endwith %}
 
       <form method="POST" autocomplete="off">
-        <!-- Username Input -->
         <div class="input-group">
           <label for="username">Username</label>
           <input type="text" name="username" id="username" class="input-field" required placeholder="Enter your username" />
         </div>
 
-        <!-- Password Input -->
         <div class="input-group">
           <label for="password">Password</label>
           <div class="password-container">
@@ -105,7 +120,6 @@
     </div>
   </div>
 
-  <!-- Theme Toggle -->
   <button onclick="toggleTheme()" class="theme-toggle-btn" aria-label="Toggle Theme">Toggle Theme</button>
 </body>
 </html>
