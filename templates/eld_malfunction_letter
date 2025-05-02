@@ -1,0 +1,141 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ELD Malfunction Letter Generator</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  <link rel="icon" href="{{ url_for('static', filename='IFTA5458.png') }}" type="image/png" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <a href="{{ url_for('dashboard') }}" class="back-icon">Back</a>
+      <img src="{{ url_for('static', filename='IFTA5458.png') }}" alt="Logo" class="header-logo">
+      <h1>ELD Malfunction Confirmation Letter Generator</h1>
+    </header>
+
+    <!-- Cleaned form without file upload -->
+    <form id="eld-malfunction-form" action="{{ url_for('eld_malfunction_letter') }}" method="POST" target="_blank">
+      <div class="input-group">
+        <label for="company">Company Name:</label>
+        <input type="text" id="company" name="company_name" required placeholder="Enter your company name" />
+      </div>
+
+      <div class="input-group">
+        <label for="dot_number">DOT Number:</label>
+        <input type="text" id="dot_number" name="dot_number" required placeholder="Enter your DOT number" />
+      </div>
+
+      <div class="input-group">
+        <label for="driver_name">Driver Name:</label>
+        <input type="text" id="driver_name" name="driver_name" required placeholder="Enter the driver's name" />
+      </div>
+
+      <div class="input-group">
+        <label for="malfunction_date">Malfunction Date:</label>
+        <input type="date" id="malfunction_date" name="malfunction_date" required />
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="primary-btn">Generate Letter</button>
+      </div>
+    </form>
+  </div>
+
+  <style>
+    .header-logo {
+      display: block;
+      margin: 0 auto 10px;
+      width: 60px;
+      height: auto;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-top: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: black;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+    }
+
+    .input-group label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+      background-color: #fff;
+    }
+
+    .input-group input[type="date"] {
+      padding: 8px;
+      font-family: 'Segoe UI', Tahoma
+    }
+
+    .form-actions {
+      text-align: center;
+    }
+
+    .primary-btn {
+      padding: 12px 30px;
+      font-size: 1.1rem;
+      background-color: #223b60;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .primary-btn:hover {
+      background-color: #202f45;
+    }
+
+    .back-icon {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background-color: #151c29; 
+  color: white;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.back-icon:hover {
+  background-color: #000000;
+}
+
+.back-icon::before {
+  content: "←";
+  font-size: 18px;
+  margin-right: 8px;
+}
+
+  </style>
+</body>
+</html>
