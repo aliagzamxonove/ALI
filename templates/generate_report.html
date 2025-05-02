@@ -8,8 +8,10 @@
   <link rel="icon" href="{{ url_for('static', filename='IFTA5458.png') }}" type="image/png" />
 </head>
 <body>
+  <a href="{{ url_for('dashboard') }}" class="back-icon">Back</a>
   <div class="container">
     <header>
+<img src="{{ url_for('static', filename='IFTA5458.png') }}" alt="IFTA Logo" class="header-logo">
       <h1>IFTA Mileage Report Generator</h1>
     </header>
 
@@ -104,5 +106,42 @@
       totalMileageInput.value = total.toFixed(2);
     });
   </script>
+ <style> 
+
+.back-icon {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background-color: #151c29; 
+  color: white;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.back-icon:hover {
+  background-color: #000000;
+}
+
+.back-icon::before {
+  content: "←";
+  font-size: 18px;
+  margin-right: 8px;
+}
+
+
+
+.header-logo {
+  display: block;
+  margin: 0 auto 10px auto;
+  width: 60px;
+  height: auto;
+}
+
+  </style>
 </body>
 </html>
