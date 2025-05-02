@@ -127,70 +127,73 @@ def generate_report():
 
     return render_template('generate_report.html')
 
-@app.route('/eld_malfunction_letter', methods=['GET', 'POST'])
+@app.route('/eld-malfunction-letter', methods=['GET', 'POST'])
 def eld_malfunction_letter():
     if request.method == 'GET':
+        # Render the form on GET request
         return render_template('eld_malfunction_letter.html')
 
-    company = request.form['company_name']
-    dot_number = request.form['dot_number']
-    driver_name = request.form['driver_name']
-    malfunction_date = request.form['malfunction_date']
+    # Handle POST request here
+    if request.method == 'POST':
+        company = request.form['company_name']
+        dot_number = request.form['dot_number']
+        driver_name = request.form['driver_name']
+        malfunction_date = request.form['malfunction_date']
 
-    output_dir = 'generated_files'
-    os.makedirs(output_dir, exist_ok=True)
+        output_dir = 'generated_files'
+        os.makedirs(output_dir, exist_ok=True)
 
-    class StyledPDF(FPDF):
-        def header(self):
-            if self.page_no() == 1:
-                logo_path = os.path.join('static', 'logo.png')
-                if os.path.exists(logo_path):
-                    self.image(logo_path, x=60, y=10, w=90)
-                self.ln(40)
-            self.set_font("DejaVu", "B", 16)
-            self.cell(0, 10, "ELD MALFUNCTION CONFIRMATION", 0, 1, 'C')
-            self.ln(5)
+        class StyledPDF(FPDF):
+            def header(self):
+                if self.page_no() == 1:
+                    logo_path = os.path.join('static', 'logo.png')
+                    if os.path.exists(logo_path):
+                        self.image(logo_path, x=60, y=10, w=90)
+                    self.ln(40)
+                self.set_font("DejaVu", "B", 16)
+                self.cell(0, 10, "ELD MALFUNCTION CONFIRMATION", 0, 1, 'C')
+                self.ln(5)
 
-        def footer(self):
-            self.set_y(-15)
-            self.set_font("DejaVu", "I", 8)
-            self.cell(0, 10, f"Page {self.page_no()}", 0, 0, 'C')
+            def footer(self):
+                self.set_y(-15)
+                self.set_font("DejaVu", "I", 8)
+                self.cell(0, 10, f"Page {self.page_no()}", 0, 0, 'C')
 
-        def chapter_body(self, body, bold_phrases=None):
-            self.set_font("DejaVu", "", 12)
-            if not bold_phrases:
-                self.multi_cell(0, 10, body)
-                return
-            parts = [body]
-            for phrase in bold_phrases:
-                temp = []
+            def chapter_body(self, body, bold_phrases=None):
+                self.set_font("DejaVu", "", 12)
+                if not bold_phrases:
+                    self.multi_cell(0, 10, body)
+                    return
+                parts = [body]
+                for phrase in bold_phrases:
+                    temp = []
+                    for part in parts:
+                        if phrase in part:
+                            before, after = part.split(phrase, 1)
+                            temp.extend([before, phrase, after])
+                        else:
+                            temp.append(part)
+                    parts = temp
                 for part in parts:
-                    if phrase in part:
-                        before, after = part.split(phrase, 1)
-                        temp.extend([before, phrase, after])
+                    if part in bold_phrases:
+                        self.set_font("DejaVu", "B", 12)
+                        self.write(10, part)
+                        self.set_font("DejaVu", "", 12)
                     else:
-                        temp.append(part)
-                parts = temp
-            for part in parts:
-                if part in bold_phrases:
-                    self.set_font("DejaVu", "B", 12)
-                    self.write(10, part)
-                    self.set_font("DejaVu", "", 12)
-                else:
-                    self.write(10, part)
-            self.ln(10)
+                        self.write(10, part)
+                self.ln(10)
 
-    font_path = os.path.join('static', 'fonts', 'DejaVuSans.ttf')
-    pdf = StyledPDF()
-    pdf.add_font('DejaVu', '', font_path, uni=True)
-    pdf.add_font('DejaVu', 'B', font_path, uni=True)
-    pdf.add_font('DejaVu', 'I', font_path, uni=True)
-    pdf.set_font('DejaVu', '', 12)
-    pdf.add_page()
+        font_path = os.path.join('static', 'fonts', 'DejaVuSans.ttf')
+        pdf = StyledPDF()
+        pdf.add_font('DejaVu', '', font_path, uni=True)
+        pdf.add_font('DejaVu', 'B', font_path, uni=True)
+        pdf.add_font('DejaVu', 'I', font_path, uni=True)
+        pdf.set_font('DejaVu', '', 12)
+        pdf.add_page()
 
-    # First page
-    pdf.chapter_body(
-        f"""To whom it may concern,
+        # First page
+        pdf.chapter_body(
+            f"""To whom it may concern,
 
 This letter confirms that the ELD system is currently in malfunction. We are aware of the issue and are working to resolve it.
 
@@ -200,48 +203,47 @@ Driver Name: {driver_name}
 
 In accordance with 49 CFR 395.8, until the ELD is serviced and back in compliance, the driver has been allowed to use paper logs for no more than 8 days. The recording of the driver’s hours of service on a paper log begins on {malfunction_date}.
 """,
-        bold_phrases=["49 CFR 395.8", "paper logs for no more than 8 days."]
-    )
+            bold_phrases=["49 CFR 395.8", "paper logs for no more than 8 days."]
+        )
 
-    pdf.ln(10)
-    pdf.set_font("DejaVu", "", 12)
-    y_before = pdf.get_y()
-    pdf.cell(90, 10, "LUCID ELD Manager, Sukhrobbek Usmonov", ln=0)
-    if os.path.exists('static/manager_signature.png'):
-        try:
-            pdf.image('static/manager_signature.png', x=120, y=y_before, w=50)
-        except Exception as e:
-            print("Signature load error:", e)
-    pdf.ln(25)
-    pdf.cell(0, 10, f"Given date: {malfunction_date}", ln=True)
+        pdf.ln(10)
+        pdf.set_font("DejaVu", "", 12)
+        y_before = pdf.get_y()
+        pdf.cell(90, 10, "LUCID ELD Manager, Sukhrobbek Usmonov", ln=0)
+        if os.path.exists('static/manager_signature.png'):
+            try:
+                pdf.image('static/manager_signature.png', x=120, y=y_before, w=50)
+            except Exception as e:
+                print("Signature load error:", e)
+        pdf.ln(25)
+        pdf.cell(0, 10, f"Given date: {malfunction_date}", ln=True)
 
-    # Second page
-    pdf.add_page()
-    pdf.chapter_body("If an ELD malfunctions, a driver must:")
-    pdf.chapter_body(
-        """- Note the malfunction of the ELD and provide written notice of the malfunction to the motor carrier within 24 hours;
+        # Second page
+        pdf.add_page()
+        pdf.chapter_body("If an ELD malfunctions, a driver must:")
+        pdf.chapter_body(
+            """- Note the malfunction of the ELD and provide written notice of the malfunction to the motor carrier within 24 hours;
 - Reconstruct the record of duty status (RODS) for the current 24-hour period and the previous 7 consecutive days, and record the records of duty status on graph-grid paper logs that comply with 49 CFR 395.8, unless the driver already has the records or retrieves them from the ELD;
 - Continue to manually prepare RODS in accordance with 49 CFR 395.8 until the ELD is serviced and back in compliance.
 
-In compliance with the above-mentioned USDOT rules and regulations, I ________________ certify that all information provided by me is true and correct to the best of my knowledge, and that I notified the company Safety Department of an ELD malfunction within 24-hours.
+In compliance with the above-mentioned USDOT rules and regulations, I ______ certify that all information provided by me is true and correct to the best of my knowledge, and that I notified the company Safety Department of an ELD malfunction within 24-hours.
 
 The reason of malfunction was:
 ☐ Device (Tablet) is powered off and cannot be recharged and is not working properly;
 ☐ ELD device does not show any lights when connected to diagnostic port or shows power off;
 ☐ ELD Device not reporting any information with Device (Tablet) when connected to the Truck;
 
-Driver Printed Name: ____________________     Signature: ________________     Date: ____________     Time: ___________
+Driver Printed Name: ________     Signature: ________     Date: ________     Time: ________
 """,
-        bold_phrases=[
-            "within 24 hours", "49 CFR 395.8", "paper logs", "Driver Printed Name", "Signature", "Date", "Time"
-        ]
-    )
+            bold_phrases=[
+                "within 24 hours", "49 CFR 395.8", "paper logs", "Driver Printed Name", "Signature", "Date", "Time"
+            ]
+        )
 
-    output_path = os.path.join(output_dir, 'eld_malfunction_letter.pdf')
-    pdf.output(output_path)
+        output_path = os.path.join(output_dir, 'eld_malfunction_letter.pdf')
+        pdf.output(output_path)
 
-    return send_file(output_path, mimetype='application/pdf', as_attachment=True, download_name='ELD_Malfunction_Letter.pdf')
-
+        return send_file(output_path, mimetype='application/pdf', as_attachment=True, download_name='ELD_Malfunction_Letter.pdf')
 
 
 @app.route('/timezones')
