@@ -6,23 +6,167 @@
   <title>Dashboard - IFTA Report Generator</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
   <link rel="icon" href="{{ url_for('static', filename='IFTA5458.png') }}" type="image/png" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #1f1f1f;
+      color: #ecf0f1;
+      text-align: center;
+    }
+
+    .dashboard-container {
+      padding: 0 20px;
+    }
+
+    /* Welcome Message Styling */
+    header h1.welcome-message {
+      font-size: 2rem;
+      font-weight: 600;
+      margin-top: 40px;
+      margin-bottom: 40px;
+    }
+
+    /* Dashboard Buttons */
+    .dashboard-buttons {
+      text-align: center;
+      margin-top: 80px;
+      position: relative;
+    }
+
+    .dashboard-btn {
+      position: relative;
+      background-color: #1f6f8b;
+      color: white;
+      font-size: 18px;
+      padding: 14px 32px;
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: 600;
+      z-index: 1;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .dashboard-btn::before {
+      content: "";
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      right: -10px;
+      bottom: -10px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      z-index: -1;
+    }
+
+    .dashboard-btn:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 12px rgba(31, 111, 139, 0.5);
+    }
+
+    /* Logout Button */
+    #logoutBtn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background-color: #B84E4E;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    #logoutBtn:hover {
+      background-color: #A13F3F;
+    }
+
+    /* Modal Styling */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      overflow: auto;
+      padding-top: 60px;
+    }
+
+    .modal-content {
+      background-color: #222;
+      margin: 5% auto;
+      padding: 24px;
+      border: 1px solid #888;
+      width: 90%;
+      max-width: 360px;
+      border-radius: 10px;
+      animation: fadeIn 0.3s ease-in-out;
+      box-shadow: 0 0 18px rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content h2 {
+      color: #ecf0f1;
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+    }
+
+    .modal-content p {
+      color: #ecf0f1;
+      font-size: 1rem;
+      margin-bottom: 20px;
+    }
+
+    .modal-buttons {
+      text-align: center;
+    }
+
+    .modal-btn {
+      background-color: #1f6f8b;
+      color: white;
+      font-size: 16px;
+      padding: 10px 20px;
+      margin: 8px;
+      border-radius: 6px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      min-width: 120px;
+    }
+
+    .modal-btn:hover {
+      background-color: #1a5678;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 <body>
   <div class="dashboard-container">
-    <!-- Header with the welcome message -->
+
+    <!-- Welcome Header -->
     <header>
       <h1 class="welcome-message">Welcome, {{ username }}!</h1>
     </header>
 
-    <!-- Button for generating a report -->
+    <!-- Dashboard Buttons -->
     <div class="dashboard-buttons">
-      <a href="{{ url_for('generate_report') }}" class="btn dashboard-btn">Generate Report</a>
-    </div>
-
-    <!-- Button for logging out, positioned at the top-right -->
+      <a href="{{ url_for('generate_report') }}" class="btn dashboard-btn">Generate IFTA Report</a>
+      <a href="{{ url_for('eld_malfunction_letter') }}" class="btn dashboard-btn">ELD Malfunction Letter</a>
+      <a href="{{ url_for('tutorial') }}" class="btn dashboard-btn">Tutorial Viewer</a>
+      <a href="{{ url_for('timezones') }}" class="btn dashboard-btn">Time Zones</a>
+    </div> 
+                    
+    <!-- Logout Button -->
     <a id="logoutBtn" class="btn logout-btn" aria-label="Logout">Logout</a>
 
-    <!-- Pop-up Modal for Confirming Logout -->
+    <!-- Logout Confirmation Modal -->
     <div id="logoutModal" class="modal" aria-labelledby="logoutModalLabel" aria-describedby="logoutModalDescription">
       <div class="modal-content">
         <h2 id="logoutModalLabel">Confirm Logout</h2>
@@ -33,25 +177,22 @@
         </div>
       </div>
     </div>
+
   </div>
 
   <script>
-    // Open the logout confirmation modal when the Logout button is clicked
     document.getElementById('logoutBtn').addEventListener('click', function() {
       document.getElementById('logoutModal').style.display = 'block';
     });
 
-    // Close the modal if the Cancel button is clicked
     document.getElementById('cancelLogout').addEventListener('click', function() {
       document.getElementById('logoutModal').style.display = 'none';
     });
 
-    // Perform logout if the Yes button is clicked
     document.getElementById('confirmLogout').addEventListener('click', function() {
       window.location.href = "{{ url_for('logout') }}";
     });
 
-    // Close the modal if the user clicks outside of it
     window.onclick = function(event) {
       var modal = document.getElementById('logoutModal');
       if (event.target == modal) {
