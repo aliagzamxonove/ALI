@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -12,8 +12,44 @@
       font-family: 'Segoe UI', sans-serif;
       overflow: hidden;
       color: white;
-      height: 100vh; /* Обеспечиваем, чтобы body заполняло весь экран */
+      height: 100vh;
     }
+
+.back-icon {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background-color: #151c29;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+  outline: none; /* Remove default outline */
+}
+
+.back-icon:hover {
+  background-color: #000000;
+  transform: scale(1.05); /* Slight scale up effect */
+}
+
+.back-icon:focus {
+  outline: 2px solid #fff; /* White outline when focused */
+  background-color: #2c3e50; /* Slightly different background color on focus */
+}
+
+.back-icon:active {
+  transform: scale(0.98); /* Slight scale down effect when clicked */
+}
+
+.back-icon::before {
+  content: "←";
+  font-size: 18px;
+  margin-right: 8px;
+}
 
     .pdf-container {
       position: relative;
@@ -29,6 +65,8 @@
       display: inline-block;
       transform-origin: center center;
       transition: transform 0.3s ease;
+      overflow-y: auto; 
+      max-height: 100vh;
     }
 
     canvas {
@@ -63,7 +101,6 @@
       justify-content: space-between;
       padding: 0 20px;
       transform: translateY(-50%);
-      pointer-events: none;
     }
 
     .zoom-controls {
@@ -71,20 +108,12 @@
       right: 20px;
     }
 
-.scroll-controls {
-  position: fixed;
-  bottom: 60px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.search-bar {
-  position: fixed;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
+    .search-bar {
+      position: fixed;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
 
     .button {
       background: rgba(255, 255, 255, 0.05);
@@ -93,7 +122,6 @@
       cursor: pointer;
       border-radius: 8px;
       transition: background 0.3s ease, transform 0.2s ease;
-      pointer-events: auto;
       font-size: 14px;
       color: white;
     }
@@ -119,64 +147,31 @@
       font-size: 14px;
       opacity: 0.8;
     }
-
-    #match-info {
-      position: absolute;
-      bottom: 90px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 14px;
-      opacity: 0.8;
-    }
-   
- .back-icon {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  background-color: #151c29; 
-  color: white;
-  padding: 10px 20px;
-  border-radius: 12px;
-  font-weight: 600;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  transition: all 0.3s ease;
-}
-
-.back-icon:hover {
-  background-color: #000000;
-}
-
-.back-icon::before {
-  content: "←";
-  font-size: 18px;
-  margin-right: 8px;
-}
-
   </style>
 </head>
 <body>
+  <!-- Back button -->
   <a href="{{ url_for('dashboard') }}" class="back-icon">Back</a>
+
   <div class="pdf-container">
     <div class="pdf-layer-wrapper" id="pdf-wrapper">
       <canvas id="pdf-render"></canvas>
       <div class="textLayer" id="text-layer"></div>
     </div>
     <div class="controls">
-      <div class="button" id="prev-page">Prev</div>
-      <div class="button" id="next-page">Next</div>
+      <button class="button" id="prev-page">← Prev</button>
+      <button class="button" id="next-page">Next →</button>
     </div>
     <div class="zoom-controls">
-      <div class="button" id="zoom-in">+</div>
-      <div class="button" id="zoom-out">-</div>
+      <button class="button" id="zoom-in">+</button>
+      <button class="button" id="zoom-out">-</button>
     </div>
-<div class="search-bar">
-  <input type="text" id="searchInput" placeholder="Search text..." />
-  <div class="button" id="searchBtn">Search</div>
-  <div class="button" id="scroll-up">▲</div>
-  <div class="button" id="scroll-down">▼</div>
-</div>
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search text..." />
+      <button class="button" id="searchBtn">Search</button>
+      <button class="button" id="prev-match">Prev Match</button>
+      <button class="button" id="next-match">Next Match</button>
+    </div>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
@@ -188,7 +183,6 @@
     let pdfDoc = null,
         pageNum = 1,
         scale = 1.5,
-        scrollOffset = 0,
         canvas = document.getElementById('pdf-render'),
         ctx = canvas.getContext('2d'),
         textLayerDiv = document.getElementById('text-layer'),
@@ -242,36 +236,14 @@
 
     const zoomIn = () => {
       scale += 0.2;
-      centerZoom(scale);  // Центрируем зум
-      renderPage(pageNum);  // Перерисовываем страницу с новым зумом
+      renderPage(pageNum);
     };
 
     const zoomOut = () => {
       if (scale > 0.5) {
         scale -= 0.2;
-        centerZoom(scale);  // Центрируем зум
-        renderPage(pageNum);  // Перерисовываем страницу с новым зумом
+        renderPage(pageNum);
       }
-    };
-
-    const centerZoom = (scale) => {
-      const pdfWrapper = document.getElementById('pdf-wrapper');
-      pdfWrapper.style.transform = `scale(${scale})`;  // Применяем зум к контейнеру
-      const wrapperRect = pdfWrapper.getBoundingClientRect();
-      const windowWidth = window.innerWidth;
-      const windowHeight = window.innerHeight;
-
-      // Центрируем контейнер
-      const offsetX = (windowWidth - wrapperRect.width) / 2;
-      const offsetY = (windowHeight - wrapperRect.height) / 2;
-
-      pdfWrapper.style.transformOrigin = `${(offsetX / windowWidth) * 100}% ${(offsetY / windowHeight) * 100}%`;
-    };
-
-    const scrollPage = (direction) => {
-      scrollOffset += direction * 100; // Сдвиг на 100px
-      const pdfWrapper = document.getElementById('pdf-wrapper');
-      pdfWrapper.style.transform = `translateY(${scrollOffset}px)`;
     };
 
     const searchInDocument = async (term) => {
@@ -298,7 +270,7 @@
 
     const updateMatchInfo = () => {
       if (matches.length > 0) {
-        document.getElementById('match-info').textContent = `Match ${currentMatchIndex + 1} of ${matches.length}`;
+        document.getElementById('searchInput').value = `Search text... (${currentMatchIndex + 1} of ${matches.length})`;
       } else {
         document.getElementById('match-info').textContent = '';
       }
@@ -316,77 +288,63 @@
       });
     };
 
+    const goToNextMatch = () => {
+      if (matches.length === 0) return;
+      currentMatchIndex = (currentMatchIndex + 1) % matches.length;
+      const match = matches[currentMatchIndex];
+      pageNum = match.page;
+      queueRenderPage(pageNum);
+      updateMatchInfo();
+    };
+
+    const goToPrevMatch = () => {
+      if (matches.length === 0) return;
+      currentMatchIndex = (currentMatchIndex - 1 + matches.length) % matches.length;
+      const match = matches[currentMatchIndex];
+      pageNum = match.page;
+      queueRenderPage(pageNum);
+      updateMatchInfo();
+    };
+
+    // Button event listeners
     document.getElementById('prev-page').addEventListener('click', showPrevPage);
     document.getElementById('next-page').addEventListener('click', showNextPage);
     document.getElementById('zoom-in').addEventListener('click', zoomIn);
     document.getElementById('zoom-out').addEventListener('click', zoomOut);
+    document.getElementById('searchBtn').addEventListener('click', () => searchInDocument(document.getElementById('searchInput').value.trim()));
+    document.getElementById('prev-match').addEventListener('click', goToPrevMatch);
+    document.getElementById('next-match').addEventListener('click', goToNextMatch);
 
-document.getElementById('searchBtn').addEventListener('click', () => {
-  const searchTerm = document.getElementById('searchInput').value.trim();
-  if (searchTerm) {
-    searchInDocument(searchTerm);
-  }
-});
-
-document.getElementById('searchInput').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    e.preventDefault();
-    document.getElementById('searchBtn').click();
-  }
-});
-
-
-    document.getElementById('scroll-up').addEventListener('click', () => {
-      scrollPage(1);
-    });
-
-    document.getElementById('scroll-down').addEventListener('click', () => {
-      scrollPage(-1);
-    });
-
-    // Обработчик события колесика мыши
-    window.addEventListener('wheel', (e) => {
-      if (e.ctrlKey) {
-        // Зум колесиком мыши
-        e.preventDefault();
-        if (e.deltaY < 0) {
-          zoomIn();
-        } else {
-          zoomOut();
-        }
-      } else {
-        // Прокрутка страницы колесиком мыши
-        e.preventDefault();
-        scrollPage(e.deltaY < 0 ? 1 : -1);
+    // Trigger search with Enter key
+    document.getElementById('searchInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        searchInDocument(document.getElementById('searchInput').value.trim());
       }
     });
 
-    (async () => {
-      pdfDoc = await pdfjsLib.getDocument(url).promise;
-      renderPage(pageNum);
-    })();
+    // Handle mouse wheel scroll (up/down)
+    window.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      if (e.deltaY > 0) {
+        document.getElementById('pdf-wrapper').scrollTop += 30; 
+      } else {
+        document.getElementById('pdf-wrapper').scrollTop -= 30; 
+      }
+    });
 
-window.addEventListener('keydown', (event) => {
-  switch (event.key) {
-    case 'ArrowLeft':
-    case 'PageUp':
-      showPrevPage();
-      break;
-    case 'ArrowRight':
-    case 'PageDown':
-      showNextPage();
-      break;
-    case '+':
-    case '=':
-      zoomIn();
-      break;
-    case '-':
-      zoomOut();
-      break;
-  }
-});
+    // Handle keyboard navigation (left/right arrow keys)
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') {
+        showPrevPage();
+      } else if (e.key === 'ArrowRight') {
+        showNextPage();
+      }
+    });
 
-
+    pdfjsLib.getDocument(url).promise.then(doc => {
+      pdfDoc = doc;
+      queueRenderPage(pageNum);
+    });
   </script>
 </body>
 </html>
