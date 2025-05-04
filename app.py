@@ -17,11 +17,11 @@ USER_CREDENTIALS = {
 }
 
 # Configure Flask-Mail
-app.config['MAIL_SERVER'] = 'smtp.example.com'  # Replace with your SMTP server
+app.config['MAIL_SERVER'] = 'smtp-mail.outlook.com'  # Replace with your SMTP server
 app.config['MAIL_PORT'] = 587  # Replace with your SMTP server port
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'your_email@example.com'  # Your email here
-app.config['MAIL_PASSWORD'] = 'your_email_password'  # Your email password here
+app.config['MAIL_USERNAME'] = 'adamlucideld@outlook.com' # Your email here
+app.config['MAIL_PASSWORD'] = 'Lucid2025Eld!'  # Your email password here
 mail = Mail(app)
 
 @app.route('/')
