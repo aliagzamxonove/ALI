@@ -29,6 +29,7 @@ def login():
         password = request.form['password']
         if username == USER_CREDENTIALS['username'] and hashlib.sha256(password.encode()).hexdigest() == USER_CREDENTIALS['password']:
             session['username'] = username
+            print("Login successful, redirecting to dashboard")  # Debug log
             return redirect(url_for('dashboard'))
         else:
             flash('Invalid credentials, please try again.', 'error')
