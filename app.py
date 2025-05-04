@@ -300,13 +300,9 @@ def timezones():
 def tutorial():
     return render_template("tutorial.html")
 
-@app.route('/mail')
-def mail():
-    return render_template('mail.html')
-
 # Отправка email
-@app.route('/send_email', methods=['POST'])
-def send_email():
+@app.route('/mail', methods=['POST'])
+def mail():
     # Получаем данные из формы
     email = request.form['email']
     email_type = request.form['email_type']
@@ -444,6 +440,16 @@ def send_email():
             else:
                 print(f"File {file} not found!")
 
+    # Получаем файлы для IFTA
+    if email_type == "ifta":
+        ifta_files = request.files.getlist("ifta_files")
+        for file in ifta_files:
+            if file:
+                # Сохраняем файлы в папку загрузки
+                file_path = os.path.join(UPLOAD_FOLDER, file.filename)
+                file.save(file_path)
+                full_files.append(file_path)
+    
     # Отправка email
     try:
         # Создаем объект сообщения
@@ -455,13 +461,12 @@ def send_email():
         # Добавляем текст в сообщение
         msg.attach(MIMEText(message, 'plain'))
 
-        # Прикрепляем файлы, если это инструкция
-        if email_type == "instructions":
-            for file in full_files:
-                with open(file, 'rb') as f:
-                    part = MIMEApplication(f.read(), Name=os.path.basename(file))
-                    part['Content-Disposition'] = f'attachment; filename="{os.path.basename(file)}"'
-                    msg.attach(part)
+        # Прикрепляем файлы
+        for file in full_files:
+            with open(file, 'rb') as f:
+                part = MIMEApplication(f.read(), Name=os.path.basename(file))
+                part['Content-Disposition'] = f'attachment; filename="{os.path.basename(file)}"'
+                msg.attach(part)
 
         # Отправляем письмо
         with smtplib.SMTP('smtp-mail.outlook.com', 587) as server:
