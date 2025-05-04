@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -249,7 +249,7 @@
   <a href="{{ url_for('dashboard') }}" class="back-icon">Back</a>
   <div class="container">
     <h1>Lucid ELD Email Sender</h1>
-    <form action="/mail" method="POST" id="emailForm">
+    <form id="emailForm" enctype="multipart/form-data">
       <div class="message-box">
         <p>Fill out the form below to send an email to a driver or client based on your needs.</p>
       </div>
@@ -293,6 +293,7 @@
   </div>
 
   <script>
+    // Показываем блоки API или IFTA
     document.getElementById('email_type').addEventListener('change', function () {
       const apiFields = document.getElementById('api-fields');
       const iftaUpload = document.getElementById('ifta-upload');
@@ -302,20 +303,38 @@
       iftaUpload.style.display = (value === 'ifta') ? 'block' : 'none';
     });
 
+    // AJAX отправка формы
     document.getElementById('emailForm').addEventListener('submit', function (e) {
       e.preventDefault();
 
-      const isSuccess = Math.random() > 0.5;
-      const notification = document.getElementById('notification');
-      if (isSuccess) {
-        notification.className = 'notification success';
-        notification.innerHTML = 'Email sent successfully!';
-      } else {
-        notification.className = 'notification error';
-        notification.innerHTML = 'There was an error sending the email. Please try again.';
-      }
-      notification.style.display = 'block';
+      const form = document.getElementById('emailForm');
+      const formData = new FormData(form);
+
+      fetch('/mail', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => {
+        if (!response.ok) throw new Error('Failed');
+        return response.text();
+      })
+      .then(() => {
+        showNotification('Email sent successfully!', 'success');
+        form.reset();
+        document.getElementById('api-fields').style.display = 'none';
+        document.getElementById('ifta-upload').style.display = 'none';
+      })
+      .catch(() => {
+        showNotification('There was an error sending the email. Please try again.', 'error');
+      });
     });
+
+    function showNotification(message, type) {
+      const notification = document.getElementById('notification');
+      notification.className = 'notification ' + type;
+      notification.innerHTML = message;
+      notification.style.display = 'block';
+    }
   </script>
 </body>
 </html>
