@@ -300,6 +300,182 @@ def timezones():
 def tutorial():
     return render_template("tutorial.html")
 
+@app.route('/')
+def index():
+    return render_template('mail.html')
+
+# Отправка email
+@app.route('/send_email', methods=['POST'])
+def send_email():
+    # Получаем данные из формы
+    email = request.form['email']
+    email_type = request.form['email_type']
+    message = ""
+    
+    # Шаблоны для каждого типа письма
+    if email_type == "instructions":
+        message = """
+        Subject: Required ELD Instruction Pack – Please Print & Keep in Truck
+
+        Hello,
+
+        Attached you will find the official **ELD Instruction Pack** for Lucid ELD. These documents are **required by FMCSA** and **must be printed and kept in the truck at all times**.
+
+        They provide essential guidance on how to operate the ELD system, handle malfunction procedures, and understand data transfer methods.
+
+        If you have any questions or need help with anything, feel free to reach out—we’re here 24/7 to support you.
+
+        Safe driving!
+
+        Best regards,  
+        Lucid ELD Support Team  
+        www.lucideld.com
+        """
+    elif email_type == "ifta":
+        message = """
+        Subject: IFTA Report Attached
+
+        Hello,
+
+        As requested, please find attached the IFTA report(s) for your review.
+
+        If you need assistance understanding or organizing these documents for your filings, don’t hesitate to reach out. We’re happy to help!
+
+        Wishing you continued success and smooth operations.
+
+        Best,  
+        Lucid ELD Team  
+        www.lucideld.com
+        """
+    elif email_type == "information":
+        message = """
+        Subject: About Lucid ELD – What We Offer
+
+        Hello,
+
+        Thank you for your interest in Lucid ELD! Here’s a quick overview of what we provide:
+
+        - **FMCSA Certified ELD system**
+        - **24/7 support from real humans**
+        - **Dedicated individual assistance for every driver**
+        - **IFTA calculation and reporting support**
+        - **Live GPS tracking and trip history**
+        - **User-friendly mobile app for iOS and Android**
+        - **Instant malfunction & compliance alerts**
+        - And much more...
+
+        Our goal is to make your compliance journey as smooth, efficient, and stress-free as possible.
+
+        If you’d like to get started or ask any questions, we’re always just a call or message away.
+
+        Warm regards,  
+        Lucid ELD Team  
+        www.lucideld.com
+        """
+    elif email_type == "advertising":
+        message = """
+        Subject: A Better ELD Solution for Your Fleet
+
+        Hello!
+
+        Managing a fleet is challenging enough—your ELD system shouldn’t make it harder.
+
+        At **Lucid ELD**, we’ve built a platform that just works:
+
+        ✔ FMCSA-compliant, rock-solid performance  
+        ✔ Real-time GPS tracking & automated IFTA reports  
+        ✔ Transparent pricing—no hidden fees, ever  
+        ✔ 24/7 live support from real humans (yes, real people!)  
+        ✔ Easy-to-use app your drivers will actually like
+
+        If your current system is frustrating—or if you just want something smoother and more reliable—we’d love to show you the difference.
+
+        **Are you available for a quick 5-minute call today?**
+
+        In the meantime, feel free to visit us at [www.lucideld.com](http://www.lucideld.com) or call me directly at (267) 578-8580.  
+        Or just reply to this email—I’ll respond right away.
+
+        Looking forward to helping you drive forward with confidence.
+
+        Best,  
+        Adam  
+        Lucid ELD  
+        📞 (267) 578-8580  
+        🌐 www.lucideld.com
+        """
+    elif email_type == "api":
+        username = request.form['username']
+        password = request.form['password']
+        api_key = request.form['api_key']
+
+        message = f"""
+        Hello,
+
+        Here are the credentials and API Key you requested for accessing our system:
+
+        **Username:** {username}  
+        **Password:** {password}  
+        **API Key:** {api_key}
+
+        Please make sure to keep this information secure. You can use these credentials to access our API and integrate with our system.
+
+        If you need further assistance or have any questions, don't hesitate to reach out.
+
+        Best regards,  
+        Lucid ELD Support Team
+        """
+
+    # Путь к файлам для прикрепления
+    files = [
+        "Users Manual.pdf",
+        "Malfunction Manual.pdf",
+        "Truck Sticker.pdf",
+        "DOT Inspection.pdf",
+        "Certificate of Compliance.pdf"
+    ]
+    
+    full_files = []
+    if email_type == "instructions":
+        # Если тип письма - инструкции, прикрепляем файлы
+        for file in files:
+            file_path = os.path.join(INSTRUCTION_FOLDER, file)
+            if os.path.exists(file_path):
+                full_files.append(file_path)
+            else:
+                print(f"File {file} not found!")
+
+    # Отправка email
+    try:
+        # Создаем объект сообщения
+        msg = MIMEMultipart()
+        msg['From'] = "adamlucideld@outlook.com"
+        msg['To'] = email
+        msg['Subject'] = "Lucid ELD Instructions & Documents"
+
+        # Добавляем текст в сообщение
+        msg.attach(MIMEText(message, 'plain'))
+
+        # Прикрепляем файлы, если это инструкция
+        if email_type == "instructions":
+            for file in full_files:
+                with open(file, 'rb') as f:
+                    part = MIMEApplication(f.read(), Name=os.path.basename(file))
+                    part['Content-Disposition'] = f'attachment; filename="{os.path.basename(file)}"'
+                    msg.attach(part)
+
+        # Отправляем письмо
+        with smtplib.SMTP('smtp-mail.outlook.com', 587) as server:
+            server.starttls()  # Шифрование
+            server.login("adamlucideld@outlook.com", "Lucid2025Eld!")  # Логин и пароль
+            server.sendmail("adamlucideld@outlook.com", email, msg.as_string())  # Отправка письма
+
+        flash("Email successfully sent!", "success")
+        return redirect('/')
+    
+    except Exception as e:
+        flash(f"Failed to send email: {str(e)}", "error")
+        return redirect('/')
+
 @app.route('/logout')
 def logout():
     session.pop('username', None)
