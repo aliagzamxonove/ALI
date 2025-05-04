@@ -300,8 +300,8 @@ def timezones():
 def tutorial():
     return render_template("tutorial.html")
 
-@app.route('/')
-def index():
+@app.route('/mail')
+def mail():
     return render_template('mail.html')
 
 # Отправка email
