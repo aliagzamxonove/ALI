@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -6,7 +6,7 @@
   <title>Lucid ELD Email Sender</title>
   <link rel="icon" href="{{ url_for('static', filename='IFTA5458.png') }}" type="image/png" />
   <style>
-    * {
+        * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
@@ -293,22 +293,22 @@
   </div>
 
   <script>
-    // Показываем блоки API или IFTA
-    document.getElementById('email_type').addEventListener('change', function () {
-      const apiFields = document.getElementById('api-fields');
-      const iftaUpload = document.getElementById('ifta-upload');
-      const value = this.value;
+    const emailTypeSelect = document.getElementById('email_type');
+    const apiFields = document.getElementById('api-fields');
+    const iftaUpload = document.getElementById('ifta-upload');
+    const emailForm = document.getElementById('emailForm');
+    const notification = document.getElementById('notification');
 
+    emailTypeSelect.addEventListener('change', function () {
+      const value = this.value;
       apiFields.style.display = (value === 'api') ? 'block' : 'none';
       iftaUpload.style.display = (value === 'ifta') ? 'block' : 'none';
     });
 
-    // AJAX отправка формы
-    document.getElementById('emailForm').addEventListener('submit', function (e) {
+    emailForm.addEventListener('submit', function (e) {
       e.preventDefault();
 
-      const form = document.getElementById('emailForm');
-      const formData = new FormData(form);
+      const formData = new FormData(emailForm);
 
       fetch('/mail', {
         method: 'POST',
@@ -320,9 +320,9 @@
       })
       .then(() => {
         showNotification('Email sent successfully!', 'success');
-        form.reset();
-        document.getElementById('api-fields').style.display = 'none';
-        document.getElementById('ifta-upload').style.display = 'none';
+        emailForm.reset();
+        apiFields.style.display = 'none';
+        iftaUpload.style.display = 'none';
       })
       .catch(() => {
         showNotification('There was an error sending the email. Please try again.', 'error');
@@ -330,7 +330,6 @@
     });
 
     function showNotification(message, type) {
-      const notification = document.getElementById('notification');
       notification.className = 'notification ' + type;
       notification.innerHTML = message;
       notification.style.display = 'block';
