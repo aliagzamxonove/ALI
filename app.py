@@ -312,10 +312,15 @@ def tutorial():
 # Отправка email
 @app.route('/mail', methods=['GET', 'POST'])
 def mail():
-    # Получаем данные из формы
-    email = request.form['email']
-    email_type = request.form['email_type']
-    message = ""
+    if request.method == 'POST':
+        # Получаем данные из формы
+        email = request.form['email']
+        email_type = request.form['email_type']
+        message = ""
+        # Здесь добавь нужную логику отправки письма и возврата
+        return redirect('/dashboard')  # или render_template(...)
+    else:
+        return render_template('mail.html')  # или другой HTML, если у тебя есть
     
     # Шаблоны для каждого типа письма
     if email_type == "instructions":
