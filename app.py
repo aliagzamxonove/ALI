@@ -28,9 +28,11 @@ app.config['MAIL_USERNAME'] = 'adamlucideld@outlook.com'
 app.config['MAIL_PASSWORD'] = 'ulutpuutcxjsfuqd'
 mail = Mail(app)
 
-# Папки для файлов
-INSTRUCTION_FOLDER = "/path/to/instruction/folder"
-UPLOAD_FOLDER = "/path/to/upload/folder"
+# Пути
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
+INSTRUCTION_FOLDER = os.path.join(BASE_DIR, 'Instruction')
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 @app.route('/')
 def home():
