@@ -6,9 +6,113 @@
   <title>Lucid ELD Email Sender</title>
   <link rel="icon" href="{{ url_for('static', filename='IFTA5458.png') }}" type="image/png" />
   <style>
-    /* ... [стили без изменений, опущены для краткости, оставь свои] ... */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-    #api-fields, #ifta-upload {
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #101d2e;
+      color: #333;
+      padding: 50px 0;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      background: #000000;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 28px;
+      color: #ffffff;
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-size: 16px;
+      color: #ffffff;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    select, input[type="text"], input[type="email"], textarea {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      border: 1px solid #34495e;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    select {
+      background-color: #1a2533;
+      color: white;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='white' d='M2 0L0 2h4L2 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 10px;
+      padding-right: 30px;
+    }
+
+    select:focus, input[type="text"]:focus, input[type="email"]:focus, textarea:focus {
+      border-color: #2980b9;
+      outline: none;
+    }
+
+    textarea {
+      height: 150px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background-color: #2980b9;
+      color: white;
+      font-size: 18px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #3498db;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 14px;
+      color: #7f8c8d;
+    }
+
+    .footer a {
+      color: #2980b9;
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    .message-box {
+      background: rgba(192, 192, 192, 0.5);
+      padding: 10px;
+      color: #000000;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+
+    #api-fields {
       background-color: rgba(255, 255, 255, 0.05);
       padding: 15px;
       border-radius: 8px;
@@ -16,16 +120,136 @@
       transition: all 0.3s ease;
     }
 
-    input[type="file"] {
+    .back-icon {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: #151c29;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    .back-icon:hover {
+      background-color: #000000;
+      transform: scale(1.05);
+    }
+
+    .back-icon:focus {
+      outline: 2px solid #fff;
+      background-color: #2c3e50;
+    }
+
+    .back-icon:active {
+      transform: scale(0.98);
+    }
+
+    .back-icon::before {
+      content: "←";
+      font-size: 18px;
+      margin-right: 8px;
+    }
+
+    .notification {
+      padding: 15px;
+      margin-top: 20px;
+      border-radius: 5px;
+      font-size: 16px;
+      text-align: center;
+    }
+
+    .success {
+      background-color: #28a745;
       color: white;
     }
+
+    .error {
+      background-color: #dc3545;
+      color: white;
+    }
+  /* Стиль для блока загрузки IFTA */
+#ifta-upload {
+  margin-top: 20px;
+  margin-bottom: 20px; /* Добавим отступ снизу */
+}
+
+#ifta-upload label {
+  font-size: 16px;
+  color: #ffffff;
+  display: block;
+  margin-bottom: 10px;
+}
+
+#ifta_files {
+  width: 100%;
+  padding: 12px;
+  background-color: #1a2533;
+  color: white;
+  border: 1px solid #34495e;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s, border-color 0.3s; /* Плавный переход */
+}
+
+#ifta_files:hover {
+  background-color: #2980b9;
+  border-color: #2980b9;
+}
+
+#ifta_files:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+#ifta_files::file-selector-button {
+  background-color: #1a2533;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: 1px solid #34495e;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s; /* Плавный переход */
+}
+
+#ifta_files::file-selector-button:hover {
+  background-color: #2980b9;
+  border-color: #2980b9;
+}
+
+#ifta-upload .file-name {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #777;
+  padding: 10px;
+  border: 1px solid #ddd;
+  background-color: #f8f8f8;
+  width: 100%;
+}
+
+/* Плавный переход для снятия hover */
+#ifta_files:not(:hover) {
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+/* Если файл выбран, меняем текст */
+#ifta_files:valid + .file-name {
+  color: #4caf50;
+}
   </style>
 </head>
 <body>
   <a href="{{ url_for('dashboard') }}" class="back-icon">Back</a>
   <div class="container">
     <h1>Lucid ELD Email Sender</h1>
-    <form action="/send_email" method="POST" id="emailForm" enctype="multipart/form-data">
+    <form action="/send_email" method="POST" id="emailForm">
       <div class="message-box">
         <p>Fill out the form below to send an email to a driver or client based on your needs.</p>
       </div>
@@ -42,7 +266,6 @@
         <option value="api">API Credentials</option>
       </select>
 
-      <!-- API Credentials Fields -->
       <div id="api-fields" style="display: none;">
         <label for="username">Username</label>
         <input type="text" id="username" name="username" placeholder="Enter username">
@@ -54,7 +277,6 @@
         <input type="text" id="api_key" name="api_key" placeholder="Enter API Key">
       </div>
 
-      <!-- IFTA File Upload -->
       <div id="ifta-upload" style="display: none;">
         <label for="ifta_files">Upload IFTA Files</label>
         <input type="file" id="ifta_files" name="ifta_files" multiple>
@@ -71,24 +293,27 @@
   </div>
 
   <script>
-    const emailTypeSelect = document.getElementById('email_type');
-    const apiFields = document.getElementById('api-fields');
-    const iftaUpload = document.getElementById('ifta-upload');
+    document.getElementById('email_type').addEventListener('change', function () {
+      const apiFields = document.getElementById('api-fields');
+      const iftaUpload = document.getElementById('ifta-upload');
+      const value = this.value;
 
-    emailTypeSelect.addEventListener('change', function () {
-      const selected = this.value;
-      apiFields.style.display = selected === 'api' ? 'block' : 'none';
-      iftaUpload.style.display = selected === 'ifta' ? 'block' : 'none';
+      apiFields.style.display = (value === 'api') ? 'block' : 'none';
+      iftaUpload.style.display = (value === 'ifta') ? 'block' : 'none';
     });
 
     document.getElementById('emailForm').addEventListener('submit', function (e) {
       e.preventDefault();
 
       const isSuccess = Math.random() > 0.5;
-
       const notification = document.getElementById('notification');
-      notification.className = 'notification ' + (isSuccess ? 'success' : 'error');
-      notification.innerHTML = isSuccess ? 'Email sent successfully!' : 'There was an error sending the email. Please try again.';
+      if (isSuccess) {
+        notification.className = 'notification success';
+        notification.innerHTML = 'Email sent successfully!';
+      } else {
+        notification.className = 'notification error';
+        notification.innerHTML = 'There was an error sending the email. Please try again.';
+      }
       notification.style.display = 'block';
     });
   </script>
