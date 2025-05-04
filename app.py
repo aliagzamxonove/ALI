@@ -3,6 +3,7 @@ from fpdf import FPDF
 import os
 import re
 import hashlib
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -14,6 +15,14 @@ USER_CREDENTIALS = {
     'username': 'admin',
     'password': hashlib.sha256('Pass4%33word'.encode()).hexdigest()  # Hashed password
 }
+
+# Configure Flask-Mail
+app.config['MAIL_SERVER'] = 'smtp.example.com'  # Replace with your SMTP server
+app.config['MAIL_PORT'] = 587  # Replace with your SMTP server port
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'your_email@example.com'  # Your email here
+app.config['MAIL_PASSWORD'] = 'your_email_password'  # Your email password here
+mail = Mail(app)
 
 @app.route('/')
 def home():
