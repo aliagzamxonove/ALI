@@ -489,7 +489,7 @@ def mail():
             # Отправляем письмо
             with smtplib.SMTP('smtp-mail.outlook.com', 587) as server:
                 server.starttls()  # Шифрование
-                server.login("adamlucideld@outlook.com", "Lucid2025Eld!")  # Логин и пароль
+                server.login("adamlucideld@outlook.com", "ulutpuutcxjsfuqd")  # Логин и пароль
                 server.sendmail("adamlucideld@outlook.com", email, msg.as_string())  # Отправка письма
 
             # Сообщение об успешной отправке
