@@ -4,98 +4,251 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login - IFTA Report Generator</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
   <link rel="icon" href="{{ url_for('static', filename='IFTA5458.png') }}" type="image/png" />
   <script>
-    function togglePassword() {
-      const passwordField = document.getElementById('password');
-      const toggleButton = document.querySelector('.password-toggle');
-      if (passwordField.type === 'password') {
-        passwordField.type = 'text';
-        toggleButton.textContent = 'Hide';
-      } else {
-        passwordField.type = 'password';
-        toggleButton.textContent = 'Show';
-      }
-    }
-
+    // Apply saved theme immediately after page load
     window.onload = function() {
       const savedTheme = localStorage.getItem('theme');
       if (savedTheme) {
         document.body.classList.add(savedTheme);
+      } else {
+        document.body.classList.add('light-theme'); // Default to light theme if not saved
       }
-    };
+    }
 
     function toggleTheme() {
       const currentTheme = document.body.classList.contains('dark-theme') ? 'dark-theme' : 'light-theme';
       const newTheme = currentTheme === 'dark-theme' ? 'light-theme' : 'dark-theme';
+      
+      // Apply new theme and save it to localStorage
       document.body.classList.replace(currentTheme, newTheme);
       localStorage.setItem('theme', newTheme);
+
+      // Change text based on the theme
+      const themeText = document.querySelector('.theme-toggle-text');
+      themeText.textContent = newTheme === 'dark-theme' ? 'Light' : 'Dark';
+      
+      // Force reflow to ensure styles are immediately updated
+      document.body.offsetHeight; // This triggers a reflow
+    }
+
+    function togglePassword() {
+      const passwordField = document.getElementById('password');
+      const toggleButton = document.getElementById('toggle-password');
+
+      // Toggle the password visibility
+      if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        toggleButton.textContent = 'Hide';  // Change button text to "Hide"
+      } else {
+        passwordField.type = 'password';
+        toggleButton.textContent = 'Show';  // Change button text to "Show"
+      }
     }
   </script>
   <style>
-    .password-toggle {
-      background-color: transparent;
-      color: #003366;
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f7f7f7;
+      color: #333;
+      margin: 0;
       padding: 0;
-      font-size: 14px;
-      cursor: pointer;
-      border: none;
-      outline: none;
-      transition: color 0.3s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
-    .password-toggle:hover {
-      color: #00509e;
+    body.light-theme {
+      background-color: #f7f7f7;
+      color: #333;
     }
 
-    .password-toggle:focus {
-      outline: none;
+    body.dark-theme {
+      background-color: #101d2e;
+      color: #dbe2e9;
     }
 
-    .flashes {
-      color: red;
-      font-size: 14px;
-      list-style-type: none;
-      padding: 0;
+    .login-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
     }
 
-    .flashes li {
-      margin-bottom: 10px;
+    .login-box {
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    body.dark-theme .login-box {
+      background-color: #000000;
+      color: #dbe2e9;
     }
 
     .login-logo {
-      display: block;
-      margin: 0 auto 10px auto;
       width: 50px;
-      height: auto;
+      margin-bottom: 20px;
     }
 
     .login-heading {
-      text-align: center;
-      font-size: 22px;
+      font-size: 24px;
+      color: #000000;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    body.dark-theme .login-heading {
+      color: #ffffff;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: bold;
+      color: #003366;
+    }
+
+    body.dark-theme .input-group label {
+      color: #dbe2e9;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 12px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      margin-top: 5px;
+      transition: border-color 0.3s ease;
+      background-color: #ffffff;
+      color: #333;
+    }
+
+    body.dark-theme .input-field {
+      background-color: #ffffff;
+      color: #333;
+      border: 1px solid #3c4c66;
+    }
+
+    .input-field:focus {
+      border-color: #003366;
+      outline: none;
+    }
+
+    .password-container {
+      position: relative;
+    }
+
+    .password-toggle {
+      position: absolute;
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      font-size: 14px;
+      color: #000000;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    body.dark-theme .password-toggle {
+      color: #000000;
+    }
+
+    .password-toggle:hover {
+      color: #49759c;
+    }
+
+    .flashes {
+      margin: 10px 0;
+      padding: 0;
+      list-style-type: none;
+      font-size: 14px;
+    }
+
+    .flashes .error-message {
+      color: #e74c3c;
+      background-color: #fbe3e4;
+      padding: 10px;
+      border-radius: 4px;
+    }
+
+    .btn {
+      padding: 12px 20px;
+      background-color: #003366;
       color: white;
-      margin-top: 15px;
-      margin-bottom: 15px;
-      font-family: 'Inter', sans-serif;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      width: 100%;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #00509e;
+    }
+
+    .form-text {
+      font-size: 12px;
+      color: #888;
+      margin-top: 5px;
+    }
+
+    body.dark-theme .form-text {
+      color: #aab4c5;
+    }
+
+    .theme-toggle-btn {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      background-color: #003366;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
+
+    .theme-toggle-btn:hover {
+      background-color: #00509e;
+    }
+
+    .theme-toggle-text {
+      font-size: 14px;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
   <div class="login-container">
     <div class="login-box">
-      <!-- Логотип -->
       <img src="{{ url_for('static', filename='IFTA5458.png') }}" alt="IFTA Logo" class="login-logo" />
-
-      <!-- Заголовок под логотипом -->
       <div class="login-heading">Log in to your Account</div>
 
-      <!-- Flash messages -->
-      {% with messages = get_flashed_messages() %}
+      {% with messages = get_flashed_messages() %} 
         {% if messages %}
           <ul class="flashes">
             {% for message in messages %}
-              <li>{{ message }}</li>
+              <li class="error-message">{{ message }}</li>
             {% endfor %}
           </ul>
         {% endif %}
@@ -104,7 +257,8 @@
       <form method="POST" autocomplete="off">
         <div class="input-group">
           <label for="username">Username</label>
-          <input type="text" name="username" id="username" class="input-field" required placeholder="Enter your username" />
+          <input type="text" name="username" id="username" class="input-field" required placeholder="Enter your username" aria-describedby="usernameHelp"/>
+          <small id="usernameHelp" class="form-text">Your unique username to access the system.</small>
         </div>
 
         <div class="input-group">
@@ -120,6 +274,10 @@
     </div>
   </div>
 
-  <button onclick="toggleTheme()" class="theme-toggle-btn" aria-label="Toggle Theme">Toggle Theme</button>
+  <button onclick="toggleTheme()" class="theme-toggle-btn">
+    <span class="theme-toggle-text">
+      Dark
+    </span>
+  </button>
 </body>
 </html>
