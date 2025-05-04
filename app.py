@@ -505,18 +505,6 @@ def mail():
     else:
         return render_template('mail.html')  # или другой HTML, если у тебя есть
 
-
-# Для отображения flash-сообщений, добавь в base.html или другую страницу, где выводишь ошибки/успех:
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    <ul>
-      {% for category, message in messages %}
-        <li class="{{ category }}">{{ message }}</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
-{% endwith %}
-
 @app.route('/logout')
 def logout():
     session.pop('username', None)
