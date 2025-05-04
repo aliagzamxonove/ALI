@@ -25,7 +25,7 @@ app.config['MAIL_SERVER'] = 'smtp-mail.outlook.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'adamlucideld@outlook.com'
-app.config['MAIL_PASSWORD'] = 'Lucid2025Eld!'
+app.config['MAIL_PASSWORD'] = 'ulutpuutcxjsfuqd'
 mail = Mail(app)
 
 # Папки для файлов
