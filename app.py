@@ -312,7 +312,6 @@ def tutorial():
 # Отправка email
 @app.route('/mail', methods=['GET', 'POST'])
 def mail():
-    pdb.set_trace()
     # Получаем данные из формы
     email = request.form['email']
     email_type = request.form['email_type']
