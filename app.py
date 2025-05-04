@@ -4,6 +4,10 @@ import os
 import re
 import hashlib
 from flask_mail import Mail, Message
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.application import MIMEApplication
+import smtplib
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -16,13 +20,17 @@ USER_CREDENTIALS = {
     'password': hashlib.sha256('Pass4%33word'.encode()).hexdigest()  # Hashed password
 }
 
-# Configure Flask-Mail
-app.config['MAIL_SERVER'] = 'smtp-mail.outlook.com'  # Replace with your SMTP server
-app.config['MAIL_PORT'] = 587  # Replace with your SMTP server port
+# Настройка Flask-Mail для отправки email
+app.config['MAIL_SERVER'] = 'smtp-mail.outlook.com'
+app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'adamlucideld@outlook.com' # Your email here
-app.config['MAIL_PASSWORD'] = 'Lucid2025Eld!'  # Your email password here
+app.config['MAIL_USERNAME'] = 'adamlucideld@outlook.com'
+app.config['MAIL_PASSWORD'] = 'Lucid2025Eld!'
 mail = Mail(app)
+
+# Папки для файлов
+INSTRUCTION_FOLDER = "/path/to/instruction/folder"
+UPLOAD_FOLDER = "/path/to/upload/folder"
 
 @app.route('/')
 def home():
