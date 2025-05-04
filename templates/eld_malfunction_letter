@@ -91,13 +91,12 @@
     .input-group input[type="date"] {
       padding: 8px;
       font-family: 'Segoe UI', Tahoma, sans-serif;
-
       }
   
       .input-group input:focus {
         border-color: #223b60;
         box-shadow: 0 0 5px rgba(34, 59, 96, 0.5);
-     }
+      }
 
     .form-actions {
       text-align: center;
