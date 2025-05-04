@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lucid ELD Email Sender</title>
+  <link rel="icon" href="{{ url_for('static', filename='IFTA5458.png') }}" type="image/png" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #101d2e;
+      color: #333;
+      padding: 50px 0;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      background: #000000;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 28px;
+      color: #ffffff;
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-size: 16px;
+      color: #ffffff;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    select, input[type="text"], input[type="email"], textarea {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      border: 1px solid #34495e;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    select {
+      background-color: #1a2533;
+      color: white;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='white' d='M2 0L0 2h4L2 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 10px;
+      padding-right: 30px;
+    }
+
+    select:focus, input[type="text"]:focus, input[type="email"]:focus, textarea:focus {
+      border-color: #2980b9;
+      outline: none;
+    }
+
+    textarea {
+      height: 150px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background-color: #2980b9;
+      color: white;
+      font-size: 18px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #3498db;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 14px;
+      color: #7f8c8d;
+    }
+
+    .footer a {
+      color: #2980b9;
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    .message-box {
+      background: rgba(192, 192, 192, 0.5);
+      padding: 10px;
+      color: #000000;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+
+    #api-fields {
+      background-color: rgba(255, 255, 255, 0.05);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .back-icon {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: #151c29;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    .back-icon:hover {
+      background-color: #000000;
+      transform: scale(1.05);
+    }
+
+    .back-icon:focus {
+      outline: 2px solid #fff;
+      background-color: #2c3e50;
+    }
+
+    .back-icon:active {
+      transform: scale(0.98);
+    }
+
+    .back-icon::before {
+      content: "←";
+      font-size: 18px;
+      margin-right: 8px;
+    }
+
+    .notification {
+      padding: 15px;
+      margin-top: 20px;
+      border-radius: 5px;
+      font-size: 16px;
+      text-align: center;
+    }
+
+    .success {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .error {
+      background-color: #dc3545;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <a href="{{ url_for('dashboard') }}" class="back-icon">Back</a>
+  <div class="container">
+    <h1>Lucid ELD Email Sender</h1>
+    <form action="/send_email" method="POST" id="emailForm">
+      <div class="message-box">
+        <p>Fill out the form below to send an email to a driver or client based on your needs.</p>
+      </div>
+
+      <label for="email">Recipient's Email</label>
+      <input type="email" id="email" name="email" placeholder="Enter email" required>
+
+      <label for="email_type">Select Email Type</label>
+      <select id="email_type" name="email_type" required>
+        <option value="instructions">ELD Instruction Pack</option>
+        <option value="ifta">IFTA Report</option>
+        <option value="information">Lucid ELD Information</option>
+        <option value="advertising">Advertising</option>
+        <option value="api">API Credentials</option>
+      </select>
+
+      <div id="api-fields" style="display: none;">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" placeholder="Enter username">
+
+        <label for="password">Password</label>
+        <input type="text" id="password" name="password" placeholder="Enter password">
+
+        <label for="api_key">API Key</label>
+        <input type="text" id="api_key" name="api_key" placeholder="Enter API Key">
+      </div>
+
+      <button type="submit">Send Email</button>
+    </form>
+
+    <div id="notification" class="notification" style="display: none;"></div>
+
+    <div class="footer">
+      <p>Powered by <a href="http://www.lucideld.com">Lucid ELD</a></p>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('email_type').addEventListener('change', function () {
+      const apiFields = document.getElementById('api-fields');
+      if (this.value === 'api') {
+        apiFields.style.display = 'block';
+      } else {
+        apiFields.style.display = 'none';
+      }
+    });
+
+    document.getElementById('emailForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      // Fake API response to simulate success or error
+      const isSuccess = Math.random() > 0.5;
+
+      const notification = document.getElementById('notification');
+      if (isSuccess) {
+        notification.className = 'notification success';
+        notification.innerHTML = 'Email sent successfully!';
+      } else {
+        notification.className = 'notification error';
+        notification.innerHTML = 'There was an error sending the email. Please try again.';
+      }
+      notification.style.display = 'block';
+    });
+  </script>
+</body>
+</html>
