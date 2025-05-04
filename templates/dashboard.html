@@ -16,6 +16,13 @@
       --danger-dark: #A13F3F;
     }
 
+    @media (prefers-color-scheme: light) {
+      :root {
+        --background: #f8f8f8;
+        --text: #1f1f1f;
+      }
+    }
+
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
@@ -89,7 +96,6 @@
       background-color: var(--danger-dark);
     }
 
-    /* Modal */
     .modal {
       display: none;
       position: fixed;
@@ -150,18 +156,15 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* New fadeOut animation for smooth closing */
     @keyframes fadeOut {
       from { opacity: 1; transform: translateY(0); }
       to { opacity: 0; transform: translateY(-20px); }
     }
 
-    /* Add fade-out effect */
     .modal.fade-out {
       animation: fadeOut 0.3s ease-in-out forwards;
     }
 
-    /* Responsive */
     @media (max-width: 480px) {
       .dashboard-btn {
         width: 90%;
@@ -177,7 +180,6 @@
 <body>
   <main>
     <header>
-      <!-- Welcome text with the username -->
       <h1>Welcome, {{ username }}!</h1>
     </header>
 
@@ -191,10 +193,10 @@
     <button id="logoutBtn" aria-label="Logout">Logout</button>
 
     <!-- Modal -->
-    <div id="logoutModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="logoutModalLabel">
+    <div id="logoutModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="logoutModalLabel" aria-describedby="logoutModalDesc">
       <div class="modal-content">
         <h2 id="logoutModalLabel">Confirm Logout</h2>
-        <p>Are you sure you want to log out?</p>
+        <p id="logoutModalDesc">Are you sure you want to log out?</p>
         <div class="modal-buttons">
           <button type="button" id="confirmLogout" class="modal-btn">Yes, Logout</button>
           <button type="button" id="cancelLogout" class="modal-btn">Cancel</button>
@@ -209,22 +211,24 @@
     const confirmLogout = document.getElementById('confirmLogout');
     const cancelLogout = document.getElementById('cancelLogout');
 
+    function openModal() {
+      logoutModal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      confirmLogout.focus();
+    }
+
+    function closeModal() {
+      logoutModal.classList.add('fade-out');
+      setTimeout(() => {
+        logoutModal.style.display = 'none';
+        logoutModal.classList.remove('fade-out');
+        document.body.style.overflow = 'auto';
+      }, 300);
+    }
+
     if (logoutBtn && logoutModal && confirmLogout && cancelLogout) {
-      logoutBtn.addEventListener('click', () => {
-        logoutModal.style.display = 'flex';
-        confirmLogout.focus();
-      });
-
-      cancelLogout.addEventListener('click', () => {
-        // Add fade-out animation before hiding the modal
-        logoutModal.classList.add('fade-out');
-
-        // Wait for the fade-out animation to complete before hiding the modal
-        setTimeout(() => {
-          logoutModal.style.display = 'none';
-          logoutModal.classList.remove('fade-out'); // Remove the fade-out class
-        }, 300); // Duration should match the CSS animation duration
-      });
+      logoutBtn.addEventListener('click', openModal);
+      cancelLogout.addEventListener('click', closeModal);
 
       confirmLogout.addEventListener('click', () => {
         window.location.href = "{{ url_for('logout') }}";
@@ -232,13 +236,18 @@
 
       window.addEventListener('click', (event) => {
         if (event.target === logoutModal) {
-          logoutModal.style.display = 'none';
+          closeModal();
         }
       });
 
-      // Ensure modal is hidden on page load
-      window.addEventListener('DOMContentLoaded', function () {
-        document.getElementById('logoutModal').style.display = 'none';
+      window.addEventListener('DOMContentLoaded', () => {
+        logoutModal.style.display = 'none';
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && logoutModal.style.display === 'flex') {
+          closeModal();
+        }
       });
     }
   </script>
