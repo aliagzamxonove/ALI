@@ -8,13 +8,15 @@
   <link rel="icon" href="{{ url_for('static', filename='IFTA5458.png') }}" type="image/png" />
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
   
- <style>
+  <style>
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(to right, #162a3f, #8d9dab, #162a3f);
       color: #ecf0f1;
       text-align: center;
+      font-size: 16px;
+      transition: background 0.5s ease-in-out;
     }
 
     h1 {
@@ -27,8 +29,8 @@
     .timezones {
       position: relative;
       width: 100%;
-      max-width: 1200px;             /* ⬅ ограничиваем ширину */
-      margin: 0 auto 10px;           /* ⬅ центрируем и отступ снизу */
+      max-width: 1200px; /* Limiting width */
+      margin: 0 auto 10px;
       display: flex;
       justify-content: space-between;
       padding: 5px;
@@ -36,6 +38,7 @@
       overflow-x: auto;
       box-sizing: border-box;
       gap: 4px;
+      flex-wrap: wrap; /* Allow wrapping on small screens */
     }
 
     .timezone {
@@ -49,21 +52,33 @@
       border-radius: 6px;
       box-shadow: 0 0 6px rgba(0, 255, 255, 0.4);
       margin: 0;
+      transition: transform 0.3s ease, background 0.3s ease;
+    }
+
+    .timezone:hover {
+      transform: scale(1.05);
+      background: linear-gradient(145deg, #203a43 0%, #0f2027 60%, rgba(0, 0, 0, 0) 100%);
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
     }
 
     .timezone span:first-child {
-  font-weight: bold;
-  font-size: 18px;  
-  margin-bottom: 0px;
-  text-transform: uppercase;
-}
+      font-weight: bold;
+      font-size: 18px;
+      margin-bottom: 0px;
+      text-transform: uppercase;
+    }
 
-.timezone span:last-child {
-  font-family: 'Roboto Mono', monospace;
-  font-size: 26px;   
-  font-weight: bold;
-  text-shadow: 0 0 8px #000;
-}
+    .timezone span:last-child {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 26px;
+      font-weight: bold;
+      text-shadow: 0 0 8px #000;
+      transition: opacity 0.3s ease-in-out;
+    }
+
+    .timezone span.updated {
+      opacity: 0;
+    }
 
     svg {
       width: 100%;
@@ -72,14 +87,14 @@
       display: block;
       margin: 0 auto;
       border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.6);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
     }
-    
-    .back-icon {
+
+.back-icon {
   position: absolute;
   top: 20px;
   left: 20px;
-  background-color: #151c29; 
+  background-color: #151c29;
   color: white;
   padding: 10px 20px;
   border-radius: 12px;
@@ -88,10 +103,21 @@
   display: flex;
   align-items: center;
   transition: all 0.3s ease;
+  outline: none; /* Remove default outline */
 }
 
 .back-icon:hover {
   background-color: #000000;
+  transform: scale(1.05); /* Slight scale up effect */
+}
+
+.back-icon:focus {
+  outline: 2px solid #fff; /* White outline when focused */
+  background-color: #2c3e50; /* Slightly different background color on focus */
+}
+
+.back-icon:active {
+  transform: scale(0.98); /* Slight scale down effect when clicked */
 }
 
 .back-icon::before {
@@ -99,6 +125,17 @@
   font-size: 18px;
   margin-right: 8px;
 }
+
+    @media (max-width: 768px) {
+      .timezones {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+
+    .back-icon:focus {
+      outline: 2px solid #fff;
+    }
 
   </style>
 </head>
@@ -108,19 +145,19 @@
   <div class="timezones">
     <div class="timezone">
       <span>PACIFIC</span>
-      <span id="pacific">--:--:--</span>
+      <span id="pacific" aria-label="Pacific Time Zone">--:--:--</span>
     </div>
     <div class="timezone">
       <span>MOUNTAIN</span>
-      <span id="mountain">--:--:--</span>
+      <span id="mountain" aria-label="Mountain Time Zone">--:--:--</span>
     </div>
     <div class="timezone">
       <span>CENTRAL</span>
-      <span id="central">--:--:--</span>
+      <span id="central" aria-label="Central Time Zone">--:--:--</span>
     </div>
     <div class="timezone">
       <span>EASTERN</span>
-      <span id="eastern">--:--:--</span>
+      <span id="eastern" aria-label="Eastern Time Zone">--:--:--</span>
     </div>
   </div>
 
@@ -956,7 +993,15 @@
           hour12: false,
           timeZone: zone
         }).format(now);
-        document.getElementById(id).textContent = time;
+
+        // Fade out the current time, update, and fade in the new time
+        const timezoneElement = document.getElementById(id);
+        timezoneElement.classList.add('updated');
+
+        setTimeout(() => {
+          timezoneElement.textContent = time;
+          timezoneElement.classList.remove('updated');
+        }, 300);  // Match this with the CSS transition time
       }
     }
 
