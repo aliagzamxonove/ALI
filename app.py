@@ -182,17 +182,21 @@ def generate_report():
 @app.route('/eld-malfunction-letter', methods=['GET', 'POST'])
 def eld_malfunction_letter():
     if request.method == 'GET':
+        # Render the HTML template for GET requests
         return render_template('eld_malfunction_letter.html')
 
-    # Handle POST
-    company = request.form['company_name']
-    dot_number = request.form['dot_number']
-    driver_name = request.form['driver_name']
-    malfunction_date = request.form['malfunction_date']
+    # Handle POST request
+    # Safely get form data with validation
+    company = request.form.get('company_name', 'N/A')
+    dot_number = request.form.get('dot_number', 'N/A')
+    driver_name = request.form.get('driver_name', 'N/A')
+    malfunction_date = request.form.get('malfunction_date', 'N/A')
 
+    # Ensure output directory exists
     output_dir = 'generated_files'
     os.makedirs(output_dir, exist_ok=True)
 
+    # Define a custom PDF class with header and footer
     class StyledPDF(FPDF):
         def header(self):
             if self.page_no() == 1:
@@ -233,15 +237,20 @@ def eld_malfunction_letter():
                     self.write(10, part)
             self.ln(10)
 
+    # Path to font file
     font_path = os.path.join('static', 'fonts', 'DejaVuSans.ttf')
+
+    # Validate font file existence
+    if not os.path.exists(font_path):
+        return "Font file not found. Make sure DejaVuSans.ttf exists in the static/fonts directory.", 500
+
+    # Initialize PDF and add fonts
     pdf = StyledPDF()
     pdf.add_font('DejaVu', '', font_path, uni=True)
     pdf.add_font('DejaVu', 'B', font_path, uni=True)
-    pdf.add_font('DejaVu', 'I', font_path, uni=True)
-    pdf.set_font('DejaVu', '', 12)
     pdf.add_page()
 
-    # First page
+    # First page content
     pdf.chapter_body(
         f"""To whom it may concern,
 
@@ -260,16 +269,19 @@ In accordance with 49 CFR 395.8, until the ELD is serviced and back in complianc
     pdf.set_font("DejaVu", "", 12)
     y_before = pdf.get_y()
     pdf.cell(90, 10, "LUCID ELD Manager, Sukhrobbek Usmonov", ln=0)
+
+    # Validate manager signature existence
     sig_path = 'static/manager_signature.png'
     if os.path.exists(sig_path):
         try:
             pdf.image(sig_path, x=120, y=y_before, w=50)
         except Exception as e:
             print("Signature load error:", e)
+
     pdf.ln(25)
     pdf.cell(0, 10, f"Given date: {malfunction_date}", ln=True)
 
-    # Second page
+    # Second page content
     pdf.add_page()
     pdf.chapter_body("If an ELD malfunctions, a driver must:")
     pdf.chapter_body(
@@ -292,9 +304,11 @@ Driver Printed Name: ________     Signature: ________     Date: ________     Tim
         ]
     )
 
+    # Output path for PDF file
     output_path = os.path.join(output_dir, 'eld_malfunction_letter.pdf')
     pdf.output(output_path)
 
+    # Cleanup the generated file after sending
     @after_this_request
     def cleanup(response):
         try:
@@ -303,6 +317,7 @@ Driver Printed Name: ________     Signature: ________     Date: ________     Tim
             print(f"Cleanup error: {e}")
         return response
 
+    # Send the file as a response
     return send_file(output_path, mimetype='application/pdf', as_attachment=True,
                      download_name='ELD_Malfunction_Letter.pdf')
 
