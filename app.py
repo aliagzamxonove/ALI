@@ -486,7 +486,7 @@ Lucid ELD Support Team"""
 
             with smtplib.SMTP('smtp-mail.outlook.com', 587) as server:
                 server.starttls()
-                server.login("adamlucideld@outlook.com", os.getenv("EMAIL_PASSWORD"))
+                server.login("adamlucideld@outlook.com", os.getenv("ulutpuutcxjsfuqd"))
                 server.sendmail(msg['From'], msg['To'], msg.as_string())
 
             flash("Email successfully sent!", "success")
