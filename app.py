@@ -21,7 +21,7 @@ USER_CREDENTIALS = {
 }
 
 # Настройка Flask-Mail для отправки email
-app.config['MAIL_SERVER'] = 'smtp.gmail.comm'
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'bluestarelduzb@gmail.com'
@@ -482,29 +482,30 @@ Lucid ELD Support Team"""
                     part['Content-Disposition'] = f'attachment; filename="{file.filename}"'
                     full_files.append(part)
 
-        # Email sending
-        try:
-            msg = MIMEMultipart()
-            msg['From'] = "bluestarelduzb@gmail.com"
-            msg['To'] = email
-            msg['Subject'] = subject
-            msg.attach(MIMEText(message, 'plain'))
+# Email sending
+try:
+    msg = MIMEMultipart()
+    msg['From'] = "bluestarelduzb@gmail.com"
+    msg['To'] = email
+    msg['Subject'] = subject
+    msg.attach(MIMEText(message, 'plain'))
 
-            for part in full_files:
-                msg.attach(part)
+    # Attach files (make sure full_files contains MIME parts)
+    for part in full_files:
+        msg.attach(part)
 
-            with smtplib.SMTP('smtp.gmail.com', 587) as server:
-                server.starttls()
-                server.login("bluestarelduzb@gmail.com", os.getenv("xmuz oyrx zdda qywm"))
-                server.sendmail(msg['From'], msg['To'], msg.as_string())
+    with smtplib.SMTP('smtp.gmail.com', 587) as server:
+        server.starttls()
+        server.login("bluestarelduzb@gmail.com", os.getenv("EMAIL_PASSWORD"))  # Make sure you set the environment variable
+        server.sendmail(msg['From'], msg['To'], msg.as_string())
 
-            flash("Email successfully sent!", "success")
-            return redirect('/')
+    flash("Email successfully sent!", "success")
+    return redirect('/')
 
-        except Exception as e:
-            print(f"Error sending email: {e}")
-            flash(f"Failed to send email: {str(e)}", "error")
-            return redirect('/')
+except Exception as e:
+    print(f"Error sending email: {e}")
+    flash(f"Failed to send email: {str(e)}", "error")
+    return redirect('/')
 
     return render_template('mail.html')
 
