@@ -24,8 +24,8 @@ USER_CREDENTIALS = {
 app.config['MAIL_SERVER'] = 'smtp-mail.outlook.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'adamlucideld@outlook.com'
-app.config['MAIL_PASSWORD'] = 'ulutpuutcxjsfuqd'
+app.config['MAIL_USERNAME'] = 'bluestarelduzb@gmail.com'
+app.config['MAIL_PASSWORD'] = 'xmuz oyrx zdda qywm'
 mail = Mail(app)
 
 # Пути
