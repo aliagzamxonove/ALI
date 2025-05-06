@@ -500,13 +500,10 @@ try:
         server.sendmail(msg['From'], msg['To'], msg.as_string())
 
     flash("Email successfully sent!", "success")
-    return redirect('/')
 
 except Exception as e:
     print(f"Error sending email: {e}")
     flash(f"Failed to send email: {str(e)}", "error")
-    return redirect('/')
-
     return render_template('mail.html')
 
 @app.route('/logout')
