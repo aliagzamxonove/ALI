@@ -21,7 +21,7 @@ USER_CREDENTIALS = {
 }
 
 # Настройка Flask-Mail для отправки email
-app.config['MAIL_SERVER'] = 'smtp-mail.outlook.com'
+app.config['MAIL_SERVER'] = 'smtp.gmail.comm'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'bluestarelduzb@gmail.com'
