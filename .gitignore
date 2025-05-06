@@ -172,3 +172,35 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# IDE/editor settings (VSCode)
+.vscode/
+
+# Temporary files from text editors
+*~
+.#*
+
+# Test output and logs
+*.log
+*.out
+
+# Docker-related files
+.dockerignore
+
+# Database files
+*.db
+
+# Local environment settings (for virtual environments not already covered)
+.env/
+.venv/
+
+# Package-specific or additional configuration files
+.tox/
+.nox/
+.coverage
+.coverage.*
+
+# Logs from Celery or other background task systems
+celerybeat-schedule
+celerybeat.pid
+
