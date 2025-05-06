@@ -104,19 +104,13 @@ def generate_report():
 
         total_mileage = sum(mileage_data.values())
 
-        logo_path = None
-        if logo_file and logo_file.filename != '':
-            logo_path = os.path.join(GENERATED_FOLDER, "temp_logo.png")
-            logo_file.save(logo_path)
-
+        # Класс для генерации PDF
         class StyledPDF(FPDF):
-            def __init__(self, logo_path=None):
-                super().__init__()
-                self.logo_path = logo_path
-
             def header(self):
-                if self.logo_path and os.path.exists(self.logo_path):
-                    self.image(self.logo_path, x=10, y=8, h=30)
+                if logo_file and logo_file.filename != '':
+                    logo_path = os.path.join(GENERATED_FOLDER, "temp_logo.png")
+                    logo_file.save(logo_path)
+                    self.image(logo_path, x=10, y=8, h=30)
 
                 self.set_font("Helvetica", "B", 18)
                 self.set_text_color(0, 51, 102)
@@ -155,7 +149,8 @@ def generate_report():
                 self.cell(col_width, 8, f"{total:.2f}", border=1, align="R")
                 self.ln(10)
 
-        pdf = StyledPDF(logo_path=logo_path)
+        # Генерация PDF
+        pdf = StyledPDF()
         pdf.add_page()
         pdf.add_table(truck_number, mileage_data, total_mileage)
 
@@ -163,9 +158,11 @@ def generate_report():
         filepath = os.path.join(GENERATED_FOLDER, filename)
         pdf.output(filepath)
 
-        # Удаляем временный логотип
-        if logo_path and os.path.exists(logo_path):
-            os.remove(logo_path)
+        # Очистка временного файла логотипа
+        if logo_file and logo_file.filename != '':
+            logo_temp_path = os.path.join(GENERATED_FOLDER, "temp_logo.png")
+            if os.path.exists(logo_temp_path):
+                os.remove(logo_temp_path)
 
         @after_this_request
         def remove_file(response):
@@ -488,7 +485,7 @@ Lucid ELD Support Team"""
         # Email sending
         try:
             msg = MIMEMultipart()
-            msg['From'] = "adamlucideld@outlook.com"
+            msg['From'] = "bluestarelduzb@gmail.com"
             msg['To'] = email
             msg['Subject'] = subject
             msg.attach(MIMEText(message, 'plain'))
@@ -496,9 +493,9 @@ Lucid ELD Support Team"""
             for part in full_files:
                 msg.attach(part)
 
-            with smtplib.SMTP('smtp-mail.outlook.com', 587) as server:
+            with smtplib.SMTP('smtp.gmail.com', 587) as server:
                 server.starttls()
-                server.login("adamlucideld@outlook.com", os.getenv("ulutpuutcxjsfuqd"))
+                server.login("bluestarelduzb@gmail.com", os.getenv("xmuz oyrx zdda qywm"))
                 server.sendmail(msg['From'], msg['To'], msg.as_string())
 
             flash("Email successfully sent!", "success")
