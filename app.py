@@ -328,9 +328,9 @@ def timezones():
     return render_template('timezones.html')
 
 
-@app.route("/tutorial")
+@app.route('/tutorial')
 def tutorial():
-    return render_template("tutorial.html")
+    return render_template('tutorial.html')
 
 @app.route('/mail', methods=['GET', 'POST'])
 def mail_page():  # Rename the route function to avoid 'mail' conflict
