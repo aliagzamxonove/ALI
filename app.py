@@ -122,7 +122,7 @@ def generate_report():
                     self.image(logo_path, x=10, y=8, h=30)
 
                 self.set_font("Helvetica", "B", 18)
-                self.set_text_color(0, 51, 102)
+                self.set_text_color(0, 51, 102)  # Official color theme
                 self.ln(10)
                 self.cell(0, 10, "IFTA REPORT", ln=True, align="C")
                 self.ln(5)
@@ -138,7 +138,7 @@ def generate_report():
                 self.cell(0, 10, f"Truck Number: {truck_number}", ln=True, align="L")
                 self.ln(4)
 
-                self.set_fill_color(230, 230, 230)
+                self.set_fill_color(230, 230, 230)  # Subtle background shading for readability
                 self.set_text_color(0)
                 self.set_draw_color(180, 180, 180)
                 col_width = 90
@@ -158,7 +158,6 @@ def generate_report():
                 self.cell(col_width, 8, f"{total:.2f}", border=1, align="R")
                 self.ln(10)
 
-        # Генерация PDF
         pdf = StyledPDF()
         pdf.add_page()
         pdf.add_table(truck_number, mileage_data, total_mileage)
@@ -167,7 +166,7 @@ def generate_report():
         filepath = os.path.join(GENERATED_FOLDER, filename)
         pdf.output(filepath)
 
-        # Очистка временного файла логотипа
+        # Cleanup logo file after report generation
         if logo_file and logo_file.filename != '':
             logo_temp_path = os.path.join(GENERATED_FOLDER, "temp_logo.png")
             if os.path.exists(logo_temp_path):
@@ -184,11 +183,8 @@ def generate_report():
         return send_file(filepath, mimetype='application/pdf', as_attachment=True, download_name=filename)
 
     return render_template('generate_report.html')
-
-from flask import Flask, request, render_template, send_file, after_this_request
-import os
-from fpdf import FPDF
-
+    
+    
 @app.route('/eld_malfunction_letter', methods=['GET', 'POST'])
 def eld_malfunction_letter():
     if request.method == 'GET':
