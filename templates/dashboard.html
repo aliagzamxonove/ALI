@@ -14,6 +14,7 @@
       --text: #ecf0f1;
       --danger: #B84E4E;
       --danger-dark: #A13F3F;
+      --transition-duration: 0.3s;
     }
 
     @media (prefers-color-scheme: light) {
@@ -65,10 +66,14 @@
       border-radius: 12px;
       font-weight: 600;
       text-decoration: none;
-      transition: all 0.3s ease;
+      transition: background-color var(--transition-duration) ease, transform var(--transition-duration) ease;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
       border: none;
       cursor: pointer;
+    }
+
+    .dashboard-btn:focus {
+      outline: 2px solid var(--primary-dark);
     }
 
     .dashboard-btn:hover {
@@ -88,8 +93,12 @@
       cursor: pointer;
       border: none;
       z-index: 1000;
-      transition: all 0.3s ease;
+      transition: background-color var(--transition-duration) ease;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    #logoutBtn:focus {
+      outline: 2px solid var(--danger-dark);
     }
 
     #logoutBtn:hover {
@@ -115,7 +124,7 @@
       width: 90%;
       max-width: 360px;
       border-radius: 10px;
-      animation: fadeIn 0.3s ease-in-out;
+      animation: fadeIn var(--transition-duration) ease-in-out;
       box-shadow: 0 0 18px rgba(0, 0, 0, 0.4);
       text-align: center;
     }
@@ -143,12 +152,22 @@
       font-weight: 600;
       border: none;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      transition: background-color var(--transition-duration) ease;
       min-width: 120px;
     }
 
     .modal-btn:hover {
       background-color: var(--primary-dark);
+    }
+
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid var(--primary);
+      border-radius: 50%;
+      width: 12px;
+      height: 12px;
+      animation: spin 1s linear infinite;
+      margin-left: 8px;
     }
 
     @keyframes fadeIn {
@@ -162,7 +181,7 @@
     }
 
     .modal.fade-out {
-      animation: fadeOut 0.3s ease-in-out forwards;
+      animation: fadeOut var(--transition-duration) ease-in-out forwards;
     }
 
     @media (max-width: 480px) {
@@ -173,6 +192,11 @@
       }
       header h1 {
         font-size: 1.6rem;
+      }
+
+      .modal-content {
+        width: 100%;
+        padding: 16px;
       }
     }
   </style>
@@ -188,11 +212,10 @@
       <a href="{{ url_for('eld_malfunction_letter') }}" class="dashboard-btn">ELD Malfunction Letter</a>
       <a href="{{ url_for('tutorial') }}" class="dashboard-btn">Tutorial Viewer</a>
       <a href="{{ url_for('timezones') }}" class="dashboard-btn">Time Zones</a>
-      <!-- Added new button for mail.html -->
       <a href="{{ url_for('mail_page') }}" class="dashboard-btn">Send Email</a>
     </div>
 
-    <button id="logoutBtn" aria-label="Logout">Logout</button>
+    <button id="logoutBtn" aria-label="Logout" title="Log out of your account">Logout</button>
 
     <!-- Modal -->
     <div id="logoutModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="logoutModalLabel" aria-describedby="logoutModalDesc">
@@ -233,6 +256,8 @@
       cancelLogout.addEventListener('click', closeModal);
 
       confirmLogout.addEventListener('click', () => {
+        // Show spinner on logout button
+        document.getElementById('logoutBtn').innerHTML = '<span class="spinner"></span> Logging out...';
         window.location.href = "{{ url_for('logout') }}";
       });
 
