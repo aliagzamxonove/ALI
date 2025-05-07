@@ -6,43 +6,34 @@
   <title>Login - IFTA Report Generator</title>
   <link rel="icon" href="{{ url_for('static', filename='IFTA5458.png') }}" type="image/png" />
   <script>
-    // Apply saved theme immediately after page load
     window.onload = function() {
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme) {
-        document.body.classList.add(savedTheme);
-      } else {
-        document.body.classList.add('light-theme'); // Default to light theme if not saved
+      const savedTheme = localStorage.getItem('theme') || 'light-theme';
+      document.body.classList.add(savedTheme);
+      const themeText = document.querySelector('.theme-toggle-text');
+      if (themeText) {
+        themeText.textContent = savedTheme === 'dark-theme' ? 'Light' : 'Dark';
       }
-    }
+    };
 
     function toggleTheme() {
       const currentTheme = document.body.classList.contains('dark-theme') ? 'dark-theme' : 'light-theme';
       const newTheme = currentTheme === 'dark-theme' ? 'light-theme' : 'dark-theme';
-      
-      // Apply new theme and save it to localStorage
       document.body.classList.replace(currentTheme, newTheme);
       localStorage.setItem('theme', newTheme);
-
-      // Change text based on the theme
       const themeText = document.querySelector('.theme-toggle-text');
       themeText.textContent = newTheme === 'dark-theme' ? 'Light' : 'Dark';
-      
-      // Force reflow to ensure styles are immediately updated
-      document.body.offsetHeight; // This triggers a reflow
+      document.body.offsetHeight;
     }
 
     function togglePassword() {
       const passwordField = document.getElementById('password');
       const toggleButton = document.getElementById('toggle-password');
-
-      // Toggle the password visibility
       if (passwordField.type === 'password') {
         passwordField.type = 'text';
-        toggleButton.textContent = 'Hide';  // Change button text to "Hide"
+        toggleButton.textContent = 'Hide';
       } else {
         passwordField.type = 'password';
-        toggleButton.textContent = 'Show';  // Change button text to "Show"
+        toggleButton.textContent = 'Show';
       }
     }
   </script>
@@ -140,8 +131,8 @@
     }
 
     body.dark-theme .input-field {
-      background-color: #ffffff;
-      color: #333;
+      background-color: #1e2a3a;
+      color: #dbe2e9;
       border: 1px solid #3c4c66;
     }
 
@@ -168,7 +159,7 @@
     }
 
     body.dark-theme .password-toggle {
-      color: #000000;
+      color: #dbe2e9;
     }
 
     .password-toggle:hover {
@@ -189,7 +180,8 @@
       border-radius: 4px;
     }
 
-    .btn {
+    .btn,
+    .login-btn {
       padding: 12px 20px;
       background-color: #003366;
       color: white;
@@ -201,7 +193,8 @@
       transition: background-color 0.3s ease;
     }
 
-    .btn:hover {
+    .btn:hover,
+    .login-btn:hover {
       background-color: #00509e;
     }
 
@@ -242,10 +235,10 @@
 <body>
   <div class="login-container">
     <div class="login-box">
-      <img src="{{ url_for('static', filename='IFTA5458.png') }}" alt="IFTA Logo" class="login-logo" />
+      <img src="{{ url_for('static', filename='IFTA5458.png') }}" alt="IFTA Logo" class="login-logo" role="img" aria-label="IFTA logo"/>
       <div class="login-heading">Log in to your Account</div>
 
-      {% with messages = get_flashed_messages() %} 
+      {% with messages = get_flashed_messages() %}
         {% if messages %}
           <ul class="flashes">
             {% for message in messages %}
@@ -276,9 +269,7 @@
   </div>
 
   <button onclick="toggleTheme()" class="theme-toggle-btn">
-    <span class="theme-toggle-text">
-      Dark
-    </span>
+    <span class="theme-toggle-text">Dark</span>
   </button>
 </body>
 </html>
