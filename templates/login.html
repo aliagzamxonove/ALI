@@ -3,262 +3,273 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Lucid ELD Email Sender</title>
+  <title>Login - IFTA Report Generator</title>
   <link rel="icon" href="{{ url_for('static', filename='IFTA5458.png') }}" type="image/png" />
+  <script>
+    window.onload = function() {
+      const savedTheme = localStorage.getItem('theme') || 'light-theme';
+      document.body.classList.add(savedTheme);
+      const themeText = document.querySelector('.theme-toggle-text');
+      if (themeText) {
+        themeText.textContent = savedTheme === 'dark-theme' ? 'Light' : 'Dark';
+      }
+    };
+
+    function toggleTheme() {
+      const currentTheme = document.body.classList.contains('dark-theme') ? 'dark-theme' : 'light-theme';
+      const newTheme = currentTheme === 'dark-theme' ? 'light-theme' : 'dark-theme';
+      document.body.classList.replace(currentTheme, newTheme);
+      localStorage.setItem('theme', newTheme);
+      const themeText = document.querySelector('.theme-toggle-text');
+      themeText.textContent = newTheme === 'dark-theme' ? 'Light' : 'Dark';
+      document.body.offsetHeight;
+    }
+
+    function togglePassword() {
+      const passwordField = document.getElementById('password');
+      const toggleButton = document.getElementById('toggle-password');
+      if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        toggleButton.textContent = 'Hide';
+      } else {
+        passwordField.type = 'password';
+        toggleButton.textContent = 'Show';
+      }
+    }
+  </script>
   <style>
-    * {
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f7f7f7;
+      color: #333;
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
-    body {
-      font-family: system-ui, 'Arial', sans-serif;
-      background: #101d2e;
-      color: #ecf0f1;
-      padding: 50px 20px;
+    body.light-theme {
+      background-color: #f7f7f7;
+      color: #333;
     }
 
-    .container {
-      max-width: 600px;
-      margin: auto;
-      background: #000;
+    body.dark-theme {
+      background-color: #101d2e;
+      color: #dbe2e9;
+    }
+
+    .login-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      width: 100%;
+    }
+
+    .login-box {
+      background-color: #ffffff;
       padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-      transition: all 0.3s ease-in-out;
-    }
-
-    h1 {
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 400px;
       text-align: center;
-      font-size: 28px;
-      color: #ffffff;
-      margin-bottom: 25px;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
-    label {
-      font-size: 15px;
+    body.dark-theme .login-box {
+      background-color: #000000;
+      color: #dbe2e9;
+    }
+
+    .login-logo {
+      width: 50px;
+      margin-bottom: 20px;
+    }
+
+    .login-heading {
+      font-size: 24px;
+      color: #000000;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    body.dark-theme .login-heading {
       color: #ffffff;
-      margin-bottom: 6px;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .input-group label {
       display: block;
+      font-size: 14px;
+      font-weight: bold;
+      color: #003366;
     }
 
-    input, select, textarea {
+    body.dark-theme .input-group label {
+      color: #dbe2e9;
+    }
+
+    .input-field {
       width: 100%;
       padding: 12px;
-      margin-bottom: 20px;
-      border: 1px solid #34495e;
-      border-radius: 6px;
-      font-size: 16px;
-      background-color: #1a2533;
-      color: #ecf0f1;
-    }
-
-    input::placeholder, textarea::placeholder {
-      color: #bbb;
-    }
-
-    select {
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg fill='white' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
-      background-size: 12px;
-      padding-right: 35px;
-    }
-
-    textarea {
-      height: 130px;
-    }
-
-    button {
-      width: 100%;
-      padding: 14px;
-      background: linear-gradient(to right, #2980b9, #3498db);
-      color: white;
-      font-size: 18px;
-      font-weight: 600;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background 0.3s ease-in-out;
-    }
-
-    button:hover {
-      background: linear-gradient(to right, #3498db, #2980b9);
-    }
-
-    .back-icon {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      background-color: #151c29;
-      color: white;
-      padding: 10px 18px;
-      border-radius: 10px;
-      font-weight: bold;
-      text-decoration: none;
-      transition: all 0.2s ease;
-      z-index: 100;
-    }
-
-    .back-icon:hover {
-      background-color: #000;
-      transform: scale(1.05);
-    }
-
-    .message-box {
-      background: rgba(255, 255, 255, 0.05);
-      padding: 15px;
-      color: #ecf0f1;
-      border-left: 5px solid #3498db;
-      border-radius: 5px;
-      margin-bottom: 20px;
-    }
-
-    .notification {
-      margin-top: 20px;
-      padding: 15px;
-      font-size: 16px;
-      border-radius: 5px;
-      display: none;
-      text-align: center;
-    }
-
-    .notification.success {
-      background-color: #28a745;
-      color: white;
-    }
-
-    .notification.error {
-      background-color: #dc3545;
-      color: white;
-    }
-
-    #api-fields, #ifta-upload {
-      background-color: rgba(255, 255, 255, 0.05);
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-    }
-
-    input[type="file"] {
-      background-color: #1a2533;
-      color: white;
-      border: 1px solid #34495e;
-      cursor: pointer;
-    }
-
-    .footer {
-      text-align: center;
-      margin-top: 25px;
       font-size: 14px;
-      color: #7f8c8d;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      margin-top: 5px;
+      transition: border-color 0.3s ease;
+      background-color: #ffffff;
+      color: #333;
     }
 
-    .footer a {
-      color: #3498db;
-      text-decoration: none;
+    body.dark-theme .input-field {
+      background-color: #1e2a3a;
+      color: #dbe2e9;
+      border: 1px solid #3c4c66;
     }
 
-    .footer a:hover {
-      text-decoration: underline;
+    .input-field:focus {
+      border-color: #003366;
+      outline: none;
+    }
+
+    .password-container {
+      position: relative;
+    }
+
+    .password-toggle {
+      position: absolute;
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      font-size: 14px;
+      color: #000000;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    body.dark-theme .password-toggle {
+      color: #dbe2e9;
+    }
+
+    .password-toggle:hover {
+      color: #49759c;
+    }
+
+    .flashes {
+      margin: 10px 0;
+      padding: 0;
+      list-style-type: none;
+      font-size: 14px;
+    }
+
+    .flashes .error-message {
+      color: #e74c3c;
+      background-color: #fbe3e4;
+      padding: 10px;
+      border-radius: 4px;
+    }
+
+    .btn,
+    .login-btn {
+      padding: 12px 20px;
+      background-color: #003366;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      width: 100%;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn:hover,
+    .login-btn:hover {
+      background-color: #00509e;
+    }
+
+    .form-text {
+      font-size: 12px;
+      color: #888;
+      margin-top: 5px;
+    }
+
+    body.dark-theme .form-text {
+      color: #aab4c5;
+    }
+
+    .theme-toggle-btn {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      background-color: #003366;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
+
+    .theme-toggle-btn:hover {
+      background-color: #00509e;
+    }
+
+    .theme-toggle-text {
+      font-size: 14px;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <a href="{{ url_for('dashboard') }}" class="back-icon">← Back</a>
-  <div class="container">
-    <h1>Lucid ELD Email Sender</h1>
-    <form id="emailForm" enctype="multipart/form-data" autocomplete="off" novalidate>
-      <div class="message-box">
-        <p>Fill out the form below to send an email to a driver or client based on your needs.</p>
-      </div>
+  <div class="login-container">
+    <div class="login-box">
+      <img src="{{ url_for('static', filename='IFTA5458.png') }}" alt="IFTA Logo" class="login-logo" role="img" aria-label="IFTA logo"/>
+      <div class="login-heading">Log in to your Account</div>
 
-      <label for="email">Recipient's Email</label>
-      <input type="email" id="email" name="email" placeholder="example@domain.com" required>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class="flashes">
+            {% for message in messages %}
+              <li class="error-message">{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
 
-      <label for="email_type">Select Email Type</label>
-      <select id="email_type" name="email_type" required>
-        <option value="" disabled selected>Select a type</option>
-        <option value="instructions">ELD Instruction Pack</option>
-        <option value="ifta">IFTA Report</option>
-        <option value="information">Lucid ELD Information</option>
-        <option value="advertising">Advertising</option>
-        <option value="api">API Credentials</option>
-      </select>
+      <form method="POST" autocomplete="off">
+        <div class="input-group">
+          <label for="username">Username</label>
+          <input type="text" name="username" id="username" class="input-field" required placeholder="Enter your username" aria-describedby="usernameHelp"/>
+          <small id="usernameHelp" class="form-text">Your unique username to access the system.</small>
+        </div>
 
-      <div id="api-fields" hidden>
-        <label for="username">Username</label>
-        <input type="text" id="username" name="username" placeholder="Enter username">
-        <label for="password">Password</label>
-        <input type="text" id="password" name="password" placeholder="Enter password">
-        <label for="api_key">API Key</label>
-        <input type="text" id="api_key" name="api_key" placeholder="Enter API Key">
-      </div>
+        <div class="input-group">
+          <label for="password">Password</label>
+          <div class="password-container">
+            <input type="password" name="password" id="password" class="input-field" required placeholder="Enter your password" aria-label="Password field"/>
+            <button type="button" id="toggle-password" class="password-toggle" onclick="togglePassword()" aria-label="Toggle password visibility">Show</button>
+          </div>
+        </div>
 
-      <div id="ifta-upload" hidden>
-        <label for="ifta_files">Upload IFTA Files</label>
-        <input type="file" id="ifta_files" name="ifta_files" multiple accept=".pdf">
-      </div>
-
-      <button type="submit" id="submitBtn">Send Email</button>
-    </form>
-
-    <div id="notification" class="notification"></div>
-
-    <div class="footer">
-      <p>Powered by <a href="https://www.lucideld.com" target="_blank">Lucid ELD</a></p>
+        <button type="submit" class="btn login-btn">Login</button>
+      </form>
     </div>
   </div>
 
-  <script>
-    const emailTypeSelect = document.getElementById('email_type');
-    const apiFields = document.getElementById('api-fields');
-    const iftaUpload = document.getElementById('ifta-upload');
-    const emailForm = document.getElementById('emailForm');
-    const notification = document.getElementById('notification');
-    const submitBtn = document.getElementById('submitBtn');
-
-    emailTypeSelect.addEventListener('change', () => {
-      const selected = emailTypeSelect.value;
-      apiFields.hidden = selected !== 'api';
-      iftaUpload.hidden = selected !== 'ifta';
-    });
-
-    emailForm.addEventListener('submit', async function (e) {
-      e.preventDefault();
-      submitBtn.disabled = true;
-      const formData = new FormData(emailForm);
-
-      try {
-        const res = await fetch('/mail', {
-          method: 'POST',
-          body: formData
-        });
-        if (!res.ok) throw new Error('Failed');
-
-        showNotification('Email sent successfully!', 'success');
-        emailForm.reset();
-        apiFields.hidden = true;
-        iftaUpload.hidden = true;
-      } catch {
-        showNotification('There was an error sending the email. Please try again.', 'error');
-      } finally {
-        submitBtn.disabled = false;
-      }
-    });
-
-    function showNotification(message, type) {
-      notification.textContent = message;
-      notification.className = `notification ${type}`;
-      notification.style.display = 'block';
-      setTimeout(() => {
-        notification.style.display = 'none';
-        notification.className = 'notification';
-        notification.textContent = '';
-      }, 5000);
-    }
-  </script>
+  <button onclick="toggleTheme()" class="theme-toggle-btn">
+    <span class="theme-toggle-text">Dark</span>
+  </button>
 </body>
 </html>
