@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lucid ELD Professional Test</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --clr-primary: #5a67d8;
+  --clr-primary-dark: #434190;
+  --clr-primary-light: #8a93ff;
+  --clr-bg-start: #f7f9fc;
+  --clr-bg-end: #e0e7ff;
+  --clr-text-main: #1a202c;
+  --clr-text-muted: #4a5568;
+  --clr-success-bg: #d4f5e9;
+  --clr-success-border: #38a169;
+  --clr-success-text: #2f855a;
+  --clr-error-bg: #ffe3e3;
+  --clr-error-border: #e53e3e;
+  --clr-error-text: #9b2c2c;
+  --clr-disabled-bg: #e2e8f0;
+  --clr-disabled-text: #a0aec0;
+
+  --font-family: 'Inter', system-ui, sans-serif;
+
+  --radius-lg: 1rem;
+  --radius-sm: 0.5rem;
+
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 0.75rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2.5rem;
+
+  --shadow-light: 0 4px 10px rgba(90, 103, 216, 0.1);
+  --shadow-heavy: 0 10px 30px rgba(90, 103, 216, 0.2);
+  --shadow-focus: 0 0 10px 3px rgba(90, 103, 216, 0.6);
+
+  --transition-speed: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-family);
+  background: linear-gradient(135deg, var(--clr-bg-start), var(--clr-bg-end));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg);
+  color: var(--clr-text-main);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background 0.5s ease;
+}
+
+.container {
+  width: 100%;
+  max-width: 720px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg) 3rem;
+  box-shadow: var(--shadow-heavy);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  transition: box-shadow var(--transition-speed), transform var(--transition-speed);
+  animation: fadeInScale 0.6s ease-out both;
+}
+
+@keyframes fadeInScale {
+  0% { opacity: 0; transform: scale(0.97); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.container:focus-within {
+  box-shadow: var(--shadow-focus);
+}
+
+h1 {
+  font-size: 2.5rem;
+  font-weight: 900;
+  text-align: center;
+  color: var(--clr-primary-dark);
+  margin-bottom: var(--spacing-lg);
+}
+
+.question {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-md);
+  min-height: 4rem;
+  transition: opacity var(--transition-speed);
+}
+
+.answers {
+  display: grid;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+.answers button {
+  background: #f9fafc;
+  border-radius: var(--radius-sm);
+  border: none;
+  padding: 1rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--clr-primary-dark);
+  cursor: pointer;
+  box-shadow: inset 4px 4px 6px rgba(0, 0, 0, 0.06),
+              inset -4px -4px 6px rgba(255, 255, 255, 0.8),
+              6px 6px 12px rgba(0, 0, 0, 0.05);
+  transition: all var(--transition-speed);
+  user-select: none;
+}
+
+.answers button:hover:not(:disabled),
+.answers button:focus-visible {
+  background-color: var(--clr-primary-light);
+  color: #fff;
+  box-shadow: 4px 4px 10px rgba(83, 95, 255, 0.7),
+              -4px -4px 15px rgba(131, 142, 255, 0.9);
+  transform: translateY(-2px) scale(1.03);
+}
+
+.answers button:disabled {
+  cursor: not-allowed;
+  color: var(--clr-disabled-text);
+  background-color: var(--clr-disabled-bg);
+  box-shadow: none;
+}
+
+.answers button.correct {
+  background: var(--clr-success-bg);
+  color: var(--clr-success-text);
+  box-shadow: 4px 4px 10px rgba(56, 161, 105, 0.6),
+              -4px -4px 15px rgba(72, 187, 126, 0.7);
+  transform: scale(1.05);
+}
+
+.answers button.incorrect {
+  background: var(--clr-error-bg);
+  color: var(--clr-error-text);
+  box-shadow: 4px 4px 10px rgba(229, 62, 62, 0.6),
+              -4px -4px 15px rgba(234, 80, 80, 0.7);
+  transform: scale(0.98);
+}
+
+.next-btn, .restart-btn {
+  background: var(--clr-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 1rem 3rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 6px 6px 15px rgba(90, 103, 216, 0.6),
+              -6px -6px 20px rgba(129, 144, 255, 0.8);
+  transition: all var(--transition-speed);
+  user-select: none;
+  display: none;
+}
+
+.next-btn.show, .restart-btn.show {
+  display: inline-block;
+}
+
+.next-btn:hover, .restart-btn:hover {
+  background-color: var(--clr-primary-dark);
+  box-shadow: 8px 8px 20px rgba(67, 56, 202, 0.8),
+              -8px -8px 25px rgba(103, 91, 255, 1);
+  transform: translateY(-1px) scale(1.05);
+}
+
+.next-btn:focus-visible, .restart-btn:focus-visible {
+  box-shadow: 0 0 14px 4px rgba(90, 103, 216, 0.9);
+  outline: none;
+}
+
+.result {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--clr-text-muted);
+  text-align: center;
+  margin-top: var(--spacing-md);
+  min-height: 2.5rem;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.result.show {
+  opacity: 1;
+}
+
+.name-entry {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+  max-width: 400px;
+  width: 100%;
+  margin-inline: auto;
+}
+
+.name-entry input,
+.name-entry button {
+  width: 100%;
+  border-radius: 0.75rem;
+  font-size: 1.2rem;
+  height: 44px;
+}
+
+.name-entry input {
+  border: 2px solid #ccc;
+  padding: 1rem 2rem;
+  transition: all 0.3s ease;
+}
+
+.name-entry input:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 10px rgba(79, 70, 229, 0.5);
+  outline: none;
+}
+
+.name-entry button {
+  background: #4f46e5;
+  color: white;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 14px rgba(79, 70, 229, 0.5);
+}
+
+.name-entry button span {
+  padding: 0.75rem 1rem;
+  width: 100%;
+  text-align: center;
+}
+
+.name-entry button:hover:not(:disabled) {
+  background-color: #4338ca;
+  box-shadow: 0 7px 20px rgba(67, 56, 202, 0.7);
+}
+
+.name-entry button:disabled {
+  background-color: #a5a5a5;
+  box-shadow: none;
+  cursor: default;
+}
+
+.leaderboard {
+  margin-top: var(--spacing-lg);
+  border-top: 2px solid var(--clr-primary-light);
+  padding-top: var(--spacing-md);
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-light);
+  overflow-x: auto;
+}
+
+.leaderboard h2 {
+  text-align: center;
+  margin-bottom: var(--spacing-md);
+  color: var(--clr-primary);
+  font-weight: 800;
+  font-size: 1.6rem;
+}
+
+.leaderboard table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  min-width: 320px;
+}
+
+.leaderboard th {
+  background: var(--clr-primary-light);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  text-align: center;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+
+.leaderboard td {
+  background: #ffffffee;
+  padding: 0.75rem 1.5rem;
+  text-align: center;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.3s ease;
+}
+
+.leaderboard tbody tr:hover td {
+  background: var(--clr-bg-end);
+  box-shadow: 0 4px 8px rgba(90, 103, 216, 0.15);
+}
+
+.status-master,
+.status-passed,
+.status-failed {
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-sm);
+  display: inline-block;
+  min-width: 70px;
+  font-size: 0.9rem;
+}
+
+.status-master {
+  background-color: #c6f6d5;
+  color: var(--clr-success-border);
+  box-shadow: 0 0 8px rgba(56, 161, 105, 0.3);
+}
+
+.status-passed {
+  background-color: #bee3f8;
+  color: #3b82f6;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
+}
+
+.status-failed {
+  background-color: #fed7d7;
+  color: var(--clr-error-border);
+  box-shadow: 0 0 8px rgba(229, 62, 62, 0.3);
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: var(--spacing-md) 1.5rem;
+  }
+  h1 {
+    font-size: 1.75rem;
+  }
+  .question {
+    font-size: 1.15rem;
+    min-height: 3rem;
+  }
+  .answers button {
+    font-size: 1rem;
+    padding: 0.85rem 1rem;
+  }
+  .next-btn,
+  .restart-btn,
+  .name-entry button {
+    padding: 0.85rem 2rem;
+    font-size: 1rem;
+  }
+  .name-entry input {
+    width: 90%;
+  }
+  .leaderboard table {
+    font-size: 0.9rem;
+  }
+  .leaderboard th,
+  .leaderboard td {
+    padding: 0.5rem 1rem;
+  }
+  .status-master,
+  .status-passed,
+  .status-failed {
+    font-size: 0.8rem;
+    min-width: 60px;
+  }
+}
+
+.celebration {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.confetti {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: var(--clr-primary);
+  opacity: 0.7;
+  animation: fall 2s linear forwards;
+  border-radius: 2px;
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+</style>
+</head>
+<body>
+  <main class="container" role="main" aria-labelledby="main-title">
+    <h1 id="main-title">Lucid ELD Compliance Test</h1>
+
+    <section id="nameEntry" class="name-entry" aria-label="Enter your name before starting the test">
+      <input type="text" id="userNameInput" placeholder="Enter your name" aria-required="true" />
+      <button id="startTestBtn" disabled>Start Test</button>
+    </section>
+    
+    <section id="quiz" aria-live="polite" aria-atomic="true" hidden>
+      <p class="question" id="question">Loading...</p>
+      <div class="answers" id="answers"></div>
+      <button class="next-btn" id="nextBtn" aria-label="Next question">Next</button>
+      <p class="result" id="result" aria-live="polite" aria-atomic="true"></p>
+      <button class="restart-btn" id="restartBtn" aria-label="Restart the test">Restart Test</button>
+    </section>
+      <section id="leaderboard" class="leaderboard" hidden aria-live="polite" aria-atomic="true" aria-label="Leaderboard of all users">
+      <h2>Leaderboard</h2>
+      <table>
+        <thead>
+          <tr><th>Name</th><th>Score</th><th>Status</th></tr>
+        </thead>
+        <tbody id="leaderboardBody"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <div class="celebration" id="celebration"></div>
+
+ <script>
+const questions = [
+  {
+    question: "Why are Electronic Logging Devices (ELDs) important in the trucking industry?",
+    options: [
+      "They help drivers increase their speed",
+      "They ensure compliance with federal hours of service regulations",
+      "They monitor the vehicle's fuel consumption",
+      "They allow drivers to bypass inspections"
+    ],
+    answer: 1
+  },
+  {
+    question: "Which agency mandates the use of ELDs for most commercial motor vehicle operators in the U.S.?",
+    options: [
+      "Department of Transportation (DOT)",
+      "Federal Motor Carrier Safety Administration (FMCSA)",
+      "National Highway Traffic Safety Administration (NHTSA)",
+      "Federal Aviation Administration (FAA)"
+    ],
+    answer: 1
+  },
+  {
+    question: "What is one of the main benefits of implementing ELDs in trucking companies?",
+    options: [
+      "Increased vehicle speed",
+      "Reduced paperwork and improved efficiency",
+      "Fewer vehicle inspections",
+      "Lower fuel consumption"
+    ],
+    answer: 1
+  },
+  {
+    question: "ELDs help prevent what kind of road accidents?",
+    options: [
+      "Speeding-related accidents",
+      "Fatigue-related accidents",
+      "Weather-related accidents",
+      "Mechanical failure-related accidents"
+    ],
+    answer: 1
+  },
+  {
+    question: "Which of the following is NOT directly related to the use of an Electronic Logging Device (ELD)?",
+    options: [
+      "Monitoring driving duration",
+      "Tracking rest periods",
+      "Complying with federal regulations",
+      "Managing employee payroll"
+    ],
+    answer: 3
+  },
+  {
+    question: "What is a logbook in the context of commercial driving?",
+    options: [
+      "A book used for vehicle maintenance records",
+      "A historical method for recording hours of service manually",
+      "A system used to track fuel consumption",
+      "A device used to track vehicle location"
+    ],
+    answer: 1
+  },
+  {
+    question: "When did logbooks first become essential for commercial drivers?",
+    options: [
+      "In the late 20th century, with the rise of ELDs",
+      "In the early 20th century, when the U.S. government began regulating trucking",
+      "After the 1990s, with the rise of online trucking services",
+      "In the 1950s, due to the increasing size of commercial vehicles"
+    ],
+    answer: 1
+  },
+  {
+    question: "Which of the following best describes the \"Off-Duty\" status in an ELD system?",
+    options: [
+      "The driver is actively driving the vehicle",
+      "The driver is resting, eating, or performing non-work-related activities",
+      "The driver is performing vehicle maintenance",
+      "The driver is resting in the truck’s sleeper berth but remains in the vehicle"
+    ],
+    answer: 1
+  },
+  {
+    question: "When the cycle time goes down, it decreases only during which of the following statuses?",
+    options: [
+      "When the driver completes a 10-hour rest break",
+      "During statuses related to work, such as On Duty, Driving, and Yard Move",
+      "When the cycle is reset on Sunday to Saturday each week",
+      "When the driver does not complete the 10-hour break in the sleeper berth"
+    ],
+    answer: 1
+  },
+  {
+    question: "In which of the following scenarios will the break time not reset?",
+    options: [
+      "When the driver remains in On Duty mode for over 30 minutes",
+      "By resting fully in Off Duty mode for over 30 minutes",
+      "By staying in Off Duty, On Duty, or Sleeper Berth for a combined total of 30 minutes, even with intermittent driving events",
+      "By staying in Off Duty, On Duty, or Sleeper Berth for a combined total of 30 minutes"
+    ],
+    answer: 2
+  },
+  {
+    question: "How does the ELD connect to the vehicle's operation?",
+    options: [
+      "It connects to the driver’s mobile device to monitor driving patterns",
+      "It connects directly to the vehicle's engine to capture real-time data about the vehicle's operation",
+      "It monitors the vehicle's fuel levels to detect movement",
+      "It uses GPS to track the vehicle's location without connecting to the engine"
+    ],
+    answer: 1
+  },
+  {
+    question: "When does the ELD automatically switch the driver's status to \"Driving\"?",
+    options: [
+      "When the vehicle moves for more than 5 minutes",
+      "When the vehicle moves above 5 mph",
+      "When the driver starts the vehicle",
+      "When the driver logs in to the ELD system"
+    ],
+    answer: 1
+  },
+  {
+    question: "Under the FMCSA ELD regulations, which of the following applies to a Short-Haul driver?",
+    options: [
+      "Short-Haul drivers must use an ELD at all times, regardless of distance.",
+      "Short-Haul drivers who exceed the 150 air-mile radius must switch to ELD logging and paper logs.",
+      "Short-Haul drivers are exempt from using an ELD but must log time records if they exceed 14 hours of work.",
+      "Short-Haul drivers can bypass the 14-hour shift limit by using time records instead of an ELD."
+    ],
+    answer: 2
+  },
+  {
+    question: "Which of the following actions would allow a driver to reset the 70-hour cycle limit?",
+    options: [
+      "The driver takes 30 minutes of break after 8 hours of driving, then continues with 3 consecutive days of On-Duty, Not Driving status.",
+      "The driver accumulates 34 hours of non-driving events (such as fueling, inspections, or unloading) over the last 3 days, with no driving time logged during this period.",
+      "The driver takes a total of 34 hours, spread across multiple breaks, within a 3-day period, including time logged as Off-Duty, On-Duty, and Sleeper Berth.",
+      "The driver takes a 34-hour consecutive break, which includes both Off-Duty and Sleeper Berth time."
+    ],
+    answer: 3
+  },
+  {
+    question: "How does the ELD system record and calculate engine hours, and why is this data important for compliance?",
+    options: [
+      "Engine hours are recorded as a total of the vehicle’s operation time, then converted to hours using a simple conversion chart for maintenance tracking.",
+      "Engine hours are calculated based solely on the vehicle’s odometer readings to ensure accurate compliance with rest time requirements.",
+      "Engine hours are recorded by the driver manually after every driving event, and the ELD system updates this data each time the driver enters a new status.",
+      "Engine hours are only logged during active driving periods, and the driver can ignore them when the vehicle is stationary."
+    ],
+    answer: 0
+  },
+  {
+    question: "Which of the following statements accurately reflects the purpose of a Load ID in the shipping process?",
+    options: [
+      "The Load ID is used only for internal tracking by the carrier and is not required on shipping documents.",
+      "The Load ID links the shipment to specific documentation and is critical for matching the load with the correct delivery instructions and cargo verification.",
+      "The Load ID is generated only at the point of delivery and is not necessary during transit.",
+      "The Load ID is automatically assigned by the ELD system based on the fuel usage reported during transit."
+    ],
+    answer: 1
+  },
+  {
+    question: "What is the significance of the International Fuel Tax Agreement (IFTA) for interstate commercial carriers?",
+    options: [
+      "IFTA allows carriers to report and pay fuel taxes based on the type of cargo being transported.",
+      "IFTA simplifies fuel tax reporting by allowing carriers to report and pay taxes based on miles driven in each jurisdiction.",
+      "IFTA only applies to Canadian commercial carriers and does not affect U.S. carriers.",
+      "IFTA requires carriers to pay taxes upfront before entering each jurisdiction, eliminating the need for post-journey reporting."
+    ],
+    answer: 1
+  },
+  {
+    question: "When a driver logs a Personal Conveyance (PC) status, which of the following scenarios would be considered INVALID under FMCSA regulations?",
+    options: [
+      "The driver travels from a rest stop to a nearby hotel for personal lodging while off-duty.",
+      "The driver uses the CMV to drive to a facility for necessary repairs after completing their shift.",
+      "The driver commutes home from the terminal after finishing their workday while off-duty.",
+      "The driver moves the truck to a nearby restaurant to have lunch during their break."
+    ],
+    answer: 1
+  },
+  {
+    question: "Which of the following is the most appropriate usage of Yard Move (YM) status?",
+    options: [
+      "Moving the truck to a different location within the company yard for loading purposes.",
+      "Driving a vehicle on a public road to reposition it for the next load.",
+      "Using Yard Move status to avoid logging actual driving time when repositioning the vehicle on the public road.",
+      "Commuting to the driver’s home from the terminal using the vehicle."
+    ],
+    answer: 0
+  },
+  {
+    question: "If a driver forgets to log into the ELD system before starting a driving event, how should the unassigned driving time be handled according to FMCSA regulations?",
+    options: [
+      "The unassigned driving time must be immediately ignored, and no further action is required.",
+      "The unassigned driving time must be reviewed, and the carrier must assign it to the appropriate driver or annotate why it cannot be assigned.",
+      "The driver can manually log the driving time, bypassing the need for any review.",
+      "The unassigned driving time will automatically be corrected by the ELD once the driver logs in."
+    ],
+    answer: 1
+  },
+  {
+    question: "In the event of an ELD malfunction that impacts the system’s ability to log data, what is the driver's responsibility according to FMCSA regulations?",
+    options: [
+      "The driver can continue driving without recording any data until the issue is fixed.",
+      "The driver must manually record their duty status while the ELD is malfunctioning.",
+      "The driver is responsible for fixing the ELD issue and ensuring it functions properly.",
+      "The driver should notify the motor carrier but continue using the ELD as usual."
+    ],
+    answer: 1
+  },
+  {
+    question: "Which of the following ELD record edits is NOT permitted under FMCSA regulations?",
+    options: [
+      "A driver can edit their duty status to correct an incorrect log entry if it does not affect driving time.",
+      "A motor carrier can propose an edit to a driver’s log, but the driver must approve or reject it.",
+      "A driver can change their logged driving time if they forgot to log out before another driver began their shift.",
+      "A driver can correct an incorrectly logged \"On Duty\" status to \"Sleeper Berth\" if the driving time is not affected."
+    ],
+    answer: 2
+  }
+];
+
+  let currentIndex = 0;
+  let score = 0;
+  let userName = '';
+
+  // DOM Elements
+  const nameEntrySection = document.getElementById('nameEntry');
+  const userNameInput = document.getElementById('userNameInput');
+  const startTestBtn = document.getElementById('startTestBtn');
+
+  const quizSection = document.getElementById('quiz');
+  const questionEl = document.getElementById('question');
+  const answersEl = document.getElementById('answers');
+  const nextBtn = document.getElementById('nextBtn');
+  const resultEl = document.getElementById('result');
+  const restartBtn = document.getElementById('restartBtn');
+
+  const leaderboardSection = document.getElementById('leaderboard');
+  const leaderboardBody = document.getElementById('leaderboardBody');
+
+  const celebrationEl = document.getElementById('celebration');
+
+  let answered = false;
+
+  // Update progress display function
+  function updateProgress(questionNumber) {
+    document.getElementById('progress').textContent = `Question ${questionNumber} of ${questions.length}`;
+  }
+
+  // Enable start button only if name entered
+  userNameInput.addEventListener('input', () => {
+    startTestBtn.disabled = !userNameInput.value.trim();
+  });
+
+  // Start test handler
+startTestBtn.addEventListener('click', () => {
+  userName = userNameInput.value.trim();
+  if (!userName) return;
+  // Use display none to hide explicitly
+  nameEntrySection.style.display = 'none';
+  nameEntrySection.classList.add('hidden');
+  quizSection.hidden = false;
+  currentIndex = 0;
+  score = 0;
+  loadQuestion();
+  updateProgress(1);
+});
+
+  function loadQuestion() {
+    answered = false;
+    const current = questions[currentIndex];
+    questionEl.textContent = `${currentIndex + 1}. ${current.question}`;
+    resultEl.textContent = '';
+    resultEl.classList.remove('show');
+    answersEl.innerHTML = '';
+
+    current.options.forEach((opt, idx) => {
+      const btn = document.createElement('button');
+      btn.textContent = opt;
+      btn.setAttribute('type', 'button');
+      btn.disabled = false;
+      btn.onclick = () => handleAnswer(idx, btn);
+      answersEl.appendChild(btn);
+    });
+
+    nextBtn.classList.remove('show');
+    restartBtn.classList.remove('show');
+    nextBtn.disabled = true;
+    nextBtn.setAttribute('aria-disabled', 'true');
+  }
+
+  function handleAnswer(selectedIndex, clickedBtn) {
+    if (answered) return;
+    answered = true;
+
+    const correctIndex = questions[currentIndex].answer;
+
+    Array.from(answersEl.children).forEach((btn, idx) => {
+      btn.disabled = true;
+      if (idx === correctIndex) {
+        btn.classList.add('correct');
+        btn.setAttribute('aria-label', btn.textContent + ' (correct answer)');
+      } else if (idx === selectedIndex) {
+        btn.classList.add('incorrect');
+        btn.setAttribute('aria-label', btn.textContent + ' (your answer, incorrect)');
+      } else {
+        btn.setAttribute('aria-label', btn.textContent);
+      }
+    });
+
+    if (selectedIndex === correctIndex) {
+      score++;
+    }
+
+    nextBtn.classList.add('show');
+    nextBtn.disabled = false;
+    nextBtn.setAttribute('aria-disabled', 'false');
+    nextBtn.focus();
+  }
+
+  function showResult() {
+    questionEl.textContent = 'Test Completed';
+    answersEl.innerHTML = '';
+    resultEl.textContent = `Your score: ${score} out of ${questions.length} (${((score / questions.length) * 100).toFixed(1)}%)`;
+    resultEl.classList.add('show');
+    restartBtn.classList.add('show');
+    restartBtn.focus();
+
+    nextBtn.classList.remove('show');
+
+    saveResult();
+    showLeaderboard();
+    launchConfetti();
+  }
+
+  function saveResult() {
+    const leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+
+    // Determine status
+    const percent = (score / questions.length) * 100;
+    let status = 'Failed';
+    if (percent >= 80) status = 'Master';
+    else if (percent >= 50) status = 'Passed';
+
+    leaderboard.push({ name: userName, score, total: questions.length, percent, status });
+    leaderboard.sort((a, b) => b.percent - a.percent); // Sort descending by score%
+    localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+  }
+
+  function showLeaderboard() {
+    const leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+    leaderboardSection.hidden = false;
+    leaderboardBody.innerHTML = '';
+
+    leaderboard.forEach(({ name, score, total, percent, status }) => {
+      const tr = document.createElement('tr');
+
+      const nameTd = document.createElement('td');
+      nameTd.textContent = name;
+      tr.appendChild(nameTd);
+
+      const scoreTd = document.createElement('td');
+      scoreTd.textContent = `${score} / ${total} (${percent.toFixed(1)}%)`;
+      tr.appendChild(scoreTd);
+
+      const statusTd = document.createElement('td');
+      statusTd.textContent = status;
+      statusTd.classList.add(
+        status === 'Master' ? 'status-master' :
+        status === 'Passed' ? 'status-passed' :
+        'status-failed'
+      );
+      tr.appendChild(statusTd);
+
+      leaderboardBody.appendChild(tr);
+    });
+  }
+
+  // Prevent restarting test before finishing
+  restartBtn.addEventListener('click', () => {
+    if (!resultEl.classList.contains('show')) return; // Don't allow restart before test finished
+    currentIndex = 0;
+    score = 0;
+    resultEl.textContent = '';
+    resultEl.classList.remove('show');
+    leaderboardSection.hidden = true;
+    restartBtn.classList.remove('show');
+    loadQuestion();
+    updateProgress(1);
+  });
+
+  // Next question button handler
+  nextBtn.addEventListener('click', () => {
+    currentIndex++;
+    if (currentIndex < questions.length) {
+      loadQuestion();
+      updateProgress(currentIndex + 1);
+    } else {
+      showResult();
+    }
+  });
+
+  // Confetti animation for celebration
+  function launchConfetti() {
+    celebrationEl.innerHTML = '';
+    const confettiCount = 100;
+    for (let i = 0; i < confettiCount; i++) {
+      const confetti = document.createElement('div');
+      confetti.classList.add('confetti');
+      confetti.style.left = Math.random() * 100 + 'vw';
+      confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 70%, 60%)`;
+      confetti.style.animationDelay = (Math.random() * 2) + 's';
+      confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+      celebrationEl.appendChild(confetti);
+    }
+    setTimeout(() => {
+      celebrationEl.innerHTML = '';
+    }, 4000);
+  }
+</script>
+</body>
+</html>
