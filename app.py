@@ -511,6 +511,10 @@ Lucid ELD Support Team"""
 def eldquiz():
     return render_template('eldquiz.html')
 
+@app.route('/supportresources')
+def supportresources():
+    return render_template('supportresources.html')
+
 @app.route('/logout')
 def logout():
     session.pop('username', None)
