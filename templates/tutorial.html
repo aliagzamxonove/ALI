@@ -319,6 +319,13 @@
         if (term) searchInDocument(term);
       }
     });
+pdfjsLib.getDocument(url).promise.then(pdfDoc_ => {
+  pdfDoc = pdfDoc_;
+  renderPage(pageNum);
+}).catch(err => {
+  console.error('Error loading PDF:', err);
+  alert('Failed to load PDF document.');
+});
   </script>
 </body>
 </html>
