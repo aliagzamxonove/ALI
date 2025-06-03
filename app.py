@@ -507,6 +507,10 @@ Lucid ELD Support Team"""
 
     return render_template('mail.html')  # GET request shows form
 
+@app.route('/eldquiz')
+def eldquiz():
+    return render_template('eldquiz.html')
+
 @app.route('/logout')
 def logout():
     session.pop('username', None)
