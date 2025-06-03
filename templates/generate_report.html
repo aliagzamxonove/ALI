@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IFTA Mileage Report Generator</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  <link rel="icon" href="{{ url_for('static', filename='IFTA5458.png') }}" type="image/png" />
+</head>
+<body>
+  <a href="{{ url_for('dashboard') }}" class="back-icon">Back</a>
+  <div class="container">
+    <header>
+      <img src="{{ url_for('static', filename='IFTA5458.png') }}" alt="IFTA Logo" class="header-logo">
+      <h1>IFTA Mileage Report Generator</h1>
+    </header>
+
+    <form id="ifta-form" action="/generate_report" method="POST" enctype="multipart/form-data">
+      <div class="input-group">
+        <label>Company Name:</label>
+        <input type="text" name="company" required placeholder="Enter your company name" />
+      </div>
+
+      <div class="input-group">
+        <label>Period:</label>
+        <input type="text" name="period" required placeholder="e.g., Jan 1 - Mar 31, 2025" />
+      </div>
+
+      <div class="input-group">
+        <label>Truck Number:</label>
+        <input type="text" name="truck_number" required placeholder="Enter truck number" />
+      </div>
+
+      <div class="input-group with-button">
+        <label>Mileage Data (State Miles):</label>
+        <textarea name="mileage_data" id="mileage_data" required placeholder="Example: AL 191.20 mi&#10;TX 5000 *&#10;FL 1234" oninput="autoResize(this)"></textarea>
+        <button type="button" class="inline-btn" onclick="pasteToField('mileage_data')">📋</button>
+        <div id="mileage-error" style="color: red; margin-top: 5px;"></div>
+      </div>
+
+      <div class="input-group horizontal-group">
+        <div class="field-with-label">
+          <label>Total Mileage:</label>
+          <input type="number" name="total_mileage" id="total_mileage" step="0.01" placeholder="Calculated mileage will appear here" readonly />
+        </div>
+        <button type="button" class="remove-btn" onclick="resetForm()" title="Clear All Fields">🗑️ Remove All</button>
+      </div>
+
+      <div class="input-group">
+        <label>Upload Company Logo (optional):</label>
+        <input type="file" name="logo" accept="image/*" />
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="primary-btn">Generate PDF</button>
+      </div>
+    </form>
+
+    <div id="loading-spinner" class="spinner hidden">
+      <div class="loader"></div>
+      <p>Generating Report...</p>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById("ifta-form");
+    const spinner = document.getElementById("loading-spinner");
+    const mileageField = document.getElementById("mileage_data");
+    const totalMileageInput = document.getElementById("total_mileage");
+
+    form.addEventListener("submit", () => {
+      spinner.classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
+      setTimeout(() => {
+        spinner.classList.add("hidden");
+      }, 3000);
+    });
+
+    function resetForm() {
+      form.reset();
+      totalMileageInput.value = '';
+      document.getElementById("mileage-error").textContent = '';
+    }
+
+    function pasteToField(name) {
+      navigator.clipboard.readText().then(text => {
+        const field = document.getElementsByName(name)[0];
+        field.value = text;
+        field.dispatchEvent(new Event('input'));
+      });
+    }
+
+    function autoResize(textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = textarea.scrollHeight + 'px';
+    }
+
+    mileageField.addEventListener("input", () => {
+      const lines = mileageField.value.trim().split('\n');
+      let total = 0;
+      let errorLines = [];
+
+      lines.forEach(line => {
+        const match = line.trim().match(/^([A-Z]{2,3})\s+(\d+(?:\.\d+)?)/i);
+        if (match) {
+          const miles = parseFloat(match[2]);
+          if (!isNaN(miles)) {
+            total += miles;
+          }
+        } else if (line.trim() !== '') {
+          errorLines.push(line);
+        }
+      });
+
+      totalMileageInput.value = total.toFixed(2);
+
+      const errorDiv = document.getElementById("mileage-error");
+      if (errorLines.length) {
+        errorDiv.textContent = "Invalid lines: " + errorLines.join(', ');
+      } else {
+        errorDiv.textContent = "";
+      }
+    });
+  </script>
+
+  <style>
+    .back-icon {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: #151c29;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    .back-icon:hover {
+      background-color: #000000;
+      transform: scale(1.05);
+    }
+
+    .back-icon:focus {
+      outline: 2px solid #fff;
+      background-color: #2c3e50;
+    }
+
+    .back-icon:active {
+      transform: scale(0.98);
+    }
+
+    .back-icon::before {
+      content: "←";
+      font-size: 18px;
+      margin-right: 8px;
+    }
+
+    .header-logo {
+      display: block;
+      margin: 0 auto 10px auto;
+      width: 60px;
+      height: auto;
+    }
+
+    .inline-btn {
+      margin-left: 10px;
+      padding: 6px 12px;
+      font-size: 18px;
+      background-color: #f0f0f0;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .inline-btn:hover {
+      background-color: #d6d6d6;
+    }
+
+    .remove-btn {
+      margin-left: 20px;
+      padding: 6px 14px;
+      font-size: 16px;
+      background-color: #ff4d4d;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .remove-btn:hover {
+      background-color: #cc0000;
+    }
+
+    .spinner {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .loader {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #007bff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      margin: 0 auto 10px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</body>
+</html>

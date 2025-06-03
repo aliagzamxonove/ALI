@@ -1,0 +1,6 @@
+Flask
+gunicorn
+fpdf
+flask-mail
+email-validator
+python-dotenv
