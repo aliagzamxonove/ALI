@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lucid ELD Tutorials</title>
+    <link rel="icon" href="/favicon.ico" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
+            colors: {
+              primary: '#3b82f6',
+              dark: '#0f172a',
+              accent: '#475569',
+              soft: '#1e293b',
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #334155;
+        border-radius: 4px;
+      }
+
+      .video-thumb {
+        position: relative;
+        border-radius: 0.75rem;
+        overflow: hidden;
+        cursor: pointer;
+        background-color: #111827;
+        aspect-ratio: 16 / 9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+      }
+
+      .video-thumb img {
+        object-fit: cover;
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      .video-thumb:hover {
+        transform: scale(1.05);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+      }
+
+      .guidance-toggle input {
+        display: none;
+      }
+
+      .guidance-toggle label {
+        padding: 0.6rem 1.25rem;
+        font-weight: 600;
+        font-size: 0.95rem;
+        border-radius: 0.5rem;
+        color: #cbd5e1;
+        transition: all 0.3s;
+        cursor: pointer;
+      }
+
+      .guidance-toggle input:checked + label {
+        background: linear-gradient(to right, #4b5563, #1f2937);
+        color: white;
+        transform: scale(1.05);
+      }
+
+      section {
+        display: none;
+        opacity: 0;
+        transform: translateY(12px);
+        transition: opacity 0.4s ease, transform 0.4s ease;
+      }
+
+      .visible-section {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* Smooth transition for background color changes */
+      body {
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Customizing the theme toggle button */
+      #themeToggle {
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      #themeToggle:hover {
+        transform: scale(1.1);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      }
+    </style>
+  </head>
+
+  <body class="bg-dark text-white font-sans min-h-screen transition-colors">
+    <div class="max-w-7xl mx-auto px-4 py-10">
+      <!-- Title and Toggle -->
+      <div class="flex justify-between items-center mb-8">
+        <h1 class="text-4xl sm:text-5xl font-extrabold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+          Lucid ELD Tutorials
+        </h1>
+        <button id="themeToggle" class="bg-accent hover:bg-primary text-white px-3 py-2 rounded-full transition">
+          🌙
+        </button>
+      </div>
+
+      <!-- Guidance Toggle -->
+      <div class="guidance-toggle flex justify-center gap-2 bg-[#1a1a1a] p-2 rounded-xl shadow-inner max-w-lg mx-auto mb-12" role="radiogroup">
+        <input type="radio" id="web" name="guidance" checked />
+        <label for="web" id="webLabel">🌐 Web Guidance</label>
+
+        <input type="radio" id="app" name="guidance" />
+        <label for="app" id="appLabel">📱 App Guidance</label>
+
+        <input type="radio" id="resources" name="guidance" />
+        <label for="resources" id="resourcesLabel">📂 Resources</label>
+      </div>
+
+      <!-- Sections -->
+<section id="webSection" class="visible-section">
+  <h2 class="text-2xl font-bold mb-4">📘 English Tutorials</h2>
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+    <div class="video-thumb">
+      <video src="webttrl/english1.mp4" muted loop preload="metadata" poster="webttrl/english1.jpg"
+        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
+    </div>
+    <div class="video-thumb">
+      <video src="webttrl/english2.mp4" muted loop preload="metadata" poster="webttrl/english2.jpg"
+        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
+    </div>
+    <div class="video-thumb">
+      <video src="webttrl/english3.mp4" muted loop preload="metadata" poster="webttrl/english3.jpg"
+        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
+    </div>
+    <div class="video-thumb">
+      <video src="webttrl/english4.mp4" muted loop preload="metadata" poster="webttrl/english4.jpg"
+        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
+    </div>
+    <div class="video-thumb">
+      <video src="webttrl/english5.mp4" muted loop preload="metadata" poster="webttrl/english5.jpg"
+        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
+    </div>
+    <div class="video-thumb">
+      <video src="webttrl/english6.mp4" muted loop preload="metadata" poster="webttrl/english6.jpg"
+        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
+    </div>
+    <div class="video-thumb">
+      <video src="webttrl/english7.mp4" muted loop preload="metadata" poster="webttrl/english7.jpg"
+        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
+    </div>
+    <div class="video-thumb">
+      <video src="webttrl/english8.mp4" muted loop preload="metadata" poster="webttrl/english8.jpg"
+        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
+    </div>
+  </div>
+
+  <h2 class="text-2xl font-bold mb-4">📙 Spanish Tutorials</h2>
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="video-thumb">
+      <video src="webttrl/spanish1.mp4" muted loop preload="metadata" poster="webttrl/spanish1.jpg"
+        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
+    </div>
+    <div class="video-thumb">
+      <video src="webttrl/spanish2.mp4" muted loop preload="metadata" poster="webttrl/spanish2.jpg"
+        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
+    </div>
+    <div class="video-thumb">
+      <video src="webttrl/spanish3.mp4" muted loop preload="metadata" poster="webttrl/spanish3.jpg"
+        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
+    </div>
+    <div class="video-thumb">
+      <video src="webttrl/spanish4.mp4" muted loop preload="metadata" poster="webttrl/spanish4.jpg"
+        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
+    </div>
+    <div class="video-thumb">
+      <video src="webttrl/spanish5.mp4" muted loop preload="metadata" poster="webttrl/spanish5.jpg"
+        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
+    </div>
+    <div class="video-thumb">
+      <video src="webttrl/spanish6.mp4" muted loop preload="metadata" poster="webttrl/spanish6.jpg"
+        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
+    </div>
+    <div class="video-thumb">
+      <video src="webttrl/spanish7.mp4" muted loop preload="metadata" poster="webttrl/spanish7.jpg"
+        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
+    </div>
+    <div class="video-thumb">
+      <video src="webttrl/spanish8.mp4" muted loop preload="metadata" poster="webttrl/spanish8.jpg"
+        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
+    </div>
+  </div>
+</section>
+
+      <section id="appSection" class="hidden-section">
+        <h2 class="text-2xl font-bold mb-4">📘 English App Tutorials</h2>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+          <div class="video-thumb" data-src="https://www.youtube.com/embed/J4p1s2QMxkg">
+            <img src="https://img.youtube.com/vi/J4p1s2QMxkg/hqdefault.jpg" alt="English App Tutorial 1">
+          </div>
+          <div class="video-thumb" data-src="https://www.youtube.com/embed/03hSWNy8VZY">
+            <img src="https://img.youtube.com/vi/03hSWNy8VZY/hqdefault.jpg" alt="English App Tutorial 2">
+          </div>
+          <div class="video-thumb" data-src="https://www.youtube.com/embed/qWLkn2hgcc0">
+            <img src="https://img.youtube.com/vi/qWLkn2hgcc0/hqdefault.jpg" alt="English App Tutorial 3">
+          </div>
+          <div class="video-thumb" data-src="https://www.youtube.com/embed/S_Oq-5PTT7U">
+            <img src="https://img.youtube.com/vi/S_Oq-5PTT7U/hqdefault.jpg" alt="English App Tutorial 4">
+          </div>
+          <div class="video-thumb" data-src="https://www.youtube.com/embed/PHqGo5uNogY">
+            <img src="https://img.youtube.com/vi/PHqGo5uNogY/hqdefault.jpg" alt="English App Tutorial 5">
+          </div>
+          <div class="video-thumb" data-src="https://www.youtube.com/embed/K-1O8aNsaDs">
+            <img src="https://img.youtube.com/vi/K-1O8aNsaDs/hqdefault.jpg" alt="English App Tutorial 6">
+          </div>
+          <div class="video-thumb" data-src="https://www.youtube.com/embed/7gFhHji96rU">
+            <img src="https://img.youtube.com/vi/7gFhHji96rU/hqdefault.jpg" alt="English App Tutorial 7">
+          </div>
+          <div class="video-thumb" data-src="https://www.youtube.com/embed/Qx-0E4M7C0Y">
+            <img src="https://img.youtube.com/vi/Qx-0E4M7C0Y/hqdefault.jpg" alt="English App Tutorial 8">
+          </div>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4">📙 Spanish App Tutorials</h2>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="video-thumb" data-src="https://www.youtube.com/embed/ATY10BvSVFQ">
+            <img src="https://img.youtube.com/vi/ATY10BvSVFQ/hqdefault.jpg" alt="Spanish App Tutorial 1">
+          </div>
+          <div class="video-thumb" data-src="https://www.youtube.com/embed/My0ZI28BSO8">
+            <img src="https://img.youtube.com/vi/My0ZI28BSO8/hqdefault.jpg" alt="Spanish App Tutorial 2">
+          </div>
+          <div class="video-thumb" data-src="https://www.youtube.com/embed/aCklwsKUckY">
+            <img src="https://img.youtube.com/vi/aCklwsKUckY/hqdefault.jpg" alt="Spanish App Tutorial 3">
+          </div>
+          <div class="video-thumb" data-src="https://www.youtube.com/embed/GZ74l7o6oes">
+            <img src="https://img.youtube.com/vi/GZ74l7o6oes/hqdefault.jpg" alt="Spanish App Tutorial 4">
+          </div>
+          <div class="video-thumb" data-src="https://www.youtube.com/embed/OjyAhJEW4QE">
+            <img src="https://img.youtube.com/vi/OjyAhJEW4QE/hqdefault.jpg" alt="Spanish App Tutorial 5">
+          </div>
+          <div class="video-thumb" data-src="https://www.youtube.com/embed/pOmQesXY6uk">
+            <img src="https://img.youtube.com/vi/pOmQesXY6uk/hqdefault.jpg" alt="Spanish App Tutorial 6">
+          </div>
+          <div class="video-thumb" data-src="https://www.youtube.com/embed/vd8Fhr6rI70">
+            <img src="https://img.youtube.com/vi/vd8Fhr6rI70/hqdefault.jpg" alt="Spanish App Tutorial 7">
+          </div>
+          <div class="video-thumb" data-src="https://www.youtube.com/embed/y9FKUj1eeek">
+            <img src="https://img.youtube.com/vi/y9FKUj1eeek/hqdefault.jpg" alt="Spanish App Tutorial 8">
+          </div>
+        </div>
+      </section>
+
+<section id="resourcesSection" class="hidden-section">
+  <h2 class="text-2xl font-bold mb-6 border-b border-gray-700 pb-2">📄 Instruction Files</h2>
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+    <a href="Instruction/DOT%20Inspection.pdf" download class="group bg-soft hover:bg-accent p-5 rounded-xl border border-gray-700 shadow transition-shadow hover:shadow-xl flex space-x-4">
+      <div class="text-3xl">📘</div>
+      <div>
+        <h3 class="text-lg font-semibold text-white">DOT Inspection</h3>
+        <p class="text-sm text-white">DOT Inspection File</p>
+      </div>
+    </a>
+
+    <a href="Instruction/Certificate%20of%20Compliance.pdf" download class="group bg-soft hover:bg-accent p-5 rounded-xl border border-gray-700 shadow transition-shadow hover:shadow-xl flex space-x-4">
+      <div class="text-3xl">📗</div>
+      <div>
+        <h3 class="text-lg font-semibold text-white">Certificate of Compliance</h3>
+        <p class="text-sm text-white">Compliance Documentation</p>
+      </div>
+    </a>
+
+    <a href="Instruction/Malfunction%20Manual.pdf" download class="group bg-soft hover:bg-accent p-5 rounded-xl border border-gray-700 shadow transition-shadow hover:shadow-xl flex space-x-4">
+      <div class="text-3xl">📕</div>
+      <div>
+        <h3 class="text-lg font-semibold text-white">Malfunction Manual</h3>
+        <p class="text-sm text-white">Troubleshooting Guide</p>
+      </div>
+    </a>
+
+    <a href="Instruction/Truck%20Sticker.pdf" download class="group bg-soft hover:bg-accent p-5 rounded-xl border border-gray-700 shadow transition-shadow hover:shadow-xl flex space-x-4">
+      <div class="text-3xl">🚚</div>
+      <div>
+        <h3 class="text-lg font-semibold text-white">Truck Sticker</h3>
+        <p class="text-sm text-white">Cab Sticker Template</p>
+      </div>
+    </a>
+
+    <a href="Instruction/Users%20Manual.pdf" download class="group bg-soft hover:bg-accent p-5 rounded-xl border border-gray-700 shadow transition-shadow hover:shadow-xl flex space-x-4">
+      <div class="text-3xl">📙</div>
+      <div>
+        <h3 class="text-lg font-semibold text-white">User Manual</h3>
+        <p class="text-sm text-white">Full Product Manual</p>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+    <script>
+      const sections = {
+        web: document.getElementById("webSection"),
+        app: document.getElementById("appSection"),
+        resources: document.getElementById("resourcesSection"),
+      };
+
+      document.querySelectorAll('input[name="guidance"]').forEach(input => {
+        input.addEventListener("change", () => {
+          for (let key in sections) {
+            sections[key].classList.remove("visible-section");
+          }
+          sections[input.id].classList.add("visible-section");
+        });
+      });
+
+      // Light/dark theme toggle
+      const themeToggle = document.getElementById("themeToggle");
+      themeToggle.addEventListener("click", () => {
+        document.body.classList.toggle("bg-white");
+        document.body.classList.toggle("text-black");
+        document.body.classList.toggle("bg-dark");
+        document.body.classList.toggle("text-white");
+        themeToggle.textContent = themeToggle.textContent === "🌙" ? "☀️" : "🌙";
+      });
+
+      // Video play on hover and stop when unhover
+      document.querySelectorAll(".video-thumb").forEach(thumb => {
+        let iframe = null;
+
+        thumb.addEventListener("mouseenter", () => {
+          if (!iframe) {
+            iframe = document.createElement("iframe");
+            iframe.src = thumb.dataset.src + "?autoplay=1";
+            iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+            iframe.allowFullscreen = true;
+            iframe.frameBorder = "0";
+            iframe.className = "w-full h-full";
+            thumb.innerHTML = "";
+            thumb.appendChild(iframe);
+          }
+        });
+
+        thumb.addEventListener("mouseleave", () => {
+          thumb.innerHTML = `<img src="https://img.youtube.com/vi/${thumb.dataset.src.split('/')[4]}/hqdefault.jpg" alt="Video Thumbnail">`;
+          iframe = null; // Reset iframe to allow it to be recreated on next hover
+        });
+      });
+    document.querySelectorAll(".video-thumb").forEach(thumb => {
+  const video = thumb.querySelector("video");
+
+  thumb.addEventListener("mouseenter", () => {
+    video.play();
+  });
+
+  thumb.addEventListener("mouseleave", () => {
+    video.pause();
+    video.currentTime = 0; // Reset video to start
+  });
+});
+    </script>
+  </body>
+</html>
