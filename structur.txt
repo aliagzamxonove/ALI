@@ -1,0 +1,14 @@
+├── app.py
+├── static
+│   ├── styles.css
+│   └── images
+│     └── us.svg
+├── /generated/      # generated PDFs and logos
+│
+├── /templates/
+│   ├── login.html
+│   ├── dashboard.html
+│   ├── layout.html
+│   ├── index.html
+│   ├── generate_report.html
+│   └── timezones.html

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Violations Live Monitor</title>
+<style>
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+  th { background: #eee; }
+</style>
+</head>
+<body>
+<h1>Live Violations Monitor</h1>
+<table id="violations-table">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Driver</th>
+      <th>Company</th>
+      <th>Violation Type</th>
+      <th>Violation Time</th>
+      <th>Resolved</th>
+      <th>Alert Sent</th>
+      <th>Elapsed (s)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Rows will be inserted here -->
+  </tbody>
+</table>
+
+<script>
+async function fetchViolations() {
+  try {
+    const response = await fetch('/violations_data');
+    const violations = await response.json();
+
+    const tbody = document.querySelector('#violations-table tbody');
+    tbody.innerHTML = ''; // Clear current rows
+
+    const now = Date.now() / 1000;
+
+    violations.forEach(v => {
+      const elapsed = (now - v.first_detected).toFixed(0);
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${v.id}</td>
+        <td>${v.driver_name}</td>
+        <td>${v.company_name}</td>
+        <td>${v.violation_type}</td>
+        <td>${v.violation_time}</td>
+        <td>${v.resolved}</td>
+        <td>${v.alert_sent}</td>
+        <td>${elapsed}</td>
+      `;
+      tbody.appendChild(row);
+    });
+  } catch (err) {
+    console.error('Failed to fetch violations:', err);
+  }
+}
+
+// Initial fetch
+fetchViolations();
+
+// Update every second
+setInterval(fetchViolations, 1000);
+</script>
+</body>
+</html>

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lucid ELD Email Sender</title>
+  <link rel="icon" href="{{ url_for('static', filename='IFTA5458.png') }}" type="image/png" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, 'Arial', sans-serif;
+      background: #101d2e;
+      color: #ecf0f1;
+      padding: 50px 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #000;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      transition: all 0.3s ease-in-out;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 28px;
+      color: #ffffff;
+      margin-bottom: 25px;
+    }
+
+    label {
+      font-size: 15px;
+      color: #ffffff;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      border: 1px solid #34495e;
+      border-radius: 6px;
+      font-size: 16px;
+      background-color: #1a2533;
+      color: #ecf0f1;
+    }
+
+    input::placeholder, textarea::placeholder {
+      color: #bbb;
+    }
+
+    select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg fill='white' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 12px;
+      padding-right: 35px;
+    }
+
+    textarea {
+      height: 130px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(to right, #2980b9, #3498db);
+      color: white;
+      font-size: 18px;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s ease-in-out;
+    }
+
+    button:hover {
+      background: linear-gradient(to right, #3498db, #2980b9);
+    }
+
+    .back-icon {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: #151c29;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-weight: bold;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      z-index: 100;
+    }
+
+    .back-icon:hover {
+      background-color: #000;
+      transform: scale(1.05);
+    }
+
+    .message-box {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 15px;
+      color: #ecf0f1;
+      border-left: 5px solid #3498db;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+
+    .notification {
+      margin-top: 20px;
+      padding: 15px;
+      font-size: 16px;
+      border-radius: 5px;
+      display: none;
+      text-align: center;
+    }
+
+    .notification.success {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .notification.error {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    #api-fields, #ifta-upload {
+      background-color: rgba(255, 255, 255, 0.05);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    input[type="file"] {
+      background-color: #1a2533;
+      color: white;
+      border: 1px solid #34495e;
+      cursor: pointer;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 25px;
+      font-size: 14px;
+      color: #7f8c8d;
+    }
+
+    .footer a {
+      color: #3498db;
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <a href="{{ url_for('dashboard') }}" class="back-icon">← Back</a>
+  <div class="container">
+    <h1>Lucid ELD Email Sender</h1>
+    <form id="emailForm" enctype="multipart/form-data" autocomplete="off" novalidate>
+      <div class="message-box">
+        <p>Fill out the form below to send an email to a driver or client based on your needs.</p>
+      </div>
+
+      <label for="email">Recipient's Email</label>
+      <input type="email" id="email" name="email" placeholder="example@domain.com" required>
+
+      <label for="email_type">Select Email Type</label>
+      <select id="email_type" name="email_type" required>
+        <option value="" disabled selected>Select a type</option>
+        <option value="instructions">ELD Instruction Pack</option>
+        <option value="ifta">IFTA Report</option>
+        <option value="information">Lucid ELD Information</option>
+        <option value="advertising">Advertising</option>
+        <option value="api">API Credentials</option>
+      </select>
+
+      <div id="api-fields" hidden>
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" placeholder="Enter username">
+        <label for="password">Password</label>
+        <input type="text" id="password" name="password" placeholder="Enter password">
+        <label for="api_key">API Key</label>
+        <input type="text" id="api_key" name="api_key" placeholder="Enter API Key">
+      </div>
+
+      <div id="ifta-upload" hidden>
+        <label for="ifta_files">Upload IFTA Files</label>
+        <input type="file" id="ifta_files" name="ifta_files" multiple accept=".pdf">
+      </div>
+
+      <button type="submit" id="submitBtn">Send Email</button>
+    </form>
+
+    <div id="notification" class="notification"></div>
+
+    <div class="footer">
+      <p>Powered by <a href="https://www.lucideld.com" target="_blank">Lucid ELD</a></p>
+    </div>
+  </div>
+
+  <script>
+    const emailTypeSelect = document.getElementById('email_type');
+    const apiFields = document.getElementById('api-fields');
+    const iftaUpload = document.getElementById('ifta-upload');
+    const emailForm = document.getElementById('emailForm');
+    const notification = document.getElementById('notification');
+    const submitBtn = document.getElementById('submitBtn');
+
+    emailTypeSelect.addEventListener('change', () => {
+      const selected = emailTypeSelect.value;
+      apiFields.hidden = selected !== 'api';
+      iftaUpload.hidden = selected !== 'ifta';
+    });
+
+    emailForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      submitBtn.disabled = true;
+      const formData = new FormData(emailForm);
+
+      try {
+        const res = await fetch('/mail', {
+          method: 'POST',
+          body: formData
+        });
+        if (!res.ok) throw new Error('Failed');
+
+        showNotification('Email sent successfully!', 'success');
+        emailForm.reset();
+        apiFields.hidden = true;
+        iftaUpload.hidden = true;
+      } catch {
+        showNotification('There was an error sending the email. Please try again.', 'error');
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+
+    function showNotification(message, type) {
+      notification.textContent = message;
+      notification.className = `notification ${type}`;
+      notification.style.display = 'block';
+      setTimeout(() => {
+        notification.style.display = 'none';
+        notification.className = 'notification';
+        notification.textContent = '';
+      }, 5000);
+    }
+  </script>
+</body>
+</html>
