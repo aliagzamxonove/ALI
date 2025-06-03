@@ -213,7 +213,6 @@
       <a href="{{ url_for('tutorial') }}" class="dashboard-btn">Tutorial Viewer</a>
       <a href="{{ url_for('timezones') }}" class="dashboard-btn">Time Zones</a>
       <a href="{{ url_for('mail_page') }}" class="dashboard-btn">Send Email</a>
-    </div>
       <a href="{{ url_for('eldquiz') }}" class="dashboard-btn">ELD Quiz</a>
     </div>
 
@@ -258,7 +257,6 @@
       cancelLogout.addEventListener('click', closeModal);
 
       confirmLogout.addEventListener('click', () => {
-        // Show spinner on logout button
         document.getElementById('logoutBtn').innerHTML = '<span class="spinner"></span> Logging out...';
         window.location.href = "{{ url_for('logout') }}";
       });
