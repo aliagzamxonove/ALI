@@ -62,9 +62,10 @@ def login():
 @app.route('/dashboard')
 def dashboard():
     if 'username' not in session:
+        flash('Please log in to access the dashboard.', 'warning')
         return redirect(url_for('login'))
-    username = session['username']
-    return render_template('dashboard.html', username=username)
+    
+    return render_template('dashboard.html', username=session['username'])
 
 @app.route('/generate_report', methods=['GET', 'POST'])
 def generate_report():
