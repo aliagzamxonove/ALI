@@ -313,66 +313,105 @@
   </div>
 </section>
 
-    <script>
-      const sections = {
-        web: document.getElementById("webSection"),
-        app: document.getElementById("appSection"),
-        resources: document.getElementById("resourcesSection"),
-      };
+<script>
+const sections = {
+  web: document.getElementById("webSection"),
+  app: document.getElementById("appSection"),
+  resources: document.getElementById("resourcesSection"),
+};
 
-      document.querySelectorAll('input[name="guidance"]').forEach(input => {
-        input.addEventListener("change", () => {
-          for (let key in sections) {
-            sections[key].classList.remove("visible-section");
-          }
-          sections[input.id].classList.add("visible-section");
-        });
-      });
-
-      // Light/dark theme toggle
-      const themeToggle = document.getElementById("themeToggle");
-      themeToggle.addEventListener("click", () => {
-        document.body.classList.toggle("bg-white");
-        document.body.classList.toggle("text-black");
-        document.body.classList.toggle("bg-dark");
-        document.body.classList.toggle("text-white");
-        themeToggle.textContent = themeToggle.textContent === "🌙" ? "☀️" : "🌙";
-      });
-
-      // Video play on hover and stop when unhover
-      document.querySelectorAll(".video-thumb").forEach(thumb => {
-        let iframe = null;
-
-        thumb.addEventListener("mouseenter", () => {
-          if (!iframe) {
-            iframe = document.createElement("iframe");
-            iframe.src = thumb.dataset.src + "?autoplay=1";
-            iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-            iframe.allowFullscreen = true;
-            iframe.frameBorder = "0";
-            iframe.className = "w-full h-full";
-            thumb.innerHTML = "";
-            thumb.appendChild(iframe);
-          }
-        });
-
-        thumb.addEventListener("mouseleave", () => {
-          thumb.innerHTML = `<img src="https://img.youtube.com/vi/${thumb.dataset.src.split('/')[4]}/hqdefault.jpg" alt="Video Thumbnail">`;
-          iframe = null; // Reset iframe to allow it to be recreated on next hover
-        });
-      });
-    document.querySelectorAll(".video-thumb").forEach(thumb => {
-  const video = thumb.querySelector("video");
-
-  thumb.addEventListener("mouseenter", () => {
-    video.play();
-  });
-
-  thumb.addEventListener("mouseleave", () => {
-    video.pause();
-    video.currentTime = 0; // Reset video to start
+document.querySelectorAll('input[name="guidance"]').forEach(input => {
+  input.addEventListener("change", () => {
+    for (let key in sections) {
+      sections[key].classList.remove("visible-section");
+    }
+    sections[input.id].classList.add("visible-section");
   });
 });
-    </script>
+
+// Light/dark theme toggle
+const themeToggle = document.getElementById("themeToggle");
+themeToggle.addEventListener("click", () => {
+  document.body.classList.toggle("bg-white");
+  document.body.classList.toggle("text-black");
+  document.body.classList.toggle("bg-dark");
+  document.body.classList.toggle("text-white");
+  themeToggle.textContent = themeToggle.textContent === "🌙" ? "☀️" : "🌙";
+});
+
+// Video hover behavior for web section (restore thumbnail on leave)
+sections.web.querySelectorAll(".video-thumb").forEach(thumb => {
+  const video = thumb.querySelector("video");
+  const isYouTube = !video && thumb.dataset.src;
+
+  if (video) {
+    thumb.addEventListener("mouseenter", () => {
+      video.play();
+    });
+    thumb.addEventListener("mouseleave", () => {
+      video.pause();
+      video.currentTime = 0;
+      video.load(); // restores thumbnail
+    });
+  } else if (isYouTube) {
+    let iframe = null;
+    thumb.addEventListener("mouseenter", () => {
+      if (!iframe) {
+        iframe = document.createElement("iframe");
+        iframe.src = thumb.dataset.src + "?autoplay=1&mute=1";
+        iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+        iframe.allowFullscreen = true;
+        iframe.frameBorder = "0";
+        iframe.className = "w-full h-full";
+        thumb.innerHTML = "";
+        thumb.appendChild(iframe);
+      }
+    });
+    thumb.addEventListener("mouseleave", () => {
+      const videoId = thumb.dataset.src.split('/')[4];
+      thumb.innerHTML = `<img src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" alt="Video Thumbnail">`;
+      iframe = null;
+    });
+  }
+});
+
+// Video hover behavior for app and resources sections (pause only)
+["app", "resources"].forEach(key => {
+  sections[key].querySelectorAll(".video-thumb").forEach(thumb => {
+    const video = thumb.querySelector("video");
+    const isYouTube = !video && thumb.dataset.src;
+
+    if (video) {
+      thumb.addEventListener("mouseenter", () => {
+        video.play();
+      });
+      thumb.addEventListener("mouseleave", () => {
+        video.pause();
+        video.currentTime = 0;
+        // no load() — keeps frame
+      });
+    } else if (isYouTube) {
+      let iframe = null;
+      thumb.addEventListener("mouseenter", () => {
+        if (!iframe) {
+          iframe = document.createElement("iframe");
+          iframe.src = thumb.dataset.src + "?autoplay=1&mute=1";
+          iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+          iframe.allowFullscreen = true;
+          iframe.frameBorder = "0";
+          iframe.className = "w-full h-full";
+          thumb.innerHTML = "";
+          thumb.appendChild(iframe);
+        }
+      });
+      thumb.addEventListener("mouseleave", () => {
+        const videoId = thumb.dataset.src.split('/')[4];
+        thumb.innerHTML = `<img src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" alt="Video Thumbnail">`;
+        iframe = null;
+      });
+    }
+  });
+});
+</script>
   </body>
 </html>
