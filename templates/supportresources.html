@@ -1,30 +1,29 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lucid ELD Tutorials</title>
-    <link rel="icon" href="/favicon.ico" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
-    <link rel="icon" href="{{ url_for('static', filename='IFTA5458.png') }}" type="image/png" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ['Inter', 'sans-serif'],
-            },
-            colors: {
-              primary: '#3b82f6',
-              dark: '#0f172a',
-              accent: '#475569',
-              soft: '#1e293b',
-            },
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lucid ELD Tutorials</title>
+  <link rel="icon" href="{{ url_for('static', filename='IFTA5458.png') }}" type="image/png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            primary: '#3b82f6',
+            dark: '#0f172a',
+            accent: '#475569',
+            soft: '#1e293b',
           },
         },
-      };
-    </script>
+      },
+    };
+  </script>
     <style>
       ::-webkit-scrollbar {
         width: 8px;
@@ -139,35 +138,35 @@
   <h2 class="text-2xl font-bold mb-4">📘 English Tutorials</h2>
   <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
     <div class="video-thumb">
-      <video controls src="webttrl/english1.mp4" muted loop preload="metadata" poster="webttrl/english1.jpg"
+      <video src="/static/webttrl/english1.mp4" muted loop preload="metadata" poster="/static/webttrl/english1.jpg"
         class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
     </div>
     <div class="video-thumb">
-      <video src="webttrl/english2.mp4" muted loop preload="metadata" poster="webttrl/english2.jpg"
+      <video src="/static/webttrl/english2.mp4" muted loop preload="metadata" poster="/static/webttrl/english2.jpg"
         class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
     </div>
     <div class="video-thumb">
-      <video src="webttrl/english3.mp4" muted loop preload="metadata" poster="webttrl/english3.jpg"
+      <video src="/static/webttrl/english3.mp4" muted loop preload="metadata" poster="/static/webttrl/english3.jpg"
         class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
     </div>
     <div class="video-thumb">
-      <video src="webttrl/english4.mp4" muted loop preload="metadata" poster="webttrl/english4.jpg"
+      <video src="/static/webttrl/english4.mp4" muted loop preload="metadata" poster="/static/webttrl/english4.jpg"
         class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
     </div>
     <div class="video-thumb">
-      <video src="webttrl/english5.mp4" muted loop preload="metadata" poster="webttrl/english5.jpg"
+      <video src="/static/webttrl/english5.mp4" muted loop preload="metadata" poster="/static/webttrl/english5.jpg"
         class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
     </div>
     <div class="video-thumb">
-      <video src="webttrl/english6.mp4" muted loop preload="metadata" poster="webttrl/english6.jpg"
+      <video src="/static/webttrl/english6.mp4" muted loop preload="metadata" poster="/static/webttrl/english6.jpg"
         class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
     </div>
     <div class="video-thumb">
-      <video src="webttrl/english7.mp4" muted loop preload="metadata" poster="webttrl/english7.jpg"
+      <video src="/static/webttrl/english7.mp4" muted loop preload="metadata" poster="/static/webttrl/english7.jpg"
         class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
     </div>
     <div class="video-thumb">
-      <video src="webttrl/english8.mp4" muted loop preload="metadata" poster="webttrl/english8.jpg"
+      <video src="/static/webttrl/english8.mp4" muted loop preload="metadata" poster="/static/webttrl/english8.jpg"
         class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
     </div>
   </div>
@@ -175,35 +174,35 @@
   <h2 class="text-2xl font-bold mb-4">📙 Spanish Tutorials</h2>
   <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
     <div class="video-thumb">
-      <video src="webttrl/spanish1.mp4" muted loop preload="metadata" poster="webttrl/spanish1.jpg"
+      <video src="/static/webttrl/spanish1.mp4" muted loop preload="metadata" poster="/static/webttrl/spanish1.jpg"
         class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
     </div>
     <div class="video-thumb">
-      <video src="webttrl/spanish2.mp4" muted loop preload="metadata" poster="webttrl/spanish2.jpg"
+      <video src="/static/webttrl/spanish2.mp4" muted loop preload="metadata" poster="/static/webttrl/spanish2.jpg"
         class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
     </div>
     <div class="video-thumb">
-      <video src="webttrl/spanish3.mp4" muted loop preload="metadata" poster="webttrl/spanish3.jpg"
+      <video src="/static/webttrl/spanish3.mp4" muted loop preload="metadata" poster="/static/webttrl/spanish3.jpg"
         class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
     </div>
     <div class="video-thumb">
-      <video src="webttrl/spanish4.mp4" muted loop preload="metadata" poster="webttrl/spanish4.jpg"
+      <video src="/static/webttrl/spanish4.mp4" muted loop preload="metadata" poster="/static/webttrl/spanish4.jpg"
         class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
     </div>
     <div class="video-thumb">
-      <video src="webttrl/spanish5.mp4" muted loop preload="metadata" poster="webttrl/spanish5.jpg"
+      <video src="/static/webttrl/spanish5.mp4" muted loop preload="metadata" poster="/static/webttrl/spanish5.jpg"
         class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
     </div>
     <div class="video-thumb">
-      <video src="webttrl/spanish6.mp4" muted loop preload="metadata" poster="webttrl/spanish6.jpg"
+      <video src="/static/webttrl/spanish6.mp4" muted loop preload="metadata" poster="/static/webttrl/spanish6.jpg"
         class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
     </div>
     <div class="video-thumb">
-      <video src="webttrl/spanish7.mp4" muted loop preload="metadata" poster="webttrl/spanish7.jpg"
+      <video src="/static/webttrl/spanish7.mp4" muted loop preload="metadata" poster="/static/webttrl/spanish7.jpg"
         class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
     </div>
     <div class="video-thumb">
-      <video src="webttrl/spanish8.mp4" muted loop preload="metadata" poster="webttrl/spanish8.jpg"
+      <video src="/static/webttrl/spanish8.mp4" muted loop preload="metadata" poster="/static/webttrl/spanish8.jpg"
         class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
     </div>
   </div>
@@ -315,102 +314,86 @@
 </section>
 
 <script>
-const sections = {
-  web: document.getElementById("webSection"),
-  app: document.getElementById("appSection"),
-  resources: document.getElementById("resourcesSection"),
-};
+document.addEventListener("DOMContentLoaded", function () {
+  const sections = {
+    web: document.getElementById("webSection"),
+    app: document.getElementById("appSection"),
+    resources: document.getElementById("resourcesSection"),
+  };
 
-document.querySelectorAll('input[name="guidance"]').forEach(input => {
-  input.addEventListener("change", () => {
-    for (let key in sections) {
-      sections[key].classList.remove("visible-section");
-    }
-    sections[input.id].classList.add("visible-section");
-  });
-});
+  const setupVideoThumbs = (key) => {
+    const section = sections[key];
+    if (!section) return;
 
-// Light/dark theme toggle
-const themeToggle = document.getElementById("themeToggle");
-themeToggle.addEventListener("click", () => {
-  document.body.classList.toggle("bg-white");
-  document.body.classList.toggle("text-black");
-  document.body.classList.toggle("bg-dark");
-  document.body.classList.toggle("text-white");
-  themeToggle.textContent = themeToggle.textContent === "🌙" ? "☀️" : "🌙";
-});
+    section.querySelectorAll(".video-thumb").forEach(thumb => {
+      const video = thumb.querySelector("video");
+      const isYouTube = !video && thumb.dataset.src;
 
-// Video hover behavior for web section (restore thumbnail on leave)
-sections.web.querySelectorAll(".video-thumb").forEach(thumb => {
-  const video = thumb.querySelector("video");
-  const isYouTube = !video && thumb.dataset.src;
-
-  if (video) {
-    thumb.addEventListener("mouseenter", () => {
-      video.play();
-    });
-    thumb.addEventListener("mouseleave", () => {
-      video.pause();
-      video.currentTime = 0;
-      video.load(); // restores thumbnail
-    });
-  } else if (isYouTube) {
-    let iframe = null;
-    thumb.addEventListener("mouseenter", () => {
-      if (!iframe) {
-        iframe = document.createElement("iframe");
-        iframe.src = thumb.dataset.src + "?autoplay=1&mute=1";
-        iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-        iframe.allowFullscreen = true;
-        iframe.frameBorder = "0";
-        iframe.className = "w-full h-full";
-        thumb.innerHTML = "";
-        thumb.appendChild(iframe);
+      if (video) {
+        thumb.addEventListener("mouseenter", () => {
+          video.play();
+        });
+        thumb.addEventListener("mouseleave", () => {
+          video.pause();
+          video.currentTime = 0;
+          video.load();
+        });
+      } else if (isYouTube) {
+        let iframe = null;
+        thumb.addEventListener("mouseenter", () => {
+          if (!iframe) {
+            iframe = document.createElement("iframe");
+            iframe.src = thumb.dataset.src + "?autoplay=1&mute=1";
+            iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+            iframe.allowFullscreen = true;
+            iframe.frameBorder = "0";
+            iframe.className = "w-full h-full";
+            thumb.innerHTML = "";
+            thumb.appendChild(iframe);
+          }
+        });
+        thumb.addEventListener("mouseleave", () => {
+          const match = thumb.dataset.src.match(/embed\/([^?&]+)/);
+          const videoId = match ? match[1] : null;
+          if (videoId) {
+            thumb.innerHTML = `<img src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" alt="Video Thumbnail" class="w-full h-full object-cover">`;
+          }
+          iframe = null;
+        });
       }
     });
-    thumb.addEventListener("mouseleave", () => {
-      const videoId = thumb.dataset.src.split('/')[4];
-      thumb.innerHTML = `<img src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" alt="Video Thumbnail">`;
-      iframe = null;
+  };
+
+  // Toggle handler
+  document.querySelectorAll('input[name="guidance"]').forEach(input => {
+    input.addEventListener("change", () => {
+      for (let key in sections) {
+        sections[key].classList.remove("visible-section");
+      }
+      const selected = sections[input.id];
+      selected.classList.add("visible-section");
+      setupVideoThumbs(input.id);
     });
-  }
-});
+  });
 
-// Video hover behavior for app and resources sections (pause only)
-["app", "resources"].forEach(key => {
-  sections[key].querySelectorAll(".video-thumb").forEach(thumb => {
-    const video = thumb.querySelector("video");
-    const isYouTube = !video && thumb.dataset.src;
-
-    if (video) {
-      thumb.addEventListener("mouseenter", () => {
-        video.play();
-      });
-      thumb.addEventListener("mouseleave", () => {
-        video.pause();
-        video.currentTime = 0;
-        // no load() — keeps frame
-      });
-    } else if (isYouTube) {
-      let iframe = null;
-      thumb.addEventListener("mouseenter", () => {
-        if (!iframe) {
-          iframe = document.createElement("iframe");
-          iframe.src = thumb.dataset.src + "?autoplay=1&mute=1";
-          iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-          iframe.allowFullscreen = true;
-          iframe.frameBorder = "0";
-          iframe.className = "w-full h-full";
-          thumb.innerHTML = "";
-          thumb.appendChild(iframe);
-        }
-      });
-      thumb.addEventListener("mouseleave", () => {
-        const videoId = thumb.dataset.src.split('/')[4];
-        thumb.innerHTML = `<img src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" alt="Video Thumbnail">`;
-        iframe = null;
-      });
+  // ✅ Setup initially visible section (e.g. "web")
+  const defaultInput = document.querySelector('input[name="guidance"]:checked');
+  if (defaultInput) {
+    const key = defaultInput.id;
+    if (sections[key]) {
+      sections[key].classList.add("visible-section");
+      setupVideoThumbs(key);
     }
+  }
+
+  // Theme toggle
+  const themeToggle = document.getElementById("themeToggle");
+  themeToggle.addEventListener("click", () => {
+    document.body.classList.toggle("bg-white");
+    document.body.classList.toggle("text-black");
+    document.body.classList.toggle("bg-dark");
+    document.body.classList.toggle("text-white");
+    themeToggle.textContent = themeToggle.textContent === "🌙" ? "☀️" : "🌙";
   });
 });
 </script>
