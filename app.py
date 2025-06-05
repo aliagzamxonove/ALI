@@ -199,55 +199,55 @@ def eld_malfunction_letter():
     driver_name = request.form.get('driver_name', 'N/A')
     malfunction_date = request.form.get('malfunction_date', 'N/A')
 
-    class StyledPDF(FPDF):
-      def header(self):
-    if self.page_no() == 1:
-        logo_path = os.path.join('static', 'logo.png')
-        if os.path.exists(logo_path):
-            self.image(logo_path, x=70, y=10, w=60)
-        self.ln(40)  # already has top margin because of logo
-    else:
-        self.ln(20)  # add extra space on 2nd page or later
+class StyledPDF(FPDF):
+    def header(self):
+        if self.page_no() == 1:
+            logo_path = os.path.join('static', 'logo.png')
+            if os.path.exists(logo_path):
+                self.image(logo_path, x=70, y=10, w=60)
+            self.ln(40)  # already has top margin because of logo
+        else:
+            self.ln(20)  # extra space on 2nd+ pages
 
-    self.set_font("DejaVu", "B", 18)
-    self.cell(0, 10, "ELD MALFUNCTION CONFIRMATION", 0, 1, 'C')
-    self.ln(10)
+        self.set_font("DejaVu", "B", 18)
+        self.cell(0, 10, "ELD MALFUNCTION CONFIRMATION", 0, 1, 'C')
+        self.ln(10)
 
-        def chapter_body(self, body, bold_phrases=None):
-            self.set_font("DejaVu", "", 12)
-            paragraphs = body.strip().split('\n\n')
-            for para in paragraphs:
-                self.set_x(self.l_margin + 5)
-                if not bold_phrases:
-                    self.multi_cell(0, 8, para)
-                else:
-                    parts = [para]
-                    for phrase in bold_phrases:
-                        temp = []
-                        for part in parts:
-                            if phrase in part:
-                                before, after = part.split(phrase, 1)
-                                temp.extend([before, phrase, after])
-                            else:
-                                temp.append(part)
-                        parts = temp
+    def chapter_body(self, body, bold_phrases=None):
+        self.set_font("DejaVu", "", 12)
+        paragraphs = body.strip().split('\n\n')
+        for para in paragraphs:
+            self.set_x(self.l_margin + 5)
+            if not bold_phrases:
+                self.multi_cell(0, 8, para)
+            else:
+                parts = [para]
+                for phrase in bold_phrases:
+                    temp = []
                     for part in parts:
-                        if part in bold_phrases:
-                            self.set_font("DejaVu", "B", 12)
-                            self.write(8, part)
-                            self.set_font("DejaVu", "", 12)
+                        if phrase in part:
+                            before, after = part.split(phrase, 1)
+                            temp.extend([before, phrase, after])
                         else:
-                            self.write(8, part)
-                    self.ln(10)
-                self.ln(5)
+                            temp.append(part)
+                    parts = temp
+                for part in parts:
+                    if part in bold_phrases:
+                        self.set_font("DejaVu", "B", 12)
+                        self.write(8, part)
+                        self.set_font("DejaVu", "", 12)
+                    else:
+                        self.write(8, part)
+                self.ln(10)
+            self.ln(5)
 
-        def write_bullets(self, items):
-            self.set_font("DejaVu", "", 12)
-            bullet = '\u2022'
-            for item in items:
-                self.set_x(self.l_margin + 10)
-                self.multi_cell(0, 8, f"{bullet} {item}")
-                self.ln(1)
+    def write_bullets(self, items):
+        self.set_font("DejaVu", "", 12)
+        bullet = '\u2022'
+        for item in items:
+            self.set_x(self.l_margin + 10)
+            self.multi_cell(0, 8, f"{bullet} {item}")
+            self.ln(1)
 
     fonts_dir = os.path.join('static', 'fonts')
     regular_font_path = os.path.join(fonts_dir, 'DejaVuSans.ttf')
