@@ -193,62 +193,13 @@ def eld_malfunction_letter():
     if request.method == 'GET':
         return render_template('eld_malfunction_letter.html', username=session['username'])
 
-    # POST request: generate the PDF
+    # POST request: gather form data
     company = request.form.get('company_name', 'N/A')
     dot_number = request.form.get('dot_number', 'N/A')
     driver_name = request.form.get('driver_name', 'N/A')
     malfunction_date = request.form.get('malfunction_date', 'N/A')
 
-class StyledPDF(FPDF):
-    def header(self):
-        if self.page_no() == 1:
-            logo_path = os.path.join('static', 'logo.png')
-            if os.path.exists(logo_path):
-                self.image(logo_path, x=70, y=10, w=60)
-            self.ln(40)  # already has top margin because of logo
-        else:
-            self.ln(20)  # extra space on 2nd+ pages
-
-        self.set_font("DejaVu", "B", 18)
-        self.cell(0, 10, "ELD MALFUNCTION CONFIRMATION", 0, 1, 'C')
-        self.ln(10)
-
-    def chapter_body(self, body, bold_phrases=None):
-        self.set_font("DejaVu", "", 12)
-        paragraphs = body.strip().split('\n\n')
-        for para in paragraphs:
-            self.set_x(self.l_margin + 5)
-            if not bold_phrases:
-                self.multi_cell(0, 8, para)
-            else:
-                parts = [para]
-                for phrase in bold_phrases:
-                    temp = []
-                    for part in parts:
-                        if phrase in part:
-                            before, after = part.split(phrase, 1)
-                            temp.extend([before, phrase, after])
-                        else:
-                            temp.append(part)
-                    parts = temp
-                for part in parts:
-                    if part in bold_phrases:
-                        self.set_font("DejaVu", "B", 12)
-                        self.write(8, part)
-                        self.set_font("DejaVu", "", 12)
-                    else:
-                        self.write(8, part)
-                self.ln(10)
-            self.ln(5)
-
-    def write_bullets(self, items):
-        self.set_font("DejaVu", "", 12)
-        bullet = '\u2022'
-        for item in items:
-            self.set_x(self.l_margin + 10)
-            self.multi_cell(0, 8, f"{bullet} {item}")
-            self.ln(1)
-
+    # ✅ This is the correct place for font existence check
     fonts_dir = os.path.join('static', 'fonts')
     regular_font_path = os.path.join(fonts_dir, 'DejaVuSans.ttf')
     bold_font_path = os.path.join(fonts_dir, 'DejaVuSans-Bold.ttf')
@@ -257,6 +208,58 @@ class StyledPDF(FPDF):
     if not all(os.path.exists(f) for f in [regular_font_path, bold_font_path, italic_font_path]):
         return "Required font files missing.", 500
 
+    # ✅ Class definition remains as-is
+    class StyledPDF(FPDF):
+        def header(self):
+            if self.page_no() == 1:
+                logo_path = os.path.join('static', 'logo.png')
+                if os.path.exists(logo_path):
+                    self.image(logo_path, x=70, y=10, w=60)
+                self.ln(40)
+            else:
+                self.ln(20)
+
+            self.set_font("DejaVu", "B", 18)
+            self.cell(0, 10, "ELD MALFUNCTION CONFIRMATION", 0, 1, 'C')
+            self.ln(10)
+
+        def chapter_body(self, body, bold_phrases=None):
+            self.set_font("DejaVu", "", 12)
+            paragraphs = body.strip().split('\n\n')
+            for para in paragraphs:
+                self.set_x(self.l_margin + 5)
+                if not bold_phrases:
+                    self.multi_cell(0, 8, para)
+                else:
+                    parts = [para]
+                    for phrase in bold_phrases:
+                        temp = []
+                        for part in parts:
+                            if phrase in part:
+                                before, after = part.split(phrase, 1)
+                                temp.extend([before, phrase, after])
+                            else:
+                                temp.append(part)
+                        parts = temp
+                    for part in parts:
+                        if part in bold_phrases:
+                            self.set_font("DejaVu", "B", 12)
+                            self.write(8, part)
+                            self.set_font("DejaVu", "", 12)
+                        else:
+                            self.write(8, part)
+                    self.ln(10)
+                self.ln(5)
+
+        def write_bullets(self, items):
+            self.set_font("DejaVu", "", 12)
+            bullet = '\u2022'
+            for item in items:
+                self.set_x(self.l_margin + 10)
+                self.multi_cell(0, 8, f"{bullet} {item}")
+                self.ln(1)
+
+    # ✅ Now you're good to use it
     pdf = StyledPDF()
     pdf.set_auto_page_break(auto=True, margin=25)
     pdf.set_left_margin(25)
