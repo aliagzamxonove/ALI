@@ -6,12 +6,13 @@
   <meta name="description" content="Generate ELD malfunction confirmation letters easily." />
   <title>ELD Malfunction Letter Generator</title>
   <link rel="icon" href="{{ url_for('static', filename='IFTA5458.png') }}" type="image/png" />
-  
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 
-  <!-- FontAwesome for icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+
+  <!-- FontAwesome for icons (optimized preload) -->
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"></noscript>
 
   <style>
     * {
@@ -195,10 +196,12 @@
       const btn = document.querySelector('.primary-btn');
       btn.textContent = 'Generating...';
       btn.disabled = true;
+
+      // Only show loading state briefly (you can remove this if target="_blank" makes it irrelevant)
       setTimeout(() => {
         btn.textContent = 'Generate Letter';
         btn.disabled = false;
-      }, 3000);
+      }, 5000);
     });
   </script>
 </body>
