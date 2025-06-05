@@ -348,19 +348,14 @@ def mail_page():
 
         if not email or not email_type:
             flash("Email and email type are required!", "error")
+            return redirect('/mail')  # ❗️Make sure to return here
         else:
-            # Process the email if needed (e.g., send it, save it, etc.)
-            flash("Email processed successfully.", "success")
+            message = ""
+            subject = ""
+            full_files = []
 
-     return redirect('/mail')
-
-        message = ""
-        subject = ""
-        full_files = []
-
-
-        if email_type == "instructions":
-            message = """Hello,
+            if email_type == "instructions":
+                message = """Hello,
 
 Attached you will find the official **ELD Instruction Pack** for Lucid ELD. These documents are **required by FMCSA** and **must be printed and kept in the truck at all times**.
 
@@ -373,27 +368,27 @@ Safe driving!
 Best regards,  
 Lucid ELD Support Team  
 www.lucideld.com"""
-            subject = "Required ELD Instruction Pack – Please Print & Keep in Truck"
+                subject = "Required ELD Instruction Pack – Please Print & Keep in Truck"
 
-            files = [
-                "Users Manual.pdf",
-                "Malfunction Manual.pdf",
-                "Truck Sticker.pdf",
-                "DOT Inspection.pdf",
-                "Certificate of Compliance.pdf"
-            ]
-            for file in files:
-                path = os.path.join(INSTRUCTION_FOLDER, file)
-                if os.path.exists(path):
-                    with open(path, 'rb') as f:
-                        part = MIMEApplication(f.read(), Name=os.path.basename(path))
-                        part['Content-Disposition'] = f'attachment; filename="{os.path.basename(path)}"'
-                        full_files.append(part)
-                else:
-                    flash(f"File not found: {file}", "error")
+                files = [
+                    "Users Manual.pdf",
+                    "Malfunction Manual.pdf",
+                    "Truck Sticker.pdf",
+                    "DOT Inspection.pdf",
+                    "Certificate of Compliance.pdf"
+                ]
+                for file in files:
+                    path = os.path.join(INSTRUCTION_FOLDER, file)
+                    if os.path.exists(path):
+                        with open(path, 'rb') as f:
+                            part = MIMEApplication(f.read(), Name=os.path.basename(path))
+                            part['Content-Disposition'] = f'attachment; filename="{os.path.basename(path)}"'
+                            full_files.append(part)
+                    else:
+                        flash(f"File not found: {file}", "error")
 
-        elif email_type == "ifta":
-            message = """Hello,
+            elif email_type == "ifta":
+                message = """Hello,
 
 As requested, please find attached the IFTA report(s) for your review.
 
@@ -404,21 +399,21 @@ Wishing you continued success and smooth operations.
 Best,  
 Lucid ELD Team  
 www.lucideld.com"""
-            subject = "IFTA Report Attached"
+                subject = "IFTA Report Attached"
 
-            uploaded_files = request.files.getlist("ifta_files")
-            if not uploaded_files:
-                flash("No files selected for IFTA!", "error")
-                return redirect('/mail')
+                uploaded_files = request.files.getlist("ifta_files")
+                if not uploaded_files:
+                    flash("No files selected for IFTA!", "error")
+                    return redirect('/mail')
 
-            for file in uploaded_files:
-                if file and file.filename:
-                    part = MIMEApplication(file.read(), Name=file.filename)
-                    part['Content-Disposition'] = f'attachment; filename="{file.filename}"'
-                    full_files.append(part)
+                for file in uploaded_files:
+                    if file and file.filename:
+                        part = MIMEApplication(file.read(), Name=file.filename)
+                        part['Content-Disposition'] = f'attachment; filename="{file.filename}"'
+                        full_files.append(part)
 
-        elif email_type == "information":
-            message = """Hello,
+            elif email_type == "information":
+                message = """Hello,
 
 Thank you for your interest in Lucid ELD! Here’s a quick overview of what we provide:
 
@@ -438,10 +433,10 @@ If you’d like to get started or ask any questions, we’re always just a call 
 Warm regards,  
 Lucid ELD Team  
 www.lucideld.com"""
-            subject = "About Lucid ELD – What We Offer"
+                subject = "About Lucid ELD – What We Offer"
 
-        elif email_type == "advertising":
-            message = """Hello!
+            elif email_type == "advertising":
+                message = """Hello!
 
 Managing a fleet is challenging enough—your ELD system shouldn’t make it harder.
 
@@ -467,18 +462,18 @@ Adam
 Lucid ELD  
 (267) 578-8580  
 www.lucideld.com"""
-            subject = "A Better ELD Solution for Your Fleet"
+                subject = "A Better ELD Solution for Your Fleet"
 
-        elif email_type == "api":
-            username = request.form.get('username')
-            password = request.form.get('password')
-            api_key = request.form.get('api_key')
+            elif email_type == "api":
+                username = request.form.get('username')
+                password = request.form.get('password')
+                api_key = request.form.get('api_key')
 
-            if not username or not password or not api_key:
-                flash("Username, password, and API key are required!", "error")
-                return redirect('/mail')
+                if not username or not password or not api_key:
+                    flash("Username, password, and API key are required!", "error")
+                    return redirect('/mail')
 
-            message = f"""Hello,
+                message = f"""Hello,
 
 Here are the credentials and API Key you requested for accessing our system:
 
@@ -492,32 +487,32 @@ If you need further assistance or have any questions, don't hesitate to reach ou
 
 Best regards,  
 Lucid ELD Support Team"""
-            subject = "API Credentials and Key"
+                subject = "API Credentials and Key"
 
-        # Send the email
-        try:
-            msg = Message(subject=subject,
-                          sender=app.config['MAIL_USERNAME'],
-                          recipients=[email],
-                          body=message)
+            try:
+                msg = Message(subject=subject,
+                              sender=app.config['MAIL_USERNAME'],
+                              recipients=[email],
+                              body=message)
 
-            for part in full_files:
-                msg.attach(
-                    filename=part.get_filename(),
-                    content_type='application/octet-stream',
-                    data=part.get_payload(decode=True)
-                )
+                for part in full_files:
+                    msg.attach(
+                        filename=part.get_filename(),
+                        content_type='application/octet-stream',
+                        data=part.get_payload(decode=True)
+                    )
 
-            mail_sender.send(msg)  # ✅ Use renamed mail object
-            flash("Email successfully sent!", "success")
+                mail_sender.send(msg)
+                flash("Email successfully sent!", "success")
 
-        except Exception as e:
-            print(f"Error sending email: {e}")
-            flash(f"Failed to send email: {str(e)}", "error")
+            except Exception as e:
+                print(f"Error sending email: {e}")
+                flash(f"Failed to send email: {str(e)}", "error")
 
-        return redirect('/mail')  # ✅ Also inside POST
+            return redirect('/mail')  # ✅ Must be here after processing
 
-    return render_template('mail.html')  # GET request shows form
+    return render_template('mail.html')  # GET request
+    
 
 @app.route('/eldquiz')
 def eldquiz():
