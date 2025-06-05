@@ -203,70 +203,92 @@ def eld_malfunction_letter():
     output_dir = 'generated_files'
     os.makedirs(output_dir, exist_ok=True)
 
-    class StyledPDF(FPDF):
-        def header(self):
-            if self.page_no() == 1:
-                logo_path = os.path.join('static', 'logo.png')
-                if os.path.exists(logo_path):
-                    self.image(logo_path, x=60, y=10, w=90)
-                self.ln(40)
-            self.set_font("DejaVu", "B", 16)
-            self.cell(0, 10, "ELD MALFUNCTION CONFIRMATION", 0, 1, 'C')
-            self.ln(5)
+class StyledPDF(FPDF):
+    def header(self):
+        if self.page_no() == 1:
+            logo_path = os.path.join('static', 'logo.png')
+            if os.path.exists(logo_path):
+                # Smaller logo centered nicely
+                self.image(logo_path, x=70, y=10, w=60)
+            self.ln(40)
+        self.set_font("DejaVu", "B", 18)
+        self.cell(0, 10, "ELD MALFUNCTION CONFIRMATION", 0, 1, 'C')
+        self.ln(10)
 
-        def footer(self):
-            self.set_y(-15)
-            self.set_font("DejaVu", "I", 8)
-            self.cell(0, 10, f"Page {self.page_no()}", 0, 0, 'C')
+    # Remove footer to hide page numbers
+    # def footer(self):
+    #     pass
 
-        def chapter_body(self, body, bold_phrases=None):
-            self.set_font("DejaVu", "", 12)
+    def chapter_body(self, body, bold_phrases=None):
+        self.set_font("DejaVu", "", 12)
+        paragraphs = body.strip().split('\n\n')  # split into paragraphs
+        for para in paragraphs:
+            # Indent paragraphs by 5mm
+            self.set_x(self.l_margin + 5)
             if not bold_phrases:
-                self.multi_cell(0, 10, body)
-                return
-            parts = [body]
-            for phrase in bold_phrases:
-                temp = []
+                self.multi_cell(0, 8, para)
+            else:
+                # Split paragraphs into parts for bold phrases
+                parts = [para]
+                for phrase in bold_phrases:
+                    temp = []
+                    for part in parts:
+                        if phrase in part:
+                            before, after = part.split(phrase, 1)
+                            temp.extend([before, phrase, after])
+                        else:
+                            temp.append(part)
+                    parts = temp
                 for part in parts:
-                    if phrase in part:
-                        before, after = part.split(phrase, 1)
-                        temp.extend([before, phrase, after])
+                    if part in bold_phrases:
+                        self.set_font("DejaVu", "B", 12)
+                        self.write(8, part)
+                        self.set_font("DejaVu", "", 12)
                     else:
-                        temp.append(part)
-                parts = temp
-            for part in parts:
-                if part in bold_phrases:
-                    self.set_font("DejaVu", "B", 12)
-                    self.write(10, part)
-                    self.set_font("DejaVu", "", 12)
-                else:
-                    self.write(10, part)
-            self.ln(10)
+                        self.write(8, part)
+                self.ln(10)
+            self.ln(5)  # space between paragraphs
 
-    # Font paths
-    fonts_dir = os.path.join('static', 'fonts')
-    regular_font_path = os.path.join(fonts_dir, 'DejaVuSans.ttf')
-    bold_font_path = os.path.join(fonts_dir, 'DejaVuSans-Bold.ttf')
-    italic_font_path = os.path.join(fonts_dir, 'DejaVuSans-Oblique.ttf')
+    def write_bullets(self, items):
+        self.set_font("DejaVu", "", 12)
+        bullet = '\u2022'
+        for item in items:
+            self.set_x(self.l_margin + 10)
+            self.multi_cell(0, 8, f"{bullet} {item}")
+            self.ln(1)
 
-    # Validate font files
-    if not all(os.path.exists(f) for f in [regular_font_path, bold_font_path, italic_font_path]):
-        return "Required font files missing (DejaVuSans.ttf, DejaVuSans-Bold.ttf, DejaVuSans-Oblique.ttf).", 500
+# Font paths
+fonts_dir = os.path.join('static', 'fonts')
+regular_font_path = os.path.join(fonts_dir, 'DejaVuSans.ttf')
+bold_font_path = os.path.join(fonts_dir, 'DejaVuSans-Bold.ttf')
+italic_font_path = os.path.join(fonts_dir, 'DejaVuSans-Oblique.ttf')
 
-    pdf = StyledPDF()
-    pdf.set_auto_page_break(auto=True, margin=15)
+# Validate font files
+if not all(os.path.exists(f) for f in [regular_font_path, bold_font_path, italic_font_path]):
+    raise FileNotFoundError("Required font files missing (DejaVuSans.ttf, DejaVuSans-Bold.ttf, DejaVuSans-Oblique.ttf).")
 
-    # Register fonts
-    pdf.add_font('DejaVu', '', regular_font_path, uni=True)
-    pdf.add_font('DejaVu', 'B', bold_font_path, uni=True)
-    pdf.add_font('DejaVu', 'I', italic_font_path, uni=True)
+pdf = StyledPDF()
+pdf.set_auto_page_break(auto=True, margin=25)
+pdf.set_left_margin(25)
+pdf.set_right_margin(25)
 
-    pdf.set_font("DejaVu", "", 12)
-    pdf.add_page()
+# Register fonts
+pdf.add_font('DejaVu', '', regular_font_path, uni=True)
+pdf.add_font('DejaVu', 'B', bold_font_path, uni=True)
+pdf.add_font('DejaVu', 'I', italic_font_path, uni=True)
 
-    # Page 1 content
-    pdf.chapter_body(
-        f"""To whom it may concern,
+pdf.set_font("DejaVu", "", 12)
+pdf.add_page()
+
+# Example variables (replace with actual data)
+dot_number = "123456"
+company = "Example Company LLC"
+driver_name = "John Doe"
+malfunction_date = "2025-06-04"
+
+# Page 1 content
+pdf.chapter_body(
+    f"""To whom it may concern,
 
 This letter confirms that the ELD system is currently in malfunction. We are aware of the issue and are working to resolve it.
 
@@ -276,44 +298,63 @@ Driver Name: {driver_name}
 
 In accordance with 49 CFR 395.8, until the ELD is serviced and back in compliance, the driver has been allowed to use paper logs for no more than 8 days. The recording of the driver’s hours of service on a paper log begins on {malfunction_date}.
 """,
-        bold_phrases=["49 CFR 395.8", "paper logs for no more than 8 days."]
-    )
+    bold_phrases=["49 CFR 395.8", "paper logs for no more than 8 days."]
+)
 
-    y_before = pdf.get_y()
-    pdf.cell(90, 10, "LUCID ELD Manager, Sukhrobbek Usmonov", ln=0)
+# Manager signature block
+y_before = pdf.get_y()
+pdf.set_x(pdf.l_margin)
+pdf.cell(90, 10, "LUCID ELD Manager, Sukhrobbek Usmonov", ln=0)
 
-    sig_path = os.path.join('static', 'manager_signature.png')
-    if os.path.exists(sig_path):
-        try:
-            pdf.image(sig_path, x=120, y=y_before, w=50)
-        except Exception as e:
-            print("Signature load error:", e)
+sig_path = os.path.join('static', 'manager_signature.png')
+if os.path.exists(sig_path):
+    try:
+        pdf.image(sig_path, x=pdf.get_x() + 10, y=y_before - 2, w=50)
+    except Exception as e:
+        print("Signature load error:", e)
 
-    pdf.ln(25)
-    pdf.cell(0, 10, f"Given date: {malfunction_date}", ln=True)
+pdf.ln(25)
+pdf.cell(0, 10, f"Given date: {malfunction_date}", ln=True)
 
-    # Page 2
-    pdf.add_page()
-    pdf.chapter_body("If an ELD malfunctions, a driver must:")
-    pdf.chapter_body(
-        """- Note the malfunction of the ELD and provide written notice of the malfunction to the motor carrier within 24 hours;
-- Reconstruct the record of duty status (RODS) for the current 24-hour period and the previous 7 consecutive days, and record the records of duty status on graph-grid paper logs that comply with 49 CFR 395.8, unless the driver already has the records or retrieves them from the ELD;
-- Continue to manually prepare RODS in accordance with 49 CFR 395.8 until the ELD is serviced and back in compliance.
+# Page 2
+pdf.add_page()
+pdf.chapter_body("If an ELD malfunctions, a driver must:")
 
-In compliance with the above-mentioned USDOT rules and regulations, I ______ certify that all information provided by me is true and correct to the best of my knowledge, and that I notified the company Safety Department of an ELD malfunction within 24-hours.
+pdf.write_bullets([
+    "Note the malfunction of the ELD and provide written notice of the malfunction to the motor carrier within 24 hours;",
+    "Reconstruct the record of duty status (RODS) for the current 24-hour period and the previous 7 consecutive days, and record the records of duty status on graph-grid paper logs that comply with 49 CFR 395.8, unless the driver already has the records or retrieves them from the ELD;",
+    "Continue to manually prepare RODS in accordance with 49 CFR 395.8 until the ELD is serviced and back in compliance."
+])
+
+pdf.chapter_body(
+    """In compliance with the above-mentioned USDOT rules and regulations, I ______ certify that all information provided by me is true and correct to the best of my knowledge, and that I notified the company Safety Department of an ELD malfunction within 24-hours.
 
 The reason of malfunction was:
 ☐ Device (Tablet) is powered off and cannot be recharged and is not working properly;
 ☐ ELD device does not show any lights when connected to diagnostic port or shows power off;
 ☐ ELD Device not reporting any information with Device (Tablet) when connected to the Truck;
+"""
+    ,
+    bold_phrases=["within 24 hours"]
+)
 
-Driver Printed Name: ________     Signature: ________     Date: ________     Time: ________
-""",
-        bold_phrases=["within 24 hours", "49 CFR 395.8", "paper logs", "Driver Printed Name", "Signature", "Date", "Time"]
-    )
+# Signature fields
+pdf.ln(15)
+pdf.set_x(pdf.l_margin)
+pdf.cell(70, 10, "Driver Printed Name: ____________________")
+pdf.ln(12)
+pdf.set_x(pdf.l_margin)
+pdf.cell(70, 10, "Signature: _______________________________")
+pdf.ln(12)
+pdf.set_x(pdf.l_margin)
+pdf.cell(50, 10, "Date: ______________    Time: ____________")
 
-    output_path = os.path.join(output_dir, 'eld_malfunction_letter.pdf')
-    pdf.output(output_path)
+# Save PDF file (replace output_dir with your path)
+output_dir = "output"
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
+output_path = os.path.join(output_dir, 'eld_malfunction_letter.pdf')
+pdf.output(output_path)
 
     @after_this_request
     def cleanup(response):
