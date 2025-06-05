@@ -188,8 +188,11 @@ def generate_report():
     
 @app.route('/eld_malfunction_letter', methods=['GET', 'POST'])
 def eld_malfunction_letter():
-    if request.method == 'GET':
-        return render_template('eld_malfunction_letter.html')
+    if 'username' not in session:
+        flash('Please log in to access the page.', 'warning')
+        return redirect(url_for('login'))
+    
+    return render_template('eld_malfunction_letter.html', username=session['username'])
 
     # Extract form data
     company = request.form.get('company_name', 'N/A')
@@ -334,14 +337,22 @@ def tutorial():
     return render_template('tutorial.html')
 
 @app.route('/mail', methods=['GET', 'POST'])
-def mail_page():  # Rename the route function to avoid 'mail' conflict
+def mail_page():
+    if 'username' not in session:
+        flash('Please log in to access the page.', 'warning')
+        return redirect(url_for('login'))
+
     if request.method == 'POST':
         email = request.form.get('email')
         email_type = request.form.get('email_type')
 
         if not email or not email_type:
             flash("Email and email type are required!", "error")
-            return redirect('/mail')
+        else:
+            # Process the email if needed (e.g., send it, save it, etc.)
+            flash("Email processed successfully.", "success")
+
+     return redirect('/mail')
 
         message = ""
         subject = ""
