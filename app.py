@@ -11,7 +11,7 @@ import smtplib
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
-GENERATED_FOLDER = 'generated'
+GENERATED_FOLDER = os.path.join(os.getcwd(), 'generated')
 os.makedirs(GENERATED_FOLDER, exist_ok=True)
 
 # Store the username and hashed password
