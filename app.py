@@ -70,14 +70,13 @@ def dashboard():
 @app.route('/generate_report', methods=['GET', 'POST'])
 def generate_report():
     if request.method == 'POST':
-        # Получаем данные из формы
-        company = request.form['company']
-        period = request.form['period']
-        truck_number = request.form['truck_number']
+        company = html.escape(request.form['company'])
+        period = html.escape(request.form['period'])
+        truck_number = html.escape(request.form['truck_number'])
         mileage_data_raw = request.form['mileage_data']
         logo_file = request.files.get('logo')
 
-        # Словарь: полные названия штатов → сокращения
+        # Full state names → abbreviations
         state_map = {
             'alabama': 'AL', 'alaska': 'AK', 'arizona': 'AZ', 'arkansas': 'AR', 'california': 'CA',
             'colorado': 'CO', 'connecticut': 'CT', 'delaware': 'DE', 'florida': 'FL', 'georgia': 'GA',
@@ -91,19 +90,16 @@ def generate_report():
             'virginia': 'VA', 'washington': 'WA', 'west virginia': 'WV', 'wisconsin': 'WI', 'wyoming': 'WY'
         }
 
-        # Приводим весь текст к нижнему регистру и очищаем от ненужных символов
+        # Normalize and parse mileage data
         normalized_text = mileage_data_raw.lower()
         normalized_text = re.sub(r'[^\w\s().-]', ' ', normalized_text)
 
-        # Заменяем полные названия штатов на аббревиатуры
         for full in sorted(state_map.keys(), key=len, reverse=True):
             abbr = state_map[full]
             normalized_text = re.sub(rf'\b{re.escape(full)}\b', abbr.lower(), normalized_text, flags=re.IGNORECASE)
 
-        # Ищем все пары типа AL 88, (TX) 123.45, AL-88, и т.д.
         matches = re.findall(r'\(?\b([A-Z]{2})\b\)?[\s:\-]*([0-9]+(?:\.[0-9]+)?)', normalized_text.upper())
 
-        # Складываем мили по штатам
         mileage_data = {}
         for state, miles_str in matches:
             try:
@@ -114,16 +110,19 @@ def generate_report():
 
         total_mileage = sum(mileage_data.values())
 
-        # Класс для генерации PDF
+        # Save logo temporarily
+        logo_temp_path = None
+        if logo_file and logo_file.filename != '':
+            logo_temp_path = os.path.join(GENERATED_FOLDER, "temp_logo.png")
+            logo_file.save(logo_temp_path)
+
         class StyledPDF(FPDF):
             def header(self):
-                if logo_file and logo_file.filename != '':
-                    logo_path = os.path.join(GENERATED_FOLDER, "temp_logo.png")
-                    logo_file.save(logo_path)
-                    self.image(logo_path, x=10, y=8, h=30)
+                if logo_temp_path and os.path.exists(logo_temp_path):
+                    self.image(logo_temp_path, x=10, y=8, h=30)
 
                 self.set_font("Helvetica", "B", 18)
-                self.set_text_color(0, 51, 102)  # Official color theme
+                self.set_text_color(0, 51, 102)
                 self.ln(10)
                 self.cell(0, 10, "IFTA REPORT", ln=True, align="C")
                 self.ln(5)
@@ -139,7 +138,7 @@ def generate_report():
                 self.cell(0, 10, f"Truck Number: {truck_number}", ln=True, align="L")
                 self.ln(4)
 
-                self.set_fill_color(230, 230, 230)  # Subtle background shading for readability
+                self.set_fill_color(230, 230, 230)
                 self.set_text_color(0)
                 self.set_draw_color(180, 180, 180)
                 col_width = 90
@@ -163,22 +162,20 @@ def generate_report():
         pdf.add_page()
         pdf.add_table(truck_number, mileage_data, total_mileage)
 
-        filename = f"{company.replace(' ', '_')}_{truck_number}_IFTA_Report.pdf"
+        safe_company = re.sub(r'[^a-zA-Z0-9_\-]', '_', company)
+        filename = f"{safe_company}_{truck_number}_IFTA_Report.pdf"
         filepath = os.path.join(GENERATED_FOLDER, filename)
         pdf.output(filepath)
 
-        # Cleanup logo file after report generation
-        if logo_file and logo_file.filename != '':
-            logo_temp_path = os.path.join(GENERATED_FOLDER, "temp_logo.png")
-            if os.path.exists(logo_temp_path):
-                os.remove(logo_temp_path)
-
         @after_this_request
-        def remove_file(response):
+        def cleanup(response):
             try:
-                os.remove(filepath)
+                if os.path.exists(filepath):
+                    os.remove(filepath)
+                if logo_temp_path and os.path.exists(logo_temp_path):
+                    os.remove(logo_temp_path)
             except Exception as e:
-                print(f"Error deleting PDF: {e}")
+                print(f"Cleanup error: {e}")
             return response
 
         return send_file(filepath, mimetype='application/pdf', as_attachment=True, download_name=filename)
