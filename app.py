@@ -190,9 +190,11 @@ def eld_malfunction_letter():
         flash('Please log in to access the page.', 'warning')
         return redirect(url_for('login'))
     
-    return render_template('eld_malfunction_letter.html', username=session['username'])
-
-    # Extract form data
+    if request.method == 'GET':
+        # Show the form page
+        return render_template('eld_malfunction_letter.html', username=session['username'])
+    
+    # POST request: process form and generate PDF
     company = request.form.get('company_name', 'N/A')
     dot_number = request.form.get('dot_number', 'N/A')
     driver_name = request.form.get('driver_name', 'N/A')
