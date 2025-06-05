@@ -193,13 +193,11 @@ def eld_malfunction_letter():
     if request.method == 'GET':
         return render_template('eld_malfunction_letter.html', username=session['username'])
 
-    # POST request: gather form data
     company = request.form.get('company_name', 'N/A')
     dot_number = request.form.get('dot_number', 'N/A')
     driver_name = request.form.get('driver_name', 'N/A')
     malfunction_date = request.form.get('malfunction_date', 'N/A')
 
-    # ✅ This is the correct place for font existence check
     fonts_dir = os.path.join('static', 'fonts')
     regular_font_path = os.path.join(fonts_dir, 'DejaVuSans.ttf')
     bold_font_path = os.path.join(fonts_dir, 'DejaVuSans-Bold.ttf')
@@ -208,20 +206,19 @@ def eld_malfunction_letter():
     if not all(os.path.exists(f) for f in [regular_font_path, bold_font_path, italic_font_path]):
         return "Required font files missing.", 500
 
-    # ✅ Class definition remains as-is
     class StyledPDF(FPDF):
         def header(self):
             if self.page_no() == 1:
                 logo_path = os.path.join('static', 'logo.png')
                 if os.path.exists(logo_path):
                     self.image(logo_path, x=70, y=10, w=60)
-                self.ln(40)
+                self.ln(25)  # reduced from 40
             else:
-                self.ln(20)
+                self.ln(15)  # reduced from 20
 
-            self.set_font("DejaVu", "B", 18)
-            self.cell(0, 10, "ELD MALFUNCTION CONFIRMATION", 0, 1, 'C')
-            self.ln(10)
+            self.set_font("DejaVu", "B", 15)  # reduced from 18
+            self.cell(0, 8, "ELD MALFUNCTION CONFIRMATION", 0, 1, 'C')
+            self.ln(6)  # reduced from 10
 
         def chapter_body(self, body, bold_phrases=None):
             self.set_font("DejaVu", "", 12)
@@ -229,7 +226,7 @@ def eld_malfunction_letter():
             for para in paragraphs:
                 self.set_x(self.l_margin + 5)
                 if not bold_phrases:
-                    self.multi_cell(0, 8, para)
+                    self.multi_cell(0, 6.5, para)  # tighter line height
                 else:
                     parts = [para]
                     for phrase in bold_phrases:
@@ -244,26 +241,25 @@ def eld_malfunction_letter():
                     for part in parts:
                         if part in bold_phrases:
                             self.set_font("DejaVu", "B", 12)
-                            self.write(8, part)
+                            self.write(6.5, part)
                             self.set_font("DejaVu", "", 12)
                         else:
-                            self.write(8, part)
-                    self.ln(10)
-                self.ln(5)
+                            self.write(6.5, part)
+                    self.ln(4)  # reduced vertical spacing
+                self.ln(4)
 
         def write_bullets(self, items):
             self.set_font("DejaVu", "", 12)
             bullet = '\u2022'
             for item in items:
                 self.set_x(self.l_margin + 10)
-                self.multi_cell(0, 8, f"{bullet} {item}")
-                self.ln(1)
+                self.multi_cell(0, 6.5, f"{bullet} {item}")  # tighter spacing
+                # removed extra self.ln()
 
-    # ✅ Now you're good to use it
     pdf = StyledPDF()
-    pdf.set_auto_page_break(auto=True, margin=25)
-    pdf.set_left_margin(25)
-    pdf.set_right_margin(25)
+    pdf.set_auto_page_break(auto=True, margin=15)  # reduced from 25
+    pdf.set_left_margin(20)  # reduced from 25
+    pdf.set_right_margin(20)
 
     pdf.add_font('DejaVu', '', regular_font_path, uni=True)
     pdf.add_font('DejaVu', 'B', bold_font_path, uni=True)
@@ -298,7 +294,7 @@ In accordance with 49 CFR 395.8, until the ELD is serviced and back in complianc
         except Exception as e:
             print("Signature load error:", e)
 
-    pdf.ln(25)
+    pdf.ln(10)  # reduced from 25
     pdf.cell(0, 10, f"Given date: {malfunction_date}", ln=True)
 
     # Page 2
@@ -323,13 +319,13 @@ The reason of malfunction was:
     )
 
     # Signature fields
-    pdf.ln(15)
+    pdf.ln(6)  # reduced from 15
     pdf.set_x(pdf.l_margin)
     pdf.cell(70, 10, "Driver Printed Name: ____________________")
-    pdf.ln(12)
+    pdf.ln(10)
     pdf.set_x(pdf.l_margin)
     pdf.cell(70, 10, "Signature: _______________________________")
-    pdf.ln(12)
+    pdf.ln(10)
     pdf.set_x(pdf.l_margin)
     pdf.cell(50, 10, "Date: ______________    Time: ____________")
 
