@@ -200,15 +200,18 @@ def eld_malfunction_letter():
     malfunction_date = request.form.get('malfunction_date', 'N/A')
 
     class StyledPDF(FPDF):
-        def header(self):
-            if self.page_no() == 1:
-                logo_path = os.path.join('static', 'logo.png')
-                if os.path.exists(logo_path):
-                    self.image(logo_path, x=70, y=10, w=60)
-                self.ln(40)
-            self.set_font("DejaVu", "B", 18)
-            self.cell(0, 10, "ELD MALFUNCTION CONFIRMATION", 0, 1, 'C')
-            self.ln(10)
+      def header(self):
+    if self.page_no() == 1:
+        logo_path = os.path.join('static', 'logo.png')
+        if os.path.exists(logo_path):
+            self.image(logo_path, x=70, y=10, w=60)
+        self.ln(40)  # already has top margin because of logo
+    else:
+        self.ln(20)  # add extra space on 2nd page or later
+
+    self.set_font("DejaVu", "B", 18)
+    self.cell(0, 10, "ELD MALFUNCTION CONFIRMATION", 0, 1, 'C')
+    self.ln(10)
 
         def chapter_body(self, body, bold_phrases=None):
             self.set_font("DejaVu", "", 12)
