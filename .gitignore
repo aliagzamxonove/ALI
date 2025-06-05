@@ -204,3 +204,30 @@ cython_debug/
 celerybeat-schedule
 celerybeat.pid
 
+# Uploaded logos and generated files
+/static/generated/
+static/generated/
+
+# Uploaded videos (if you store them locally during development)
+static/webttrl/
+
+# Generated PDFs
+*.pdf
+
+# Flask debug logs
+flask.log
+
+# Coverage and profiling reports
+*.prof
+*.pstats
+
+# Compiled HTML/static cache
+*.htmlcache
+
+# Temporary HTML backup
+*.html~
+
+# VS Code Workspace settings
+*.code-workspace
+
+
