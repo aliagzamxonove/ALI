@@ -3,6 +3,7 @@ from fpdf import FPDF
 import os
 import re
 import hashlib
+import html
 from flask_mail import Mail, Message
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
