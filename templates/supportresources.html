@@ -24,124 +24,148 @@
       },
     };
   </script>
-    <style>
-      ::-webkit-scrollbar {
-        width: 8px;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #334155;
-        border-radius: 4px;
-      }
+ <style>
+  /* Скроллбар */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
 
-      .video-thumb {
-        position: relative;
-        border-radius: 0.75rem;
-        overflow: hidden;
-        cursor: pointer;
-        background-color: #111827;
-        aspect-ratio: 16 / 9;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-      }
+  ::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+  }
 
-      .video-thumb img {
-        object-fit: cover;
-        width: 100%;
-        height: 100%;
-        display: block;
-      }
+  /* Базовая структура карточки */
+  .video-thumb {
+    position: relative;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    cursor: pointer;
+    background-color: #111827;
+    aspect-ratio: 16 / 9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
 
-      .video-thumb:hover {
-        transform: scale(1.05);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
-      }
+  .video-thumb:hover {
+    transform: scale(1.04);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+  }
 
-      .guidance-toggle input {
-        display: none;
-      }
+  .video-thumb video,
+  .video-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: inherit;
+    transition: opacity 0.3s ease;
+  }
 
-      .guidance-toggle label {
-        padding: 0.6rem 1.25rem;
-        font-weight: 600;
-        font-size: 0.95rem;
-        border-radius: 0.5rem;
-        color: #cbd5e1;
-        transition: all 0.3s;
-        cursor: pointer;
-      }
+  .video-thumb video.invisible {
+    opacity: 0;
+    pointer-events: none;
+  }
 
-      .guidance-toggle input:checked + label {
-        background: linear-gradient(to right, #4b5563, #1f2937);
-        color: white;
-        transform: scale(1.05);
-      }
+  /* Кастомные контролы */
+  .video-controls {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    display: flex;
+    gap: 10px;
+    z-index: 10;
+  }
 
-      section {
-        display: none;
-        opacity: 0;
-        transform: translateY(12px);
-        transition: opacity 0.4s ease, transform 0.4s ease;
-      }
+  .video-controls button {
+    background-color: rgba(0, 0, 0, 0.55);
+    border: none;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-      .visible-section {
-        display: block;
-        opacity: 1;
-        transform: translateY(0);
-      }
+  .video-controls button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+  }
 
-      /* Smooth transition for background color changes */
-      body {
-        transition: background-color 0.3s ease, color 0.3s ease;
-      }
-      .video-thumb {
-  position: relative;
-  overflow: hidden;
-}
+  .video-controls svg {
+    width: 22px;
+    height: 22px;
+    fill: white;
+  }
 
-.video-controls {
-  position: absolute;
-  bottom: 8px;
-  right: 8px;
-  display: flex;
-  gap: 8px;
-  z-index: 10;
-}
+  /* Переключатели (guidance) */
+  .guidance-toggle input {
+    display: none;
+  }
 
-.video-controls button {
-  background-color: rgba(0, 0, 0, 0.6);
-  border: none;
-  padding: 8px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  .guidance-toggle label {
+    padding: 0.6rem 1.25rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-radius: 0.5rem;
+    color: #cbd5e1;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
 
-.video-controls button:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
+  .guidance-toggle input:checked + label {
+    background: linear-gradient(to right, #4b5563, #1f2937);
+    color: white;
+    transform: scale(1.05);
+  }
 
-.video-controls svg {
-  width: 20px;
-  height: 20px;
-  fill: white;
-}
+  /* Плавное появление секций */
+  section {
+    display: none;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
 
-      /* Customizing the theme toggle button */
-      #themeToggle {
-        transition: all 0.3s ease;
-        cursor: pointer;
-      }
+  .visible-section {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+  }
 
-      #themeToggle:hover {
-        transform: scale(1.1);
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-      }
-    </style>
+  /* Плавный body при смене темы */
+  body {
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Тема */
+  #themeToggle {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    padding: 0.4rem;
+    font-size: 1.2rem;
+    background: transparent;
+    border: none;
+  }
+
+  #themeToggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Адаптация под мобильные устройства */
+  @media (hover: none) and (pointer: coarse) {
+    .video-thumb:hover {
+      transform: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+  }
+</style>
   </head>
 
   <body class="bg-dark text-white font-sans min-h-screen transition-colors">
