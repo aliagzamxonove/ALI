@@ -6,6 +6,10 @@
   <title>Lucid ELD Tutorials</title>
   <link rel="icon" href="{{ url_for('static', filename='IFTA5458.png') }}" type="image/png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+  lucide.createIcons();
+</script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -340,51 +344,46 @@ video.invisible {
         </div>
       </section>
 
-<section id="resourcesSection" class="hidden-section">
-  <h2 class="text-2xl font-bold mb-6 border-b border-gray-700 pb-2">📄 Instruction Files</h2>
-  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+<section id="resourcesSection" class="hidden-section py-10 px-4">
+  <h2 class="text-3xl font-bold mb-8 border-b border-gray-700 pb-2 text-white">📄 Instruction Files</h2>
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
 
-    <a href="Instruction/DOT%20Inspection.pdf" download class="group bg-soft hover:bg-accent p-5 rounded-xl border border-gray-700 shadow transition-shadow hover:shadow-xl flex space-x-4">
-      <div class="text-3xl">📘</div>
-      <div>
-        <h3 class="text-lg font-semibold text-white">DOT Inspection</h3>
-        <p class="text-sm text-white">DOT Inspection File</p>
-      </div>
-    </a>
+    {% set docs = [
+      {'icon': 'file-text', 'title': 'DOT Inspection', 'desc': 'DOT Inspection File', 'file': 'DOT Inspection.pdf'},
+      {'icon': 'file-check', 'title': 'Certificate of Compliance', 'desc': 'Compliance Documentation', 'file': 'Certificate of Compliance.pdf'},
+      {'icon': 'file-warning', 'title': 'Malfunction Manual', 'desc': 'Troubleshooting Guide', 'file': 'Malfunction Manual.pdf'},
+      {'icon': 'truck', 'title': 'Truck Sticker', 'desc': 'Cab Sticker Template', 'file': 'Truck Sticker.pdf'},
+      {'icon': 'book', 'title': 'User Manual', 'desc': 'Full Product Manual', 'file': 'Users Manual.pdf'}
+    ] %}
 
-    <a href="Instruction/Certificate%20of%20Compliance.pdf" download class="group bg-soft hover:bg-accent p-5 rounded-xl border border-gray-700 shadow transition-shadow hover:shadow-xl flex space-x-4">
-      <div class="text-3xl">📗</div>
-      <div>
-        <h3 class="text-lg font-semibold text-white">Certificate of Compliance</h3>
-        <p class="text-sm text-white">Compliance Documentation</p>
+    {% for doc in docs %}
+    <div class="bg-gray-800 border border-gray-700 rounded-2xl shadow-lg hover:shadow-xl transition p-6 flex flex-col justify-between">
+      <div class="flex items-center space-x-4 mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <use href="https://unpkg.com/lucide@latest/icons/{{ doc.icon }}.svg#icon" />
+        </svg>
+        <div>
+          <h3 class="text-xl font-semibold text-white">{{ doc.title }}</h3>
+          <p class="text-sm text-gray-300">{{ doc.desc }}</p>
+        </div>
       </div>
-    </a>
+      <div class="flex space-x-3 pt-2 mt-auto">
+        <a href="{{ url_for('static', filename='Instruction/' + doc.file) }}"
+           target="_blank" rel="noopener"
+           class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg transition font-medium shadow">
+          👁️ Просмотреть
+        </a>
+        <a href="{{ url_for('static', filename='Instruction/' + doc.file) }}"
+           download
+           class="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg transition font-medium shadow">
+          ⬇️ Скачать
+        </a>
+      </div>
+    </div>
+    {% endfor %}
 
-    <a href="Instruction/Malfunction%20Manual.pdf" download class="group bg-soft hover:bg-accent p-5 rounded-xl border border-gray-700 shadow transition-shadow hover:shadow-xl flex space-x-4">
-      <div class="text-3xl">📕</div>
-      <div>
-        <h3 class="text-lg font-semibold text-white">Malfunction Manual</h3>
-        <p class="text-sm text-white">Troubleshooting Guide</p>
-      </div>
-    </a>
-
-    <a href="Instruction/Truck%20Sticker.pdf" download class="group bg-soft hover:bg-accent p-5 rounded-xl border border-gray-700 shadow transition-shadow hover:shadow-xl flex space-x-4">
-      <div class="text-3xl">🚚</div>
-      <div>
-        <h3 class="text-lg font-semibold text-white">Truck Sticker</h3>
-        <p class="text-sm text-white">Cab Sticker Template</p>
-      </div>
-    </a>
-
-    <a href="Instruction/Users%20Manual.pdf" download class="group bg-soft hover:bg-accent p-5 rounded-xl border border-gray-700 shadow transition-shadow hover:shadow-xl flex space-x-4">
-      <div class="text-3xl">📙</div>
-      <div>
-        <h3 class="text-lg font-semibold text-white">User Manual</h3>
-        <p class="text-sm text-white">Full Product Manual</p>
-      </div>
-    </a>
   </div>
-      </section>
+</section>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
