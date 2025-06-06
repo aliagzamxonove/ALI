@@ -341,8 +341,9 @@ video.invisible {
   </div>
 </section>
 
-<section id="resourcesSection" class="visible-section">
-  <h2 class="text-2xl font-bold mb-4">     Instruction Files</h2>
+<section id="resourcesSection" class="visible-section py-12 px-6 transition-colors duration-300">
+  <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">📁 Instruction Files</h2>
+  
   <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
     {% set docs = [
       {'icon': 'fa-file-alt', 'title': 'DOT Inspection', 'desc': 'DOT Inspection File', 'file': 'DOT Inspection.pdf'},
@@ -357,7 +358,7 @@ video.invisible {
     >
       <header class="flex items-center mb-4">
         <i class="fas {{ doc.icon }} text-primary dark:text-blue-400 text-2xl mr-4"></i>
-        <h3 class="text-xl font-semibold tracking-tight">{{ doc.title }}</h3>
+        <h3 class="text-xl font-semibold tracking-tight text-gray-900">{{ doc.title }}</h3>
       </header>
       <p class="text-gray-700 dark:text-gray-300 flex-grow leading-relaxed mb-6">{{ doc.desc }}</p>
       <footer class="flex space-x-4">
