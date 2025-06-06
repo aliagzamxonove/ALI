@@ -95,6 +95,14 @@
       body {
         transition: background-color 0.3s ease, color 0.3s ease;
       }
+      .video-thumb {
+  position: relative;
+  overflow: hidden;
+}
+
+.video-controls {
+  pointer-events: auto;
+}
 
       /* Customizing the theme toggle button */
       #themeToggle {
@@ -329,14 +337,61 @@ document.addEventListener("DOMContentLoaded", function () {
       const video = thumb.querySelector("video");
       const isYouTube = !video && thumb.dataset.src;
 
+      // Удаляем старые контролы
+      thumb.querySelectorAll(".video-controls").forEach(c => c.remove());
+
       if (video) {
-        thumb.addEventListener("mouseenter", () => {
-          video.play();
+        // Добавление пользовательских кнопок управления
+        const controls = document.createElement("div");
+        controls.className = "video-controls absolute bottom-2 right-2 flex gap-2 z-10";
+
+        const playPauseBtn = document.createElement("button");
+        playPauseBtn.textContent = "⏯️";
+        playPauseBtn.className = "bg-black/50 text-white px-2 py-1 rounded";
+        controls.appendChild(playPauseBtn);
+
+        const fullscreenBtn = document.createElement("button");
+        fullscreenBtn.textContent = "⛶";
+        fullscreenBtn.className = "bg-black/50 text-white px-2 py-1 rounded";
+        controls.appendChild(fullscreenBtn);
+
+        thumb.appendChild(controls);
+
+        let isPlayingManually = false;
+
+        playPauseBtn.addEventListener("click", () => {
+          if (video.paused) {
+            video.muted = false;
+            video.play();
+            isPlayingManually = true;
+          } else {
+            video.pause();
+            isPlayingManually = false;
+          }
         });
+
+        fullscreenBtn.addEventListener("click", () => {
+          if (video.requestFullscreen) {
+            video.requestFullscreen();
+          } else if (video.webkitRequestFullscreen) {
+            video.webkitRequestFullscreen();
+          } else if (video.msRequestFullscreen) {
+            video.msRequestFullscreen();
+          }
+        });
+
+        thumb.addEventListener("mouseenter", () => {
+          if (!isPlayingManually) {
+            video.muted = true;
+            video.play();
+          }
+        });
+
         thumb.addEventListener("mouseleave", () => {
-          video.pause();
-          video.currentTime = 0;
-          video.load();
+          if (!isPlayingManually) {
+            video.pause();
+            video.currentTime = 0;
+          }
         });
       } else if (isYouTube) {
         let iframe = null;
@@ -352,6 +407,7 @@ document.addEventListener("DOMContentLoaded", function () {
             thumb.appendChild(iframe);
           }
         });
+
         thumb.addEventListener("mouseleave", () => {
           const match = thumb.dataset.src.match(/embed\/([^?&]+)/);
           const videoId = match ? match[1] : null;
@@ -364,7 +420,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   };
 
-  // Toggle handler
+  // Переключение секций
   document.querySelectorAll('input[name="guidance"]').forEach(input => {
     input.addEventListener("change", () => {
       for (let key in sections) {
@@ -376,7 +432,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  // ✅ Setup initially visible section (e.g. "web")
+  // Начальная секция
   const defaultInput = document.querySelector('input[name="guidance"]:checked');
   if (defaultInput) {
     const key = defaultInput.id;
@@ -386,7 +442,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Theme toggle
+  // Переключение темы
   const themeToggle = document.getElementById("themeToggle");
   themeToggle.addEventListener("click", () => {
     document.body.classList.toggle("bg-white");
