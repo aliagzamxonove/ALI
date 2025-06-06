@@ -379,7 +379,7 @@ video.invisible {
 
   </div>
 </section>
-
+<script src="https://www.youtube.com/iframe_api"></script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const sections = {
@@ -391,15 +391,33 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentPlayingVideo = null;
 
   const pauseAllVideos = () => {
+    // Остановить все HTML5 видео
     document.querySelectorAll(".video-thumb video").forEach(video => {
       video.pause();
       video.currentTime = 0;
       video.classList.add("invisible");
       video.style.pointerEvents = "none";
     });
+    // Показать все превью
     document.querySelectorAll(".video-thumb img.thumbnail").forEach(img => {
       img.style.display = "block";
     });
+    // Остановить все YouTube видео (через YT API)
+    document.querySelectorAll(".video-thumb").forEach(thumb => {
+      if (thumb._ytPlayer) {
+        thumb._ytPlayer.pauseVideo();
+        thumb._ytPlayer.destroy();
+        thumb._ytPlayer = null;
+        thumb.innerHTML = "";
+        const match = thumb.dataset.src?.match(/embed\/([^?&]+)/);
+        const videoId = match ? match[1] : null;
+        if (videoId) {
+          thumb.innerHTML = `<img src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" class="w-full h-full object-cover" alt="YouTube thumbnail">`;
+        }
+        thumb._ytManuallyPlayed = false;
+      }
+    });
+
     currentPlayingVideo = null;
   };
 
@@ -411,6 +429,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const video = thumb.querySelector("video");
       const isYouTube = !video && thumb.dataset.src;
 
+      // Удаляем старые контролы
       thumb.querySelectorAll(".video-controls").forEach(c => c.remove());
 
       if (!video && !isYouTube) return;
@@ -418,7 +437,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (video) {
         let isManuallyPlayed = false;
 
-        // Controls
+        // Контролы для HTML5 видео
         const controls = document.createElement("div");
         controls.className = "video-controls absolute bottom-2 right-2 z-10";
 
@@ -432,7 +451,7 @@ document.addEventListener("DOMContentLoaded", () => {
         controls.appendChild(fullscreenBtn);
         thumb.appendChild(controls);
 
-        // Thumbnail
+        // Превью
         const thumbnail = document.createElement("img");
         thumbnail.src = thumb.dataset.thumbnail || video.getAttribute("poster") || "";
         thumbnail.alt = "Video thumbnail";
@@ -527,33 +546,88 @@ document.addEventListener("DOMContentLoaded", () => {
 
         showThumbnail();
       }
-
-      // YouTube (если используется)
       else if (isYouTube) {
-        let iframe = null;
+        // Обработка YouTube через Iframe API
+        thumb._ytPlayer = null;
+        thumb._ytManuallyPlayed = false;
 
-        thumb.addEventListener("mouseenter", () => {
-          pauseAllVideos();
-          if (!iframe) {
-            iframe = document.createElement("iframe");
-            iframe.src = `${thumb.dataset.src}?autoplay=1&mute=1`;
-            iframe.allow = "autoplay; encrypted-media";
-            iframe.allowFullscreen = true;
-            iframe.frameBorder = "0";
-            iframe.className = "w-full h-full";
-            thumb.innerHTML = "";
-            thumb.appendChild(iframe);
+        const createPlayer = (autoplay = false, mute = true) => {
+          if (thumb._ytPlayer) return;
+
+          // Создаем iframe
+          const iframe = document.createElement("iframe");
+          iframe.src = thumb.dataset.src + "?enablejsapi=1&version=3";
+          iframe.allow = "autoplay; encrypted-media";
+          iframe.allowFullscreen = true;
+          iframe.frameBorder = "0";
+          iframe.className = "w-full h-full";
+
+          thumb.innerHTML = "";
+          thumb.appendChild(iframe);
+
+          thumb._ytPlayer = new YT.Player(iframe, {
+            events: {
+              onReady: (event) => {
+                if (autoplay) {
+                  if (mute) event.target.mute();
+                  else event.target.unMute();
+                  event.target.playVideo();
+                }
+              },
+              onStateChange: (event) => {
+                if (event.data === YT.PlayerState.ENDED) {
+                  cleanup();
+                }
+              }
+            }
+          });
+        };
+
+        const cleanup = () => {
+          if (thumb._ytPlayer) {
+            thumb._ytPlayer.destroy();
+            thumb._ytPlayer = null;
           }
-        });
-
-        thumb.addEventListener("mouseleave", () => {
+          thumb._ytManuallyPlayed = false;
           const match = thumb.dataset.src.match(/embed\/([^?&]+)/);
           const videoId = match ? match[1] : null;
           if (videoId) {
             thumb.innerHTML = `<img src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" class="w-full h-full object-cover" alt="YouTube thumbnail">`;
           }
-          iframe = null;
+        };
+
+        thumb.addEventListener("mouseenter", () => {
+          if (!thumb._ytManuallyPlayed) {
+            pauseAllVideos();
+            createPlayer(true, true);
+          }
         });
+
+        thumb.addEventListener("mouseleave", () => {
+          if (!thumb._ytManuallyPlayed) {
+            cleanup();
+          }
+        });
+
+        thumb.addEventListener("click", () => {
+          if (!thumb._ytManuallyPlayed) {
+            pauseAllVideos();
+            createPlayer(true, false);
+            thumb._ytManuallyPlayed = true;
+          } else {
+            if (thumb._ytPlayer) {
+              thumb._ytPlayer.pauseVideo();
+            }
+            cleanup();
+          }
+        });
+
+        // Показать превью изначально
+        const match = thumb.dataset.src.match(/embed\/([^?&]+)/);
+        const videoId = match ? match[1] : null;
+        if (videoId) {
+          thumb.innerHTML = `<img src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" class="w-full h-full object-cover" alt="YouTube thumbnail">`;
+        }
       }
     });
   };
