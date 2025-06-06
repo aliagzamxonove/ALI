@@ -341,11 +341,9 @@ video.invisible {
   </div>
 </section>
 
-<section id="resourcesSection" class="py-12 px-6 transition-colors duration-300 text-gray-900 dark:text-gray-100">
-  <h2 class="text-3xl font-extrabold mb-12 border-b border-gray-300 dark:border-gray-700 pb-4 uppercase tracking-widest">
-    Instruction Files
-  </h2>
-  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
+<section id="resourcesSection" class="visible-section">
+  <h2 class="text-2xl font-bold mb-4">     Instruction Files</h2>
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
     {% set docs = [
       {'icon': 'fa-file-alt', 'title': 'DOT Inspection', 'desc': 'DOT Inspection File', 'file': 'DOT Inspection.pdf'},
       {'icon': 'fa-check-circle', 'title': 'Certificate of Compliance', 'desc': 'Compliance Documentation', 'file': 'Certificate of Compliance.pdf'},
