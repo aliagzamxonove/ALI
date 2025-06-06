@@ -346,10 +346,10 @@ video.invisible {
 </section>
 
 <section id="resourcesSection" class="py-12 px-6 bg-white dark:bg-gray-900 transition-colors duration-300">
-  <h2 class="text-3xl font-bold mb-10 border-b border-gray-300 dark:border-gray-700 pb-3 text-gray-900 dark:text-white uppercase tracking-wide">
+  <h2 class="text-3xl font-extrabold mb-12 border-b border-gray-300 dark:border-gray-700 pb-4 text-gray-900 dark:text-gray-100 uppercase tracking-widest">
     Instruction Files
   </h2>
-  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
     {% set docs = [
       {'icon': 'file-text', 'title': 'DOT Inspection', 'desc': 'DOT Inspection File', 'file': 'DOT Inspection.pdf'},
       {'icon': 'file-check', 'title': 'Certificate of Compliance', 'desc': 'Compliance Documentation', 'file': 'Certificate of Compliance.pdf'},
@@ -357,29 +357,27 @@ video.invisible {
       {'icon': 'truck', 'title': 'Truck Sticker', 'desc': 'Cab Sticker Template', 'file': 'Truck Sticker.pdf'},
       {'icon': 'book-open', 'title': 'User Manual', 'desc': 'Full Product Manual', 'file': 'Users Manual.pdf'}
     ] %}
-    
+
     {% for doc in docs %}
-    <div class="border border-gray-300 dark:border-gray-700 rounded-xl shadow hover:shadow-md transition-all p-6 flex flex-col justify-between bg-gray-50 dark:bg-gray-800">
-      <div class="mb-6">
-        <div class="flex items-center mb-3 text-gray-700 dark:text-gray-200">
-          <i data-lucide="{{ doc.icon }}" class="w-5 h-5 mr-2"></i>
-          <h3 class="text-lg font-semibold">{{ doc.title }}</h3>
-        </div>
-        <p class="text-sm text-gray-600 dark:text-gray-400">{{ doc.desc }}</p>
-      </div>
-      <div class="flex space-x-3 mt-auto pt-4">
+    <article class="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col p-7">
+      <header class="flex items-center mb-5 text-gray-800 dark:text-gray-200">
+        <i data-lucide="{{ doc.icon }}" class="w-6 h-6 mr-3 text-blue-600 dark:text-blue-400"></i>
+        <h3 class="text-xl font-semibold tracking-tight">{{ doc.title }}</h3>
+      </header>
+      <p class="text-gray-600 dark:text-gray-400 flex-grow leading-relaxed">{{ doc.desc }}</p>
+      <footer class="mt-6 flex space-x-4">
         <a href="{{ url_for('static', filename='Instruction/' + doc.file) }}"
            target="_blank" rel="noopener"
-           class="bg-blue-600 hover:bg-blue-500 text-white text-sm px-4 py-2 rounded-md transition inline-flex items-center">
-          <i data-lucide="eye" class="w-4 h-4 mr-2"></i> View
+           class="inline-flex items-center justify-center px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors duration-200">
+          <i data-lucide="eye" class="w-5 h-5 mr-2"></i> View
         </a>
         <a href="{{ url_for('static', filename='Instruction/' + doc.file) }}"
            download
-           class="bg-green-600 hover:bg-green-500 text-white text-sm px-4 py-2 rounded-md transition inline-flex items-center">
-          <i data-lucide="download" class="w-4 h-4 mr-2"></i> Download
+           class="inline-flex items-center justify-center px-5 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white font-medium transition-colors duration-200">
+          <i data-lucide="download" class="w-5 h-5 mr-2"></i> Download
         </a>
-      </div>
-    </div>
+      </footer>
+    </article>
     {% endfor %}
   </div>
 </section>
@@ -604,6 +602,12 @@ document.addEventListener("DOMContentLoaded", () => {
     themeToggle.textContent = themeToggle.textContent === "🌙" ? "☀️" : "🌙";  
   });  
 });  
+</script>
+<script src="https://cdn.jsdelivr.net/npm/lucide/dist/lucide.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    lucide.replace();
+  });
 </script>
   </body>
 </html>
