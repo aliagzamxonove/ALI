@@ -7,10 +7,6 @@
   <link rel="icon" href="{{ url_for('static', filename='IFTA5458.png') }}" type="image/png" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
-<script src="https://unpkg.com/lucide@latest"></script>
-<script>
-  lucide.createIcons();
-</script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -345,7 +341,7 @@ video.invisible {
   </div>
 </section>
 
-<section id="resourcesSection" class="py-12 px-6 bg-white dark:bg-gray-900 transition-colors duration-300">
+<section id="resourcesSection" class="py-12 px-6 transition-colors duration-300">
   <h2 class="text-3xl font-extrabold mb-12 border-b border-gray-300 dark:border-gray-700 pb-4 text-gray-900 dark:text-gray-100 uppercase tracking-widest">
     Instruction Files
   </h2>
@@ -359,16 +355,16 @@ video.invisible {
     ] %}
 
     {% for doc in docs %}
-    <article class="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col p-7">
-      <header class="flex items-center mb-5 text-gray-800 dark:text-gray-200">
-        <i data-lucide="{{ doc.icon }}" class="w-6 h-6 mr-3 text-blue-600 dark:text-blue-400"></i>
+    <article class="flex flex-col justify-between p-6 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors duration-300 cursor-pointer">
+      <header class="flex items-center mb-4 text-gray-800 dark:text-gray-200">
+        <i data-lucide="{{ doc.icon }}" class="w-6 h-6 mr-3 text-primary dark:text-blue-400"></i>
         <h3 class="text-xl font-semibold tracking-tight">{{ doc.title }}</h3>
       </header>
-      <p class="text-gray-600 dark:text-gray-400 flex-grow leading-relaxed">{{ doc.desc }}</p>
-      <footer class="mt-6 flex space-x-4">
+      <p class="text-gray-600 dark:text-gray-400 flex-grow leading-relaxed mb-6">{{ doc.desc }}</p>
+      <footer class="flex space-x-4">
         <a href="{{ url_for('static', filename='Instruction/' + doc.file) }}"
            target="_blank" rel="noopener"
-           class="inline-flex items-center justify-center px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors duration-200">
+           class="inline-flex items-center justify-center px-5 py-2 rounded-lg bg-primary hover:bg-blue-700 text-white font-medium transition-colors duration-200">
           <i data-lucide="eye" class="w-5 h-5 mr-2"></i> View
         </a>
         <a href="{{ url_for('static', filename='Instruction/' + doc.file) }}"
