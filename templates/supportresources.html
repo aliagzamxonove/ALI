@@ -339,7 +339,6 @@ video.invisible {
       <img src="https://img.youtube.com/vi/y9FKUj1eeek/hqdefault.jpg" alt="Spanish App Tutorial 8">
     </div>
   </div>
-</section>
 
 <section id="resourcesSection" class="py-12 px-6 transition-colors duration-300">
   <h2 class="text-3xl font-extrabold mb-12 border-b border-gray-300 dark:border-gray-700 pb-4 text-gray-900 dark:text-gray-100 uppercase tracking-widest">
@@ -347,30 +346,30 @@ video.invisible {
   </h2>
   <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
     {% set docs = [
-      {'icon': 'file-text', 'title': 'DOT Inspection', 'desc': 'DOT Inspection File', 'file': 'DOT Inspection.pdf'},
-      {'icon': 'file-check', 'title': 'Certificate of Compliance', 'desc': 'Compliance Documentation', 'file': 'Certificate of Compliance.pdf'},
-      {'icon': 'file-warning', 'title': 'Malfunction Manual', 'desc': 'Troubleshooting Guide', 'file': 'Malfunction Manual.pdf'},
-      {'icon': 'truck', 'title': 'Truck Sticker', 'desc': 'Cab Sticker Template', 'file': 'Truck Sticker.pdf'},
-      {'icon': 'book-open', 'title': 'User Manual', 'desc': 'Full Product Manual', 'file': 'Users Manual.pdf'}
+      {'icon': 'fa-file-alt', 'title': 'DOT Inspection', 'desc': 'DOT Inspection File', 'file': 'DOT Inspection.pdf'},
+      {'icon': 'fa-file-check', 'title': 'Certificate of Compliance', 'desc': 'Compliance Documentation', 'file': 'Certificate of Compliance.pdf'},
+      {'icon': 'fa-exclamation-triangle', 'title': 'Malfunction Manual', 'desc': 'Troubleshooting Guide', 'file': 'Malfunction Manual.pdf'},
+      {'icon': 'fa-truck', 'title': 'Truck Sticker', 'desc': 'Cab Sticker Template', 'file': 'Truck Sticker.pdf'},
+      {'icon': 'fa-book-open', 'title': 'User Manual', 'desc': 'Full Product Manual', 'file': 'Users Manual.pdf'}
     ] %}
 
     {% for doc in docs %}
-    <article class="flex flex-col justify-between p-6 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors duration-300 cursor-pointer">
-      <header class="flex items-center mb-4 text-gray-800 dark:text-gray-200">
-        <i data-lucide="{{ doc.icon }}" class="w-6 h-6 mr-3 text-primary dark:text-blue-400"></i>
+    <article class="flex flex-col justify-between p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-lg dark:shadow-black/50 hover:shadow-xl dark:hover:shadow-black/70 transition-shadow duration-300 cursor-pointer">
+      <header class="flex items-center mb-4 text-gray-900 dark:text-gray-100">
+        <i class="fas {{ doc.icon }} text-primary dark:text-blue-400 text-2xl mr-4"></i>
         <h3 class="text-xl font-semibold tracking-tight">{{ doc.title }}</h3>
       </header>
-      <p class="text-gray-600 dark:text-gray-400 flex-grow leading-relaxed mb-6">{{ doc.desc }}</p>
+      <p class="text-gray-700 dark:text-gray-300 flex-grow leading-relaxed mb-6">{{ doc.desc }}</p>
       <footer class="flex space-x-4">
         <a href="{{ url_for('static', filename='Instruction/' + doc.file) }}"
            target="_blank" rel="noopener"
            class="inline-flex items-center justify-center px-5 py-2 rounded-lg bg-primary hover:bg-blue-700 text-white font-medium transition-colors duration-200">
-          <i data-lucide="eye" class="w-5 h-5 mr-2"></i> View
+          <i class="fas fa-eye mr-2"></i> View
         </a>
         <a href="{{ url_for('static', filename='Instruction/' + doc.file) }}"
            download
            class="inline-flex items-center justify-center px-5 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white font-medium transition-colors duration-200">
-          <i data-lucide="download" class="w-5 h-5 mr-2"></i> Download
+          <i class="fas fa-download mr-2"></i> Download
         </a>
       </footer>
     </article>
