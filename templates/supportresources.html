@@ -345,10 +345,11 @@ video.invisible {
   </div>
 </section>
 
-<section id="resourcesSection" class="py-12 px-6">
-  <h2 class="text-3xl font-bold mb-10 border-b border-gray-700 pb-3 text-white uppercase tracking-wide">Instruction Files</h2>
+<section id="resourcesSection" class="py-12 px-6 bg-white dark:bg-gray-900 transition-colors duration-300">
+  <h2 class="text-3xl font-bold mb-10 border-b border-gray-300 dark:border-gray-700 pb-3 text-gray-900 dark:text-white uppercase tracking-wide">
+    Instruction Files
+  </h2>
   <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-
     {% set docs = [
       {'icon': 'file-text', 'title': 'DOT Inspection', 'desc': 'DOT Inspection File', 'file': 'DOT Inspection.pdf'},
       {'icon': 'file-check', 'title': 'Certificate of Compliance', 'desc': 'Compliance Documentation', 'file': 'Certificate of Compliance.pdf'},
@@ -356,28 +357,30 @@ video.invisible {
       {'icon': 'truck', 'title': 'Truck Sticker', 'desc': 'Cab Sticker Template', 'file': 'Truck Sticker.pdf'},
       {'icon': 'book-open', 'title': 'User Manual', 'desc': 'Full Product Manual', 'file': 'Users Manual.pdf'}
     ] %}
-
+    
     {% for doc in docs %}
-    <div class="border border-gray-700 rounded-xl shadow-sm hover:shadow-md transition-all p-6 flex flex-col justify-between">
+    <div class="border border-gray-300 dark:border-gray-700 rounded-xl shadow hover:shadow-md transition-all p-6 flex flex-col justify-between bg-gray-50 dark:bg-gray-800">
       <div class="mb-6">
-        <h3 class="text-lg font-medium text-white mb-1">{{ doc.title }}</h3>
-        <p class="text-sm text-gray-400">{{ doc.desc }}</p>
+        <div class="flex items-center mb-3 text-gray-700 dark:text-gray-200">
+          <i data-lucide="{{ doc.icon }}" class="w-5 h-5 mr-2"></i>
+          <h3 class="text-lg font-semibold">{{ doc.title }}</h3>
+        </div>
+        <p class="text-sm text-gray-600 dark:text-gray-400">{{ doc.desc }}</p>
       </div>
       <div class="flex space-x-3 mt-auto pt-4">
         <a href="{{ url_for('static', filename='Instruction/' + doc.file) }}"
            target="_blank" rel="noopener"
-           class="bg-gray-800 hover:bg-gray-700 text-white text-sm px-4 py-2 rounded-md transition inline-flex items-center">
+           class="bg-blue-600 hover:bg-blue-500 text-white text-sm px-4 py-2 rounded-md transition inline-flex items-center">
           <i data-lucide="eye" class="w-4 h-4 mr-2"></i> View
         </a>
         <a href="{{ url_for('static', filename='Instruction/' + doc.file) }}"
            download
-           class="bg-green-700 hover:bg-green-600 text-white text-sm px-4 py-2 rounded-md transition inline-flex items-center">
+           class="bg-green-600 hover:bg-green-500 text-white text-sm px-4 py-2 rounded-md transition inline-flex items-center">
           <i data-lucide="download" class="w-4 h-4 mr-2"></i> Download
         </a>
       </div>
     </div>
     {% endfor %}
-
   </div>
 </section>
 <script>  
