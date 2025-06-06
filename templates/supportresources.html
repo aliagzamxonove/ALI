@@ -346,10 +346,8 @@
     </a>
 
   </div>
-</section>
-
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
   const sections = {
     web: document.getElementById("webSection"),
     app: document.getElementById("appSection"),
@@ -364,28 +362,25 @@ document.addEventListener("DOMContentLoaded", function () {
       const video = thumb.querySelector("video");
       const isYouTube = !video && thumb.dataset.src;
 
-      // Удаляем старые контролы
       thumb.querySelectorAll(".video-controls").forEach(c => c.remove());
 
       if (video) {
-        // Добавление пользовательских кнопок управления
         const controls = document.createElement("div");
         controls.className = "video-controls absolute bottom-2 right-2 flex gap-2 z-10";
 
         const playPauseBtn = document.createElement("button");
-playPauseBtn.innerHTML = `
-  <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-`;
-        playPauseBtn.className = "bg-black/50 text-white px-2 py-1 rounded";
-        controls.appendChild(playPauseBtn);
+        playPauseBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
+        playPauseBtn.className = "bg-black/50 text-white px-2 py-1 rounded hover:bg-black/70 transition";
+        playPauseBtn.setAttribute("aria-label", "Play or pause video");
+        playPauseBtn.setAttribute("tabindex", "0");
 
         const fullscreenBtn = document.createElement("button");
-fullscreenBtn.innerHTML = `
-  <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm0-4h2V7h3V5H7v5zm10 9h-3v2h5v-5h-2v3zm-3-9V7h3v3h2V5h-5v2h-3z"/></svg>
-`;
-        fullscreenBtn.className = "bg-black/50 text-white px-2 py-1 rounded";
-        controls.appendChild(fullscreenBtn);
+        fullscreenBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm0-4h2V7h3V5H7v5zm10 9h-3v2h5v-5h-2v3zm-3-9V7h3v3h2V5h-5v2h-3z"/></svg>`;
+        fullscreenBtn.className = "bg-black/50 text-white px-2 py-1 rounded hover:bg-black/70 transition";
+        fullscreenBtn.setAttribute("aria-label", "Fullscreen");
+        fullscreenBtn.setAttribute("tabindex", "0");
 
+        controls.append(playPauseBtn, fullscreenBtn);
         thumb.appendChild(controls);
 
         let isPlayingManually = false;
@@ -402,13 +397,8 @@ fullscreenBtn.innerHTML = `
         });
 
         fullscreenBtn.addEventListener("click", () => {
-          if (video.requestFullscreen) {
-            video.requestFullscreen();
-          } else if (video.webkitRequestFullscreen) {
-            video.webkitRequestFullscreen();
-          } else if (video.msRequestFullscreen) {
-            video.msRequestFullscreen();
-          }
+          const requestFull = video.requestFullscreen || video.webkitRequestFullscreen || video.msRequestFullscreen;
+          if (requestFull) requestFull.call(video);
         });
 
         thumb.addEventListener("mouseenter", () => {
@@ -429,7 +419,7 @@ fullscreenBtn.innerHTML = `
         thumb.addEventListener("mouseenter", () => {
           if (!iframe) {
             iframe = document.createElement("iframe");
-            iframe.src = thumb.dataset.src + "?autoplay=1&mute=1";
+            iframe.src = `${thumb.dataset.src}?autoplay=1&mute=1`;
             iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
             iframe.allowFullscreen = true;
             iframe.frameBorder = "0";
@@ -451,19 +441,24 @@ fullscreenBtn.innerHTML = `
     });
   };
 
-  // Переключение секций
   document.querySelectorAll('input[name="guidance"]').forEach(input => {
     input.addEventListener("change", () => {
       for (let key in sections) {
         sections[key].classList.remove("visible-section");
+
+        // Reset all video states
+        sections[key].querySelectorAll("video").forEach(v => {
+          v.pause();
+          v.currentTime = 0;
+        });
       }
+
       const selected = sections[input.id];
       selected.classList.add("visible-section");
       setupVideoThumbs(input.id);
     });
   });
 
-  // Начальная секция
   const defaultInput = document.querySelector('input[name="guidance"]:checked');
   if (defaultInput) {
     const key = defaultInput.id;
@@ -473,9 +468,8 @@ fullscreenBtn.innerHTML = `
     }
   }
 
-  // Переключение темы
   const themeToggle = document.getElementById("themeToggle");
-  themeToggle.addEventListener("click", () => {
+  themeToggle?.addEventListener("click", () => {
     document.body.classList.toggle("bg-white");
     document.body.classList.toggle("text-black");
     document.body.classList.toggle("bg-dark");
