@@ -454,24 +454,31 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         const playVideo = (manual = false) => {
-          if (currentPlayingVideo && currentPlayingVideo !== video) {
-            currentPlayingVideo.pause();
-            currentPlayingVideo.currentTime = 0;
-            currentPlayingVideo.classList.add("invisible");
-            currentPlayingVideo.style.pointerEvents = "none";
-            const prevThumb = currentPlayingVideo.closest(".video-thumb");
-            if (prevThumb) {
-              const prevImg = prevThumb.querySelector("img.thumbnail");
-              if (prevImg) prevImg.style.display = "block";
-            }
-          }
+  if (currentPlayingVideo && currentPlayingVideo !== video) {
+    currentPlayingVideo.pause();
+    currentPlayingVideo.currentTime = 0;
+    currentPlayingVideo.classList.add("invisible");
+    currentPlayingVideo.style.pointerEvents = "none";
+    const prevThumb = currentPlayingVideo.closest(".video-thumb");
+    if (prevThumb) {
+      const prevImg = prevThumb.querySelector("img.thumbnail");
+      if (prevImg) prevImg.style.display = "block";
+    }
+  }
 
-          hideThumbnail();
-          video.muted = !manual;
-          video.play().catch(err => console.warn("Play error:", err));
-          currentPlayingVideo = video;
-          isManuallyPlayed = manual;
-        };
+  hideThumbnail();
+
+  if (manual) {
+    video.defaultMuted = false;
+    video.muted = false;
+  } else {
+    video.muted = true;
+  }
+
+  video.play().catch(err => console.warn("Play error:", err));
+  currentPlayingVideo = video;
+  isManuallyPlayed = manual;
+};
 
         const togglePlayback = () => {
           if (video.paused) {
