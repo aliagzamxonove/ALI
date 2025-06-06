@@ -165,6 +165,21 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
   }
+video.invisible {
+  pointer-events: none;
+  opacity: 0;
+}
+
+.video-thumb video {
+  z-index: 2;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.video-thumb img.thumbnail {
+  z-index: 1;
+}
 </style>
   </head>
 
@@ -381,10 +396,11 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentPlayingVideo = null;
 
   const pauseAllVideos = () => {
-    document.querySelectorAll(".video-thumb video").forEach(v => {
-      v.pause();
-      v.currentTime = 0;
-      v.classList.add("invisible");
+    document.querySelectorAll(".video-thumb video").forEach(video => {
+      video.pause();
+      video.currentTime = 0;
+      video.classList.add("invisible");
+      video.style.pointerEvents = "none";
     });
     document.querySelectorAll(".video-thumb img.thumbnail").forEach(img => {
       img.style.display = "block";
@@ -405,33 +421,41 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!video && !isYouTube) return;
 
       if (video) {
+        let isManuallyPlayed = false;
+
+        // Controls
         const controls = document.createElement("div");
-        controls.className = "video-controls";
+        controls.className = "video-controls absolute bottom-2 right-2 z-10";
 
         const fullscreenBtn = document.createElement("button");
         fullscreenBtn.innerHTML = `
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/>
           </svg>`;
+        fullscreenBtn.className = "bg-black/50 text-white p-1 rounded hover:bg-black/70 transition";
         fullscreenBtn.setAttribute("aria-label", "Fullscreen");
         controls.appendChild(fullscreenBtn);
         thumb.appendChild(controls);
 
+        // Thumbnail
         const thumbnail = document.createElement("img");
         thumbnail.src = thumb.dataset.thumbnail || video.getAttribute("poster") || "";
         thumbnail.alt = "Video thumbnail";
         thumbnail.className = "absolute top-0 left-0 w-full h-full object-cover z-0 thumbnail";
         thumb.appendChild(thumbnail);
         video.classList.add("invisible");
+        video.style.pointerEvents = "none";
 
         const showThumbnail = () => {
           video.classList.add("invisible");
+          video.style.pointerEvents = "none";
           thumbnail.style.display = "block";
         };
 
         const hideThumbnail = () => {
           thumbnail.style.display = "none";
           video.classList.remove("invisible");
+          video.style.pointerEvents = "auto";
         };
 
         const playVideo = (manual = false) => {
@@ -439,16 +463,19 @@ document.addEventListener("DOMContentLoaded", () => {
             currentPlayingVideo.pause();
             currentPlayingVideo.currentTime = 0;
             currentPlayingVideo.classList.add("invisible");
+            currentPlayingVideo.style.pointerEvents = "none";
             const prevThumb = currentPlayingVideo.closest(".video-thumb");
             if (prevThumb) {
               const prevImg = prevThumb.querySelector("img.thumbnail");
               if (prevImg) prevImg.style.display = "block";
             }
           }
+
           hideThumbnail();
           video.muted = !manual;
-          video.play();
+          video.play().catch(err => console.warn("Play error:", err));
           currentPlayingVideo = video;
+          isManuallyPlayed = manual;
         };
 
         const togglePlayback = () => {
@@ -461,43 +488,49 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         };
 
-        // Fullscreen
         fullscreenBtn.addEventListener("click", (e) => {
           e.stopPropagation();
-          const requestFull = video.requestFullscreen || video.webkitRequestFullscreen || video.msRequestFullscreen;
-          if (requestFull) requestFull.call(video);
+          const reqFull = video.requestFullscreen || video.webkitRequestFullscreen || video.msRequestFullscreen;
+          if (reqFull) reqFull.call(video);
         });
 
-        // Click (toggle playback)
         thumb.addEventListener("click", () => togglePlayback());
 
-        // Hover for desktop
+        // Hover (desktop)
         thumb.addEventListener("mouseenter", () => {
-          if (!video.paused) return;
-          playVideo(false);
+          if (!isManuallyPlayed) playVideo(false);
         });
 
         thumb.addEventListener("mouseleave", () => {
-          if (!video.paused) return;
-          video.pause();
-          video.currentTime = 0;
-          showThumbnail();
-          currentPlayingVideo = null;
+          if (!isManuallyPlayed) {
+            video.pause();
+            video.currentTime = 0;
+            showThumbnail();
+            currentPlayingVideo = null;
+          }
         });
 
         // Touch (mobile)
         thumb.addEventListener("touchstart", () => {
-          if (!video.paused) return;
-          playVideo(false);
+          if (!isManuallyPlayed) playVideo(false);
         });
 
         thumb.addEventListener("touchend", () => {
-          if (!video.paused) return;
-          video.pause();
-          video.currentTime = 0;
+          if (!isManuallyPlayed) {
+            video.pause();
+            video.currentTime = 0;
+            showThumbnail();
+            currentPlayingVideo = null;
+          }
+        });
+
+        // Ended
+        video.addEventListener("ended", () => {
           showThumbnail();
           currentPlayingVideo = null;
         });
+
+        showThumbnail();
       }
 
       // YouTube (если используется)
