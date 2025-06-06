@@ -387,9 +387,9 @@ document.addEventListener("DOMContentLoaded", () => {
     app: document.getElementById("appSection"),  
     resources: document.getElementById("resourcesSection"),  
   };  
-  
+
   let currentPlayingVideo = null;  
-  
+
   const pauseAllVideos = () => {  
     document.querySelectorAll(".video-thumb video").forEach(video => {  
       video.pause();  
@@ -402,26 +402,25 @@ document.addEventListener("DOMContentLoaded", () => {
     });  
     currentPlayingVideo = null;  
   };  
-  
+
   const setupVideoThumbs = (key) => {  
     const section = sections[key];  
     if (!section) return;  
-  
+
     section.querySelectorAll(".video-thumb").forEach(thumb => {  
       const video = thumb.querySelector("video");  
       const isYouTube = !video && thumb.dataset.src;  
-  
+
       thumb.querySelectorAll(".video-controls").forEach(c => c.remove());  
-  
+
       if (!video && !isYouTube) return;  
-  
+
       if (video) {  
         let isManuallyPlayed = false;  
-  
-        // Controls  
+
         const controls = document.createElement("div");  
         controls.className = "video-controls absolute bottom-2 right-2 z-10";  
-  
+
         const fullscreenBtn = document.createElement("button");  
         fullscreenBtn.innerHTML = `  
           <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">  
@@ -431,8 +430,7 @@ document.addEventListener("DOMContentLoaded", () => {
         fullscreenBtn.setAttribute("aria-label", "Fullscreen");  
         controls.appendChild(fullscreenBtn);  
         thumb.appendChild(controls);  
-  
-        // Thumbnail  
+
         const thumbnail = document.createElement("img");  
         thumbnail.src = thumb.dataset.thumbnail || video.getAttribute("poster") || "";  
         thumbnail.alt = "Video thumbnail";  
@@ -440,19 +438,19 @@ document.addEventListener("DOMContentLoaded", () => {
         thumb.appendChild(thumbnail);  
         video.classList.add("invisible");  
         video.style.pointerEvents = "none";  
-  
+
         const showThumbnail = () => {  
           video.classList.add("invisible");  
           video.style.pointerEvents = "none";  
           thumbnail.style.display = "block";  
         };  
-  
+
         const hideThumbnail = () => {  
           thumbnail.style.display = "none";  
           video.classList.remove("invisible");  
           video.style.pointerEvents = "auto";  
         };  
-  
+
         const playVideo = (manual = false) => {  
           if (currentPlayingVideo && currentPlayingVideo !== video) {  
             currentPlayingVideo.pause();  
@@ -465,14 +463,22 @@ document.addEventListener("DOMContentLoaded", () => {
               if (prevImg) prevImg.style.display = "block";  
             }  
           }  
-  
+
           hideThumbnail();  
-          video.muted = !manual;  
+          
+          if (manual) {  
+            video.muted = false;  
+            video.controls = true;  
+          } else {  
+            video.muted = true;  
+            video.controls = false;  
+          }  
+
           video.play().catch(err => console.warn("Play error:", err));  
           currentPlayingVideo = video;  
           isManuallyPlayed = manual;  
         };  
-  
+
         const togglePlayback = () => {  
           if (video.paused) {  
             playVideo(true);  
@@ -482,20 +488,20 @@ document.addEventListener("DOMContentLoaded", () => {
             currentPlayingVideo = null;  
           }  
         };  
-  
+
         fullscreenBtn.addEventListener("click", (e) => {  
           e.stopPropagation();  
           const reqFull = video.requestFullscreen || video.webkitRequestFullscreen || video.msRequestFullscreen;  
           if (reqFull) reqFull.call(video);  
         });  
-  
+
         thumb.addEventListener("click", () => togglePlayback());  
-  
-        // Hover (desktop)  
+
+        // Hover (desktop autoplay muted)  
         thumb.addEventListener("mouseenter", () => {  
           if (!isManuallyPlayed) playVideo(false);  
         });  
-  
+
         thumb.addEventListener("mouseleave", () => {  
           if (!isManuallyPlayed) {  
             video.pause();  
@@ -504,12 +510,12 @@ document.addEventListener("DOMContentLoaded", () => {
             currentPlayingVideo = null;  
           }  
         });  
-  
-        // Touch (mobile)  
+
+        // Touch (mobile autoplay muted)  
         thumb.addEventListener("touchstart", () => {  
           if (!isManuallyPlayed) playVideo(false);  
         });  
-  
+
         thumb.addEventListener("touchend", () => {  
           if (!isManuallyPlayed) {  
             video.pause();  
@@ -518,20 +524,19 @@ document.addEventListener("DOMContentLoaded", () => {
             currentPlayingVideo = null;  
           }  
         });  
-  
-        // Ended  
+
         video.addEventListener("ended", () => {  
           showThumbnail();  
           currentPlayingVideo = null;  
         });  
-  
+
         showThumbnail();  
       }  
-  
-      // YouTube (если используется)  
+
+      // YouTube (if used)  
       else if (isYouTube) {  
         let iframe = null;  
-  
+
         thumb.addEventListener("mouseenter", () => {  
           pauseAllVideos();  
           if (!iframe) {  
@@ -545,7 +550,7 @@ document.addEventListener("DOMContentLoaded", () => {
             thumb.appendChild(iframe);  
           }  
         });  
-  
+
         thumb.addEventListener("mouseleave", () => {  
           const match = thumb.dataset.src.match(/embed\/([^?&]+)/);  
           const videoId = match ? match[1] : null;  
@@ -557,8 +562,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }  
     });  
   };  
-  
-  // Переключение секций  
+
+  // Section switching  
   document.querySelectorAll('input[name="guidance"]').forEach(input => {  
     input.addEventListener("change", () => {  
       pauseAllVideos();  
@@ -570,8 +575,8 @@ document.addEventListener("DOMContentLoaded", () => {
       setupVideoThumbs(input.id);  
     });  
   });  
-  
-  // Начальная секция  
+
+  // Initial section  
   const defaultInput = document.querySelector('input[name="guidance"]:checked');  
   if (defaultInput) {  
     const key = defaultInput.id;  
@@ -580,8 +585,8 @@ document.addEventListener("DOMContentLoaded", () => {
       setupVideoThumbs(key);  
     }  
   }  
-  
-  // Переключение темы  
+
+  // Theme toggle  
   const themeToggle = document.getElementById("themeToggle");  
   themeToggle?.addEventListener("click", () => {  
     document.body.classList.toggle("bg-white");  
