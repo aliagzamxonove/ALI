@@ -188,18 +188,18 @@ video.invisible {
 </style>
   </head>
 
-<body class="bg-dark text-white font-sans min-h-screen transition-colors">
-  <div class="max-w-7xl mx-auto px-4 py-10">
-    <!-- Title and Toggle -->
-    <div class="flex justify-between items-center mb-8">
-      <h1 class="text-4xl sm:text-5xl font-extrabold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-        Lucid ELD Tutorials
-      </h1>
-      <button id="themeToggle" aria-label="Toggle theme" class="bg-accent hover:bg-primary text-white px-3 py-2 rounded-full transition flex items-center justify-center">
-        <i data-lucide="moon" class="w-6 h-6"></i>
-      </button>
-    </div>
-
+  <body class="bg-dark text-white font-sans min-h-screen transition-colors">  
+    <div class="max-w-7xl mx-auto px-4 py-10">  
+      <!-- Title and Toggle -->  
+      <div class="flex justify-between items-center mb-8">  
+        <h1 class="text-4xl sm:text-5xl font-extrabold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">  
+          Lucid ELD Tutorials  
+        </h1>  
+        <button id="themeToggle" class="bg-accent hover:bg-primary text-white px-3 py-2 rounded-full transition">  
+          🌙  
+        </button>  
+      </div>  
+  
       <!-- Guidance Toggle -->
       <div class="guidance-toggle flex justify-center gap-2 bg-[#1a1a1a] p-2 rounded-xl shadow-inner max-w-lg mx-auto mb-12" role="radiogroup">
         <input type="radio" id="web" name="guidance" checked />
@@ -591,22 +591,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }  
   }  
 
-const themeToggle = document.getElementById("themeToggle");
-themeToggle?.addEventListener("click", () => {
-  document.body.classList.toggle("bg-white");
-  document.body.classList.toggle("text-black");
-  document.body.classList.toggle("bg-dark");
-  document.body.classList.toggle("text-white");
-
-  const icon = themeToggle.querySelector("i");
-  if (icon.getAttribute("data-lucide") === "moon") {
-    icon.setAttribute("data-lucide", "sun");
-  } else {
-    icon.setAttribute("data-lucide", "moon");
-  }
-
-  lucide.replace();  // обновляем иконки Lucide
-});
-</script>
+  // Тоггл темы  
+  const themeToggle = document.getElementById("themeToggle");  
+  themeToggle?.addEventListener("click", () => {  
+    document.body.classList.toggle("bg-white");  
+    document.body.classList.toggle("text-black");  
+    document.body.classList.toggle("bg-dark");  
+    document.body.classList.toggle("text-white");  
+    themeToggle.textContent = themeToggle.textContent === "🌙" ? "☀️" : "🌙";  
+  });  
+});  
   </body>
 </html>
