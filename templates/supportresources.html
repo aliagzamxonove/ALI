@@ -543,8 +543,10 @@ document.addEventListener("DOMContentLoaded", () => {
         thumb.addEventListener("mouseenter", () => {  
           pauseAllVideos();  
           if (!iframe) {  
+            const isInAppSection = thumb.closest("#appSection") !== null;  
+            const muteParam = isInAppSection ? "0" : "1";  
             iframe = document.createElement("iframe");  
-            iframe.src = `${thumb.dataset.src}?autoplay=1&mute=1`;  
+            iframe.src = `${thumb.dataset.src}?autoplay=1&mute=${muteParam}`;  
             iframe.allow = "autoplay; encrypted-media";  
             iframe.allowFullscreen = true;  
             iframe.frameBorder = "0";  
