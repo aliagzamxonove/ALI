@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lucid ELD Tutorials</title>
   <link rel="icon" href="{{ url_for('static', filename='IFTA5458.png') }}" type="image/png" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
 <script src="https://unpkg.com/lucide@latest"></script>
 <script>
@@ -379,7 +380,6 @@ video.invisible {
 
   </div>
 </section>
-<script src="https://www.youtube.com/iframe_api"></script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const sections = {
@@ -391,31 +391,32 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentPlayingVideo = null;
 
   const pauseAllVideos = () => {
-    // Остановить все HTML5 видео
+    // Остановить HTML5 видео
     document.querySelectorAll(".video-thumb video").forEach(video => {
       video.pause();
       video.currentTime = 0;
       video.classList.add("invisible");
       video.style.pointerEvents = "none";
     });
-    // Показать все превью
+
+    // Показать превью
     document.querySelectorAll(".video-thumb img.thumbnail").forEach(img => {
       img.style.display = "block";
     });
-    // Остановить все YouTube видео (через YT API)
+
+    // YouTube
     document.querySelectorAll(".video-thumb").forEach(thumb => {
       if (thumb._ytPlayer) {
         thumb._ytPlayer.pauseVideo();
         thumb._ytPlayer.destroy();
         thumb._ytPlayer = null;
-        thumb.innerHTML = "";
         const match = thumb.dataset.src?.match(/embed\/([^?&]+)/);
         const videoId = match ? match[1] : null;
         if (videoId) {
           thumb.innerHTML = `<img src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" class="w-full h-full object-cover" alt="YouTube thumbnail">`;
         }
-        thumb._ytManuallyPlayed = false;
       }
+      thumb._ytManuallyPlayed = false;
     });
 
     currentPlayingVideo = null;
@@ -429,7 +430,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const video = thumb.querySelector("video");
       const isYouTube = !video && thumb.dataset.src;
 
-      // Удаляем старые контролы
       thumb.querySelectorAll(".video-controls").forEach(c => c.remove());
 
       if (!video && !isYouTube) return;
@@ -437,26 +437,24 @@ document.addEventListener("DOMContentLoaded", () => {
       if (video) {
         let isManuallyPlayed = false;
 
-        // Контролы для HTML5 видео
         const controls = document.createElement("div");
         controls.className = "video-controls absolute bottom-2 right-2 z-10";
 
         const fullscreenBtn = document.createElement("button");
         fullscreenBtn.innerHTML = `
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/>
-          </svg>`;
-        fullscreenBtn.className = "bg-black/50 text-white p-1 rounded hover:bg-black/70 transition";
+          <i class="fas fa-expand text-white"></i>`;
+        fullscreenBtn.className = "bg-black/50 p-2 rounded hover:bg-black/70 transition";
         fullscreenBtn.setAttribute("aria-label", "Fullscreen");
+
         controls.appendChild(fullscreenBtn);
         thumb.appendChild(controls);
 
-        // Превью
         const thumbnail = document.createElement("img");
         thumbnail.src = thumb.dataset.thumbnail || video.getAttribute("poster") || "";
         thumbnail.alt = "Video thumbnail";
         thumbnail.className = "absolute top-0 left-0 w-full h-full object-cover z-0 thumbnail";
         thumb.appendChild(thumbnail);
+
         video.classList.add("invisible");
         video.style.pointerEvents = "none";
 
@@ -487,19 +485,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
           hideThumbnail();
           video.muted = !manual;
-          video.play().catch(err => console.warn("Play error:", err));
+          video.play().catch(err => console.warn("Video play error:", err));
           currentPlayingVideo = video;
           isManuallyPlayed = manual;
-        };
-
-        const togglePlayback = () => {
-          if (video.paused) {
-            playVideo(true);
-          } else {
-            video.pause();
-            showThumbnail();
-            currentPlayingVideo = null;
-          }
         };
 
         fullscreenBtn.addEventListener("click", (e) => {
@@ -508,9 +496,16 @@ document.addEventListener("DOMContentLoaded", () => {
           if (reqFull) reqFull.call(video);
         });
 
-        thumb.addEventListener("click", () => togglePlayback());
+        thumb.addEventListener("click", () => {
+          if (video.paused) {
+            playVideo(true);
+          } else {
+            video.pause();
+            showThumbnail();
+            currentPlayingVideo = null;
+          }
+        });
 
-        // Hover (desktop)
         thumb.addEventListener("mouseenter", () => {
           if (!isManuallyPlayed) playVideo(false);
         });
@@ -524,7 +519,6 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         });
 
-        // Touch (mobile)
         thumb.addEventListener("touchstart", () => {
           if (!isManuallyPlayed) playVideo(false);
         });
@@ -538,7 +532,6 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         });
 
-        // Ended
         video.addEventListener("ended", () => {
           showThumbnail();
           currentPlayingVideo = null;
@@ -546,15 +539,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         showThumbnail();
       }
-      else if (isYouTube) {
-        // Обработка YouTube через Iframe API
+      else if (isYouTube && window.YT && YT.Player) {
         thumb._ytPlayer = null;
         thumb._ytManuallyPlayed = false;
 
         const createPlayer = (autoplay = false, mute = true) => {
           if (thumb._ytPlayer) return;
 
-          // Создаем iframe
           const iframe = document.createElement("iframe");
           iframe.src = thumb.dataset.src + "?enablejsapi=1&version=3";
           iframe.allow = "autoplay; encrypted-media";
@@ -622,7 +613,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         });
 
-        // Показать превью изначально
+        // Показать превью сразу
         const match = thumb.dataset.src.match(/embed\/([^?&]+)/);
         const videoId = match ? match[1] : null;
         if (videoId) {
@@ -636,23 +627,18 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll('input[name="guidance"]').forEach(input => {
     input.addEventListener("change", () => {
       pauseAllVideos();
-      for (let key in sections) {
-        sections[key].classList.remove("visible-section");
-      }
+      Object.values(sections).forEach(s => s.classList.remove("visible-section"));
       const selected = sections[input.id];
       selected.classList.add("visible-section");
       setupVideoThumbs(input.id);
     });
   });
 
-  // Начальная секция
+  // Инициализация по умолчанию
   const defaultInput = document.querySelector('input[name="guidance"]:checked');
-  if (defaultInput) {
-    const key = defaultInput.id;
-    if (sections[key]) {
-      sections[key].classList.add("visible-section");
-      setupVideoThumbs(key);
-    }
+  if (defaultInput && sections[defaultInput.id]) {
+    sections[defaultInput.id].classList.add("visible-section");
+    setupVideoThumbs(defaultInput.id);
   }
 
   // Переключение темы
