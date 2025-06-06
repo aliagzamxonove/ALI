@@ -364,63 +364,114 @@ document.addEventListener("DOMContentLoaded", () => {
 
       thumb.querySelectorAll(".video-controls").forEach(c => c.remove());
 
+      // Очистка
+      if (!video && !isYouTube) return;
+
       if (video) {
+        // Контролы
         const controls = document.createElement("div");
         controls.className = "video-controls absolute bottom-2 right-2 flex gap-2 z-10";
 
-        const playPauseBtn = document.createElement("button");
-        playPauseBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
-        playPauseBtn.className = "bg-black/50 text-white px-2 py-1 rounded hover:bg-black/70 transition";
-        playPauseBtn.setAttribute("aria-label", "Play or pause video");
-        playPauseBtn.setAttribute("tabindex", "0");
-
         const fullscreenBtn = document.createElement("button");
-        fullscreenBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm0-4h2V7h3V5H7v5zm10 9h-3v2h5v-5h-2v3zm-3-9V7h3v3h2V5h-5v2h-3z"/></svg>`;
-        fullscreenBtn.className = "bg-black/50 text-white px-2 py-1 rounded hover:bg-black/70 transition";
+        fullscreenBtn.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/>
+          </svg>`;
+        fullscreenBtn.className = "bg-black/50 text-white p-1 rounded hover:bg-black/70 transition";
         fullscreenBtn.setAttribute("aria-label", "Fullscreen");
-        fullscreenBtn.setAttribute("tabindex", "0");
+        controls.appendChild(fullscreenBtn);
 
-        controls.append(playPauseBtn, fullscreenBtn);
         thumb.appendChild(controls);
 
-        let isPlayingManually = false;
+        let isManuallyPlaying = false;
+        let thumbnail = null;
 
-        playPauseBtn.addEventListener("click", () => {
-          if (video.paused) {
-            video.muted = false;
-            video.play();
-            isPlayingManually = true;
-          } else {
-            video.pause();
-            isPlayingManually = false;
+        const showThumbnail = () => {
+          if (!thumbnail) {
+            thumbnail = document.createElement("img");
+            thumbnail.src = thumb.dataset.thumbnail || video.getAttribute("poster") || "";
+            thumbnail.alt = "Video thumbnail";
+            thumbnail.className = "absolute top-0 left-0 w-full h-full object-cover z-0";
+            thumb.appendChild(thumbnail);
           }
-        });
+          video.classList.add("invisible");
+        };
 
-        fullscreenBtn.addEventListener("click", () => {
+        const hideThumbnail = () => {
+          if (thumbnail) {
+            thumbnail.remove();
+            thumbnail = null;
+          }
+          video.classList.remove("invisible");
+        };
+
+        // Fullscreen
+        fullscreenBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
           const requestFull = video.requestFullscreen || video.webkitRequestFullscreen || video.msRequestFullscreen;
           if (requestFull) requestFull.call(video);
         });
 
+        // Основной обработчик клика по thumb
+        thumb.addEventListener("click", () => {
+          if (video.paused) {
+            hideThumbnail();
+            video.muted = false;
+            video.play();
+            isManuallyPlaying = true;
+          } else {
+            video.pause();
+            isManuallyPlaying = false;
+            showThumbnail();
+          }
+        });
+
+        // Hover (desktop)
         thumb.addEventListener("mouseenter", () => {
-          if (!isPlayingManually) {
+          if (!isManuallyPlaying) {
+            hideThumbnail();
             video.muted = true;
             video.play();
           }
         });
 
         thumb.addEventListener("mouseleave", () => {
-          if (!isPlayingManually) {
+          if (!isManuallyPlaying) {
             video.pause();
             video.currentTime = 0;
+            showThumbnail();
           }
         });
-      } else if (isYouTube) {
+
+        // Touch (mobile)
+        thumb.addEventListener("touchstart", () => {
+          if (!isManuallyPlaying) {
+            hideThumbnail();
+            video.muted = true;
+            video.play();
+          }
+        });
+
+        thumb.addEventListener("touchend", () => {
+          if (!isManuallyPlaying) {
+            video.pause();
+            video.currentTime = 0;
+            showThumbnail();
+          }
+        });
+
+        showThumbnail();
+      }
+
+      // --- YouTube mode ---
+      else if (isYouTube) {
         let iframe = null;
+
         thumb.addEventListener("mouseenter", () => {
           if (!iframe) {
             iframe = document.createElement("iframe");
             iframe.src = `${thumb.dataset.src}?autoplay=1&mute=1`;
-            iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+            iframe.allow = "autoplay; encrypted-media";
             iframe.allowFullscreen = true;
             iframe.frameBorder = "0";
             iframe.className = "w-full h-full";
@@ -433,7 +484,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const match = thumb.dataset.src.match(/embed\/([^?&]+)/);
           const videoId = match ? match[1] : null;
           if (videoId) {
-            thumb.innerHTML = `<img src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" alt="Video Thumbnail" class="w-full h-full object-cover">`;
+            thumb.innerHTML = `<img src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" class="w-full h-full object-cover" alt="YouTube thumbnail">`;
           }
           iframe = null;
         });
@@ -441,24 +492,23 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
+  // Переключение секций
   document.querySelectorAll('input[name="guidance"]').forEach(input => {
     input.addEventListener("change", () => {
       for (let key in sections) {
         sections[key].classList.remove("visible-section");
-
-        // Reset all video states
         sections[key].querySelectorAll("video").forEach(v => {
           v.pause();
           v.currentTime = 0;
         });
       }
-
       const selected = sections[input.id];
       selected.classList.add("visible-section");
       setupVideoThumbs(input.id);
     });
   });
 
+  // Начальная секция
   const defaultInput = document.querySelector('input[name="guidance"]:checked');
   if (defaultInput) {
     const key = defaultInput.id;
@@ -468,6 +518,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Переключение темы
   const themeToggle = document.getElementById("themeToggle");
   themeToggle?.addEventListener("click", () => {
     document.body.classList.toggle("bg-white");
