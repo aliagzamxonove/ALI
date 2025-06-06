@@ -466,7 +466,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
           hideThumbnail();  
 
-          if (manual) {  
+          // Убираем mute для видео в appSection  
+          const isInAppSection = thumb.closest("#appSection") !== null;  
+
+          if (manual || isInAppSection) {  
             video.muted = false;  
             video.controls = true;  
           } else {  
@@ -533,7 +536,7 @@ document.addEventListener("DOMContentLoaded", () => {
         showThumbnail();  
       }  
 
-      // YouTube (if used)  
+      // YouTube (если есть)  
       else if (isYouTube) {  
         let iframe = null;  
 
@@ -563,7 +566,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });  
   };  
 
-  // Section switching  
+  // Переключение секций  
   document.querySelectorAll('input[name="guidance"]').forEach(input => {  
     input.addEventListener("change", () => {  
       pauseAllVideos();  
@@ -576,7 +579,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });  
   });  
 
-  // Initial section  
+  // Инициализация секции по умолчанию  
   const defaultInput = document.querySelector('input[name="guidance"]:checked');  
   if (defaultInput) {  
     const key = defaultInput.id;  
@@ -586,7 +589,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }  
   }  
 
-  // Theme toggle  
+  // Тоггл темы  
   const themeToggle = document.getElementById("themeToggle");  
   themeToggle?.addEventListener("click", () => {  
     document.body.classList.toggle("bg-white");  
