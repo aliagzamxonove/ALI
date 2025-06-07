@@ -485,40 +485,37 @@ document.addEventListener("DOMContentLoaded", () => {
           video.style.pointerEvents = "auto";
         };
 
-        const playVideo = (manual = false) => {
-          if (currentPlayingVideo && currentPlayingVideo !== video) {
-            currentPlayingVideo.pause();
-            currentPlayingVideo.currentTime = 0;
+const playVideo = (manual = false) => {
+  if (currentPlayingVideo && currentPlayingVideo !== video) {
+    currentPlayingVideo.pause();
+    currentPlayingVideo.currentTime = 0;
 
-            const prevThumb = currentPlayingVideo.closest(".video-thumb");
-            prevThumb?.querySelector("img.thumbnail")?.style?.setProperty("display", "block");
+    const prevThumb = currentPlayingVideo.closest(".video-thumb");
+    prevThumb?.querySelector("img.thumbnail")?.style?.setProperty("display", "block");
 
-            currentPlayingVideo.classList.add("opacity-0");
-            currentPlayingVideo.style.pointerEvents = "none";
-          }
+    currentPlayingVideo.classList.add("opacity-0");
+    currentPlayingVideo.style.pointerEvents = "none";
+  }
 
-          hideThumbnail();
+  hideThumbnail();
 
-          if (manual) {
-            video.muted = false;
-          }
+  if (manual) {
+    video.muted = false;
+  }
 
-          video.controls = manual;
+  video.controls = manual;
 
-          video.play().catch(e => console.warn("Autoplay failed:", e));
-          currentPlayingVideo = video;
-        };
+  video.play().catch(e => console.warn("Autoplay failed:", e));
+  currentPlayingVideo = video;
+};
 
         const togglePlayback = () => {
           if (video.paused) {
             playVideo(true);
           } else {
             video.pause();
-            video.currentTime = 0;
             showThumbnail();
-            if (currentPlayingVideo === video) {
-              currentPlayingVideo = null;
-            }
+            currentPlayingVideo = null;
           }
         };
 
@@ -535,11 +532,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         thumb.addEventListener("click", togglePlayback);
-        thumb.addEventListener("mouseenter", () => {
-          if (!video.controls && video.paused) {
-            playVideo(false);
-          }
-        });
+        thumb.addEventListener("mouseenter", () => playVideo(false));
         thumb.addEventListener("mouseleave", () => {
           if (!video.controls && !isFullscreen) {
             video.pause();
