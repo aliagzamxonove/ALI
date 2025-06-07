@@ -515,11 +515,10 @@ document.addEventListener("DOMContentLoaded", () => {
           } else {
             video.pause();
             video.currentTime = 0;
-            video.addEventListener("pause", function handlePause() {
-              showThumbnail();
-              video.removeEventListener("pause", handlePause);
-            });
-            currentPlayingVideo = null;
+            showThumbnail();
+            if (currentPlayingVideo === video) {
+              currentPlayingVideo = null;
+            }
           }
         };
 
@@ -630,7 +629,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 </script>
-     <script>
   lucide.createIcons();
 </script>
   </body>
