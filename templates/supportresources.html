@@ -500,12 +500,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const fullscreenBtn = document.createElement("button");
         fullscreenBtn.className = "fullscreen-btn absolute bottom-2 right-2 bg-black/60 text-white p-1 rounded z-10 hover:bg-black/80";
         fullscreenBtn.setAttribute("aria-label", "Toggle Full Screen");
-        fullscreenBtn.innerHTML = `
-          <!-- Your original fullscreen icon preserved -->
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="currentColor"
-            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-            <path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2 2v-3M16 21h3a2 2 0 0 0-2-2v-3"/>
-          </svg>`;
+fullscreenBtn.innerHTML = `
+  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M8 3H5a2 2 0 0 0-2 2v3m0 8v3a2 2 0 0 0 2 2h3m8-18h3a2 2 0 0 1 2 2v3m0 8v3a2 2 0 0 1-2 2h-3"/>
+  </svg>`;
+        
         fullscreenBtn.addEventListener("click", e => {
           e.stopPropagation();
           hideThumbnail();
