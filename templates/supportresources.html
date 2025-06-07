@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lucid ELD Tutorials</title>
   <link rel="icon" href="{{ url_for('static', filename='IFTA5458.png') }}" type="image/png" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -215,21 +215,29 @@ video.invisible {
   
 
   
-      <!-- Guidance Toggle -->
-      <div class="guidance-toggle flex justify-center gap-2 bg-[#1a1a1a] p-2 rounded-xl shadow-inner max-w-lg mx-auto mb-12" role="radiogroup">
-        <input type="radio" id="web" name="guidance" checked />
-        <label for="web" id="webLabel">🌐 Web Guidance</label>
+<!-- Guidance Toggle -->
+<div class="guidance-toggle flex justify-center gap-3 bg-[#1a1a1a] p-3 rounded-xl shadow-inner max-w-lg mx-auto mb-12" role="radiogroup" aria-label="Select guidance type">
+  <input type="radio" id="web" name="guidance" checked />
+  <label for="web" id="webLabel" class="flex items-center gap-2">
+    <i class="fas fa-globe text-blue-400"></i> Web Guidance
+  </label>
 
-        <input type="radio" id="app" name="guidance" />
-        <label for="app" id="appLabel">📱 App Guidance</label>
+  <input type="radio" id="app" name="guidance" />
+  <label for="app" id="appLabel" class="flex items-center gap-2">
+    <i class="fas fa-mobile-alt text-green-400"></i> App Guidance
+  </label>
 
-        <input type="radio" id="resources" name="guidance" />
-        <label for="resources" id="resourcesLabel">📂 Resources</label>
-      </div>
+  <input type="radio" id="resources" name="guidance" />
+  <label for="resources" id="resourcesLabel" class="flex items-center gap-2">
+    <i class="fas fa-folder-open text-yellow-400"></i> Resources
+  </label>
+</div>
 
 <!-- Sections -->
 <section id="webSection" class="visible-section">
-  <h2 class="text-2xl font-bold mb-4">📘 English Tutorials</h2>
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2 text-white">
+  <i class="fas fa-flag-usa text-blue-400"></i> English Tutorials
+</h2>
   <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
     {% for i in range(1, 9) %}
     <div class="video-thumb relative">
@@ -252,7 +260,9 @@ video.invisible {
     {% endfor %}
   </div>
 
-  <h2 class="text-2xl font-bold mb-4">📙 Spanish Tutorials</h2>
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2 text-white">
+  <i class="fas fa-flag text-red-400"></i> Spanish Tutorials
+</h2>
   <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
     {% for i in range(1, 9) %}
     <div class="video-thumb relative">
@@ -277,7 +287,9 @@ video.invisible {
 </section>
 
 <section id="appSection" class="hidden-section">
-  <h2 class="text-2xl font-bold mb-4">📘 English App Tutorials</h2>
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2 text-white">
+  <i class="fas fa-mobile-alt text-blue-400"></i> English App Tutorials
+</h2>
   <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
     {% set english_app_links = [
       'J4p1s2QMxkg', '03hSWNy8VZY', 'qWLkn2hgcc0', 'S_Oq-5PTT7U',
@@ -294,7 +306,9 @@ video.invisible {
     {% endfor %}
   </div>
 
-  <h2 class="text-2xl font-bold mb-4">📙 Spanish App Tutorials</h2>
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2 text-white">
+  <i class="fas fa-mobile-alt text-red-400"></i> Spanish App Tutorials
+</h2>
   <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
     {% set spanish_app_links = [
       'ATY10BvSVFQ', 'My0ZI28BSO8', 'aCklwsKUckY', 'GZ74l7o6oes',
