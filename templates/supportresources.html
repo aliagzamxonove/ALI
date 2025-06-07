@@ -181,6 +181,13 @@ video.invisible {
 .video-thumb img.thumbnail {
   z-index: 1;
 }
+   @media (prefers-color-scheme: dark) {
+  .glass-card {
+    background-color: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+}
 </style>
   </head>
 
@@ -305,9 +312,12 @@ video.invisible {
   </div>
 </section>
 
-<section id="resourcesSection" class="visible-section">
-  <h2 class="text-2xl font-bold mb-4"> 📁 Instruction Files </h2>
-  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+<section id="resourcesSection" class="hidden-section">
+  <h2 class="text-3xl font-extrabold mb-8 text-center tracking-tight bg-gradient-to-r from-blue-400 to-blue-600 text-transparent bg-clip-text">
+    📁 Instruction Files
+  </h2>
+
+  <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
     {% set docs = [
       {'icon': 'fa-file-alt', 'title': 'DOT Inspection', 'desc': 'DOT Inspection File', 'file': 'DOT Inspection.pdf'},
       {'icon': 'fa-check-circle', 'title': 'Certificate of Compliance', 'desc': 'Compliance Documentation', 'file': 'Certificate of Compliance.pdf'},
@@ -316,31 +326,37 @@ video.invisible {
       {'icon': 'fa-book-open', 'title': 'User Manual', 'desc': 'Full Product Manual', 'file': 'Users Manual.pdf'}
     ] %}
     {% for doc in docs %}
-    <article
-      class="flex flex-col justify-between p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-lg dark:shadow-black/50 hover:shadow-xl dark:hover:shadow-black/70 transition-shadow duration-300 cursor-pointer"
-    >
-      <header class="flex items-center mb-4">
-        <i class="fas {{ doc.icon }} text-primary dark:text-blue-400 text-2xl mr-4"></i>
-        <h3 class="text-xl font-semibold tracking-tight text-white">{{ doc.title }}</h3>
-      </header>
-      <p class="text-gray-700 dark:text-gray-300 flex-grow leading-relaxed mb-6">{{ doc.desc }}</p>
-      <footer class="flex space-x-4">
+    <article class="group backdrop-blur-lg bg-white/5 dark:bg-white/10 border border-white/10 hover:border-white/20 transition duration-300 rounded-2xl p-6 shadow-lg hover:shadow-xl flex flex-col justify-between">
+      <div class="flex items-center mb-4">
+        <div class="flex items-center justify-center w-12 h-12 bg-primary/20 text-primary rounded-full">
+          <i class="fas {{ doc.icon }} text-xl"></i>
+        </div>
+        <h3 class="ml-4 text-lg font-semibold text-white group-hover:text-blue-400 transition-colors duration-200">
+          {{ doc.title }}
+        </h3>
+      </div>
+
+      <p class="text-sm text-gray-300 mb-6 leading-relaxed">
+        {{ doc.desc }}
+      </p>
+
+      <div class="flex gap-3 mt-auto">
         <a
           href="{{ url_for('static', filename='Instruction/' + doc.file) }}"
           target="_blank"
           rel="noopener"
-          class="inline-flex items-center justify-center px-5 py-2 rounded-lg bg-primary hover:bg-blue-700 text-white font-medium transition-colors duration-200"
+          class="flex-1 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition"
         >
           <i class="fas fa-eye mr-2"></i> View
         </a>
         <a
           href="{{ url_for('static', filename='Instruction/' + doc.file) }}"
           download
-          class="inline-flex items-center justify-center px-5 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white font-medium transition-colors duration-200"
+          class="flex-1 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition"
         >
           <i class="fas fa-download mr-2"></i> Download
         </a>
-      </footer>
+      </div>
     </article>
     {% endfor %}
   </div>
