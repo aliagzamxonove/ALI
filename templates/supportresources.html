@@ -184,18 +184,30 @@ video.invisible {
 </style>
   </head>
 
-  <body class="bg-dark text-white font-sans min-h-screen transition-colors">  
-    <div class="max-w-7xl mx-auto px-4 py-10">  
-      <!-- Title and Toggle -->  
-      <div class="flex justify-between items-center mb-8">  
-        <h1 class="text-4xl sm:text-5xl font-extrabold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">  
-          Lucid ELD Tutorials  
-        </h1>  
-        <button id="themeToggle" class="bg-accent hover:bg-primary text-white px-3 py-2 rounded-full transition">  
-          🌙  
-        </button>  
-      </div>  
-  
+  <body class="bg-dark text-white font-sans min-h-screen transition-colors">
+  
+    <div class="max-w-7xl mx-auto px-4 py-10">
+  
+      <!-- Title and Toggle -->
+  
+      <div class="flex justify-between items-center mb-8">
+  
+        <h1 class="text-4xl sm:text-5xl font-extrabold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+  
+          Lucid ELD Tutorials
+  
+        </h1>
+  
+        <button id="themeToggle" class="bg-accent hover:bg-primary text-white px-3 py-2 rounded-full transition">
+  
+          🌙
+  
+        </button>
+  
+      </div>
+  
+
+  
       <!-- Guidance Toggle -->
       <div class="guidance-toggle flex justify-center gap-2 bg-[#1a1a1a] p-2 rounded-xl shadow-inner max-w-lg mx-auto mb-12" role="radiogroup">
         <input type="radio" id="web" name="guidance" checked />
@@ -208,136 +220,78 @@ video.invisible {
         <label for="resources" id="resourcesLabel">📂 Resources</label>
       </div>
 
-      <!-- Sections -->
+<!-- Sections -->
 <section id="webSection" class="visible-section">
   <h2 class="text-2xl font-bold mb-4">📘 English Tutorials</h2>
   <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+    <!-- English Web Tutorials -->
+    {% for i in range(1, 9) %}
     <div class="video-thumb">
-      <video src="/static/webttrl/english1.mp4" muted loop preload="metadata" poster="/static/webttrl/english1.jpg"
-        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
+      <video
+        src="/static/webttrl/english{{ i }}.mp4"
+        muted
+        loop
+        preload="metadata"
+        poster="/static/webttrl/english{{ i }}.jpg"
+        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"
+      ></video>
     </div>
-    <div class="video-thumb">
-      <video src="/static/webttrl/english2.mp4" muted loop preload="metadata" poster="/static/webttrl/english2.jpg"
-        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
-    </div>
-    <div class="video-thumb">
-      <video src="/static/webttrl/english3.mp4" muted loop preload="metadata" poster="/static/webttrl/english3.jpg"
-        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
-    </div>
-    <div class="video-thumb">
-      <video src="/static/webttrl/english4.mp4" muted loop preload="metadata" poster="/static/webttrl/english4.jpg"
-        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
-    </div>
-    <div class="video-thumb">
-      <video src="/static/webttrl/english5.mp4" muted loop preload="metadata" poster="/static/webttrl/english5.jpg"
-        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
-    </div>
-    <div class="video-thumb">
-      <video src="/static/webttrl/english6.mp4" muted loop preload="metadata" poster="/static/webttrl/english6.jpg"
-        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
-    </div>
-    <div class="video-thumb">
-      <video src="/static/webttrl/english7.mp4" muted loop preload="metadata" poster="/static/webttrl/english7.jpg"
-        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
-    </div>
-    <div class="video-thumb">
-      <video src="/static/webttrl/english8.mp4" muted loop preload="metadata" poster="/static/webttrl/english8.jpg"
-        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
-    </div>
+    {% endfor %}
   </div>
 
   <h2 class="text-2xl font-bold mb-4">📙 Spanish Tutorials</h2>
   <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Spanish Web Tutorials -->
+    {% for i in range(1, 9) %}
     <div class="video-thumb">
-      <video src="/static/webttrl/spanish1.mp4" muted loop preload="metadata" poster="/static/webttrl/spanish1.jpg"
-        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
+      <video
+        src="/static/webttrl/spanish{{ i }}.mp4"
+        muted
+        loop
+        preload="metadata"
+        poster="/static/webttrl/spanish{{ i }}.jpg"
+        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"
+      ></video>
     </div>
-    <div class="video-thumb">
-      <video src="/static/webttrl/spanish2.mp4" muted loop preload="metadata" poster="/static/webttrl/spanish2.jpg"
-        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
-    </div>
-    <div class="video-thumb">
-      <video src="/static/webttrl/spanish3.mp4" muted loop preload="metadata" poster="/static/webttrl/spanish3.jpg"
-        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
-    </div>
-    <div class="video-thumb">
-      <video src="/static/webttrl/spanish4.mp4" muted loop preload="metadata" poster="/static/webttrl/spanish4.jpg"
-        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
-    </div>
-    <div class="video-thumb">
-      <video src="/static/webttrl/spanish5.mp4" muted loop preload="metadata" poster="/static/webttrl/spanish5.jpg"
-        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
-    </div>
-    <div class="video-thumb">
-      <video src="/static/webttrl/spanish6.mp4" muted loop preload="metadata" poster="/static/webttrl/spanish6.jpg"
-        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
-    </div>
-    <div class="video-thumb">
-      <video src="/static/webttrl/spanish7.mp4" muted loop preload="metadata" poster="/static/webttrl/spanish7.jpg"
-        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
-    </div>
-    <div class="video-thumb">
-      <video src="/static/webttrl/spanish8.mp4" muted loop preload="metadata" poster="/static/webttrl/spanish8.jpg"
-        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"></video>
-    </div>
+    {% endfor %}
   </div>
 </section>
 
 <section id="appSection" class="hidden-section">
   <h2 class="text-2xl font-bold mb-4">📘 English App Tutorials</h2>
   <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-    <div class="video-thumb" data-src="https://www.youtube.com/embed/J4p1s2QMxkg">
-      <img src="https://img.youtube.com/vi/J4p1s2QMxkg/hqdefault.jpg" alt="English App Tutorial 1">
+    <!-- English App Tutorials -->
+    {% set english_app_links = [
+      'J4p1s2QMxkg', '03hSWNy8VZY', 'qWLkn2hgcc0', 'S_Oq-5PTT7U',
+      'PHqGo5uNogY', 'K-1O8aNsaDs', '7gFhHji96rU', 'Qx-0E4M7C0Y'
+    ] %}
+    {% for id in english_app_links %}
+    <div class="video-thumb" data-src="https://www.youtube.com/embed/{{ id }}">
+      <img
+        src="https://img.youtube.com/vi/{{ id }}/hqdefault.jpg"
+        alt="English App Tutorial {{ loop.index }}"
+        class="rounded-xl shadow-lg hover:scale-105 transition-transform duration-300 w-full h-full object-cover"
+      >
     </div>
-    <div class="video-thumb" data-src="https://www.youtube.com/embed/03hSWNy8VZY">
-      <img src="https://img.youtube.com/vi/03hSWNy8VZY/hqdefault.jpg" alt="English App Tutorial 2">
-    </div>
-    <div class="video-thumb" data-src="https://www.youtube.com/embed/qWLkn2hgcc0">
-      <img src="https://img.youtube.com/vi/qWLkn2hgcc0/hqdefault.jpg" alt="English App Tutorial 3">
-    </div>
-    <div class="video-thumb" data-src="https://www.youtube.com/embed/S_Oq-5PTT7U">
-      <img src="https://img.youtube.com/vi/S_Oq-5PTT7U/hqdefault.jpg" alt="English App Tutorial 4">
-    </div>
-    <div class="video-thumb" data-src="https://www.youtube.com/embed/PHqGo5uNogY">
-      <img src="https://img.youtube.com/vi/PHqGo5uNogY/hqdefault.jpg" alt="English App Tutorial 5">
-    </div>
-    <div class="video-thumb" data-src="https://www.youtube.com/embed/K-1O8aNsaDs">
-      <img src="https://img.youtube.com/vi/K-1O8aNsaDs/hqdefault.jpg" alt="English App Tutorial 6">
-    </div>
-    <div class="video-thumb" data-src="https://www.youtube.com/embed/7gFhHji96rU">
-      <img src="https://img.youtube.com/vi/7gFhHji96rU/hqdefault.jpg" alt="English App Tutorial 7">
-    </div>
-    <div class="video-thumb" data-src="https://www.youtube.com/embed/Qx-0E4M7C0Y">
-      <img src="https://img.youtube.com/vi/Qx-0E4M7C0Y/hqdefault.jpg" alt="English App Tutorial 8">
-    </div>
+    {% endfor %}
   </div>
 
   <h2 class="text-2xl font-bold mb-4">📙 Spanish App Tutorials</h2>
   <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    <div class="video-thumb" data-src="https://www.youtube.com/embed/ATY10BvSVFQ">
-      <img src="https://img.youtube.com/vi/ATY10BvSVFQ/hqdefault.jpg" alt="Spanish App Tutorial 1">
+    <!-- Spanish App Tutorials -->
+    {% set spanish_app_links = [
+      'ATY10BvSVFQ', 'My0ZI28BSO8', 'aCklwsKUckY', 'GZ74l7o6oes',
+      'OjyAhJEW4QE', 'pOmQesXY6uk', 'vd8Fhr6rI70', 'y9FKUj1eeek'
+    ] %}
+    {% for id in spanish_app_links %}
+    <div class="video-thumb" data-src="https://www.youtube.com/embed/{{ id }}">
+      <img
+        src="https://img.youtube.com/vi/{{ id }}/hqdefault.jpg"
+        alt="Spanish App Tutorial {{ loop.index }}"
+        class="rounded-xl shadow-lg hover:scale-105 transition-transform duration-300 w-full h-full object-cover"
+      >
     </div>
-    <div class="video-thumb" data-src="https://www.youtube.com/embed/My0ZI28BSO8">
-      <img src="https://img.youtube.com/vi/My0ZI28BSO8/hqdefault.jpg" alt="Spanish App Tutorial 2">
-    </div>
-    <div class="video-thumb" data-src="https://www.youtube.com/embed/aCklwsKUckY">
-      <img src="https://img.youtube.com/vi/aCklwsKUckY/hqdefault.jpg" alt="Spanish App Tutorial 3">
-    </div>
-    <div class="video-thumb" data-src="https://www.youtube.com/embed/GZ74l7o6oes">
-      <img src="https://img.youtube.com/vi/GZ74l7o6oes/hqdefault.jpg" alt="Spanish App Tutorial 4">
-    </div>
-    <div class="video-thumb" data-src="https://www.youtube.com/embed/OjyAhJEW4QE">
-      <img src="https://img.youtube.com/vi/OjyAhJEW4QE/hqdefault.jpg" alt="Spanish App Tutorial 5">
-    </div>
-    <div class="video-thumb" data-src="https://www.youtube.com/embed/pOmQesXY6uk">
-      <img src="https://img.youtube.com/vi/pOmQesXY6uk/hqdefault.jpg" alt="Spanish App Tutorial 6">
-    </div>
-    <div class="video-thumb" data-src="https://www.youtube.com/embed/vd8Fhr6rI70">
-      <img src="https://img.youtube.com/vi/vd8Fhr6rI70/hqdefault.jpg" alt="Spanish App Tutorial 7">
-    </div>
-    <div class="video-thumb" data-src="https://www.youtube.com/embed/y9FKUj1eeek">
-      <img src="https://img.youtube.com/vi/y9FKUj1eeek/hqdefault.jpg" alt="Spanish App Tutorial 8">
-    </div>
+    {% endfor %}
   </div>
 </section>
 
