@@ -485,26 +485,29 @@ document.addEventListener("DOMContentLoaded", () => {
           video.style.pointerEvents = "auto";
         };
 
-        const playVideo = (manual = false) => {
-          if (currentPlayingVideo && currentPlayingVideo !== video) {
-            currentPlayingVideo.pause();
-            currentPlayingVideo.currentTime = 0;
+const playVideo = (manual = false) => {
+  if (currentPlayingVideo && currentPlayingVideo !== video) {
+    currentPlayingVideo.pause();
+    currentPlayingVideo.currentTime = 0;
 
-            const prevThumb = currentPlayingVideo.closest(".video-thumb");
-            prevThumb?.querySelector("img.thumbnail")?.style?.setProperty("display", "block");
+    const prevThumb = currentPlayingVideo.closest(".video-thumb");
+    prevThumb?.querySelector("img.thumbnail")?.style?.setProperty("display", "block");
 
-            currentPlayingVideo.classList.add("opacity-0");
-            currentPlayingVideo.style.pointerEvents = "none";
-          }
+    currentPlayingVideo.classList.add("opacity-0");
+    currentPlayingVideo.style.pointerEvents = "none";
+  }
 
-          hideThumbnail();
+  hideThumbnail();
 
-          video.muted = !manual;
-          video.controls = manual;
+  if (manual) {
+    video.muted = false;
+  }
 
-          video.play().catch(e => console.warn("Autoplay failed:", e));
-          currentPlayingVideo = video;
-        };
+  video.controls = manual;
+
+  video.play().catch(e => console.warn("Autoplay failed:", e));
+  currentPlayingVideo = video;
+};
 
         const togglePlayback = () => {
           if (video.paused) {
