@@ -224,15 +224,15 @@ video.invisible {
 <section id="webSection" class="visible-section">
   <h2 class="text-2xl font-bold mb-4">📘 English Tutorials</h2>
   <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-    <!-- English Web Tutorials -->
     {% for i in range(1, 9) %}
     <div class="video-thumb">
       <video
         src="/static/webttrl/english{{ i }}.mp4"
-        muted
         loop
         preload="metadata"
         poster="/static/webttrl/english{{ i }}.jpg"
+        controls
+        title="English Web Tutorial {{ i }}"
         class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"
       ></video>
     </div>
@@ -240,16 +240,16 @@ video.invisible {
   </div>
 
   <h2 class="text-2xl font-bold mb-4">📙 Spanish Tutorials</h2>
-  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    <!-- Spanish Web Tutorials -->
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
     {% for i in range(1, 9) %}
     <div class="video-thumb">
       <video
         src="/static/webttrl/spanish{{ i }}.mp4"
-        muted
         loop
         preload="metadata"
         poster="/static/webttrl/spanish{{ i }}.jpg"
+        controls
+        title="Spanish Web Tutorial {{ i }}"
         class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"
       ></video>
     </div>
