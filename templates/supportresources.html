@@ -421,11 +421,10 @@ document.addEventListener("DOMContentLoaded", () => {
     app: document.getElementById("appSection"),
     resources: document.getElementById("resourcesSection")
   };
-
   let currentPlayingVideo = null;
   let isFullscreen = false;
+  const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
 
-  // Track fullscreen mode
   document.addEventListener("fullscreenchange", () => {
     isFullscreen = !!document.fullscreenElement;
   });
@@ -437,11 +436,12 @@ document.addEventListener("DOMContentLoaded", () => {
       video.style.pointerEvents = "none";
       video.classList.add("opacity-0");
     });
-
     document.querySelectorAll(".video-thumb img.thumbnail").forEach(img => {
       img.style.display = "block";
     });
-
+    document.querySelectorAll(".video-thumb iframe").forEach(iframe => {
+      iframe.src = "";  // unload YouTube frames
+    });
     currentPlayingVideo = null;
   };
 
@@ -451,10 +451,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     section.querySelectorAll(".video-thumb").forEach(thumb => {
       const video = thumb.querySelector("video");
+      const thumbnail = thumb.querySelector("img.thumbnail");
       const isYouTube = !video && thumb.dataset.src;
 
-      // Clean up any previous custom controls
-      thumb.querySelectorAll(".video-controls").forEach(control => control.remove());
+      const cleanupControls = () => {
+        thumb.querySelectorAll(".video-controls, .fullscreen-btn").forEach(el => el.remove());
+      };
+      cleanupControls();
 
       if (video) {
         video.muted = true;
@@ -462,57 +465,45 @@ document.addEventListener("DOMContentLoaded", () => {
         video.controls = false;
 
         const fullscreenBtn = document.createElement("button");
-        fullscreenBtn.className = "absolute bottom-2 right-2 bg-black/60 text-white p-1 rounded z-10 hover:bg-black/80";
+        fullscreenBtn.className = "fullscreen-btn absolute bottom-2 right-2 bg-black/60 text-white p-1 rounded z-10 hover:bg-black/80";
+        fullscreenBtn.setAttribute("aria-label", "Toggle Full Screen");
         fullscreenBtn.innerHTML = `
           <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/>
-          </svg>
-        `;
+            <path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2 2v-3M16 21h3a2 2 0 0 0-2-2v-3"/>
+          </svg>`;
         thumb.appendChild(fullscreenBtn);
-
-        const thumbnail = thumb.querySelector("img.thumbnail");
 
         const showThumbnail = () => {
           thumbnail.style.display = "block";
           video.classList.add("opacity-0");
           video.style.pointerEvents = "none";
         };
-
         const hideThumbnail = () => {
           thumbnail.style.display = "none";
           video.classList.remove("opacity-0");
           video.style.pointerEvents = "auto";
         };
 
-const playVideo = (manual = false) => {
-  if (currentPlayingVideo && currentPlayingVideo !== video) {
-    currentPlayingVideo.pause();
-    currentPlayingVideo.currentTime = 0;
-
-    const prevThumb = currentPlayingVideo.closest(".video-thumb");
-    prevThumb?.querySelector("img.thumbnail")?.style?.setProperty("display", "block");
-
-    currentPlayingVideo.classList.add("opacity-0");
-    currentPlayingVideo.style.pointerEvents = "none";
-  }
-
-  hideThumbnail();
-
-  if (manual) {
-    video.muted = false;
-  }
-
-  video.controls = manual;
-
-  video.play().catch(e => console.warn("Autoplay failed:", e));
-  currentPlayingVideo = video;
-};
+        const playVideo = (manual = false) => {
+          if (currentPlayingVideo && currentPlayingVideo !== video) {
+            currentPlayingVideo.pause();
+            currentPlayingVideo.currentTime = 0;
+            const prevThumb = currentPlayingVideo.closest(".video-thumb");
+            prevThumb?.querySelector("img.thumbnail")?.style?.setProperty("display", "block");
+            currentPlayingVideo.classList.add("opacity-0");
+            currentPlayingVideo.style.pointerEvents = "none";
+          }
+          hideThumbnail();
+          if (manual) video.muted = false;
+          video.controls = manual;
+          video.play().catch(e => console.warn("Autoplay failed:", e));
+          currentPlayingVideo = video;
+        };
 
         const togglePlayback = () => {
-          if (video.paused) {
-            playVideo(true);
-          } else {
+          if (video.paused) playVideo(true);
+          else {
             video.pause();
             showThumbnail();
             currentPlayingVideo = null;
@@ -521,103 +512,96 @@ const playVideo = (manual = false) => {
 
         fullscreenBtn.addEventListener("click", e => {
           e.stopPropagation();
-
-          video.classList.remove("opacity-0");
-          video.style.pointerEvents = "auto";
+          hideThumbnail();
+          if (video.paused) video.play().catch(() => {});
           video.controls = true;
           video.muted = false;
-
-          const requestFull = video.requestFullscreen || video.webkitRequestFullscreen || video.msRequestFullscreen;
-          requestFull?.call(video);
+          video.style.pointerEvents = "auto";
+          (video.requestFullscreen || video.webkitRequestFullscreen || video.msRequestFullscreen)?.call(video);
         });
 
-        thumb.addEventListener("click", togglePlayback);
-        thumb.addEventListener("mouseenter", () => playVideo(false));
-        thumb.addEventListener("mouseleave", () => {
-          if (!video.controls && !isFullscreen) {
-            video.pause();
-            video.currentTime = 0;
-            showThumbnail();
-            currentPlayingVideo = null;
-          }
-        });
+        const pointerPlayEvt = isTouch ? "touchstart" : "mouseenter";
+        const pointerLeaveEvt = isTouch ? "touchend" : "mouseleave";
+
+        thumb.addEventListener(pointerPlayEvt, () => playVideo(isTouch));
+        if (!isTouch) {
+          thumb.addEventListener(pointerLeaveEvt, () => {
+            if (!video.controls && !isFullscreen) {
+              video.pause();
+              video.currentTime = 0;
+              showThumbnail();
+              currentPlayingVideo = null;
+            }
+          });
+        }
 
         video.addEventListener("ended", () => {
-          if (!isFullscreen) {
-            showThumbnail();
-            currentPlayingVideo = null;
-          }
+          queueMicrotask(() => {
+            if (!document.fullscreenElement) {
+              showThumbnail();
+              currentPlayingVideo = null;
+            }
+          });
         });
 
         showThumbnail();
-      }
-
-      // YouTube Thumbnails
+      } 
       else if (isYouTube) {
-        let iframe = null;
         const videoId = thumb.dataset.src.split("/embed/")[1];
+        const img = document.createElement("img");
+        img.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+        img.alt = "YouTube thumbnail";
+        img.className = "rounded-xl shadow-lg hover:scale-105 transition-transform duration-300 w-full h-full object-cover thumbnail";
+        thumb.innerHTML = "";
+        thumb.appendChild(img);
 
-        thumb.addEventListener("mouseenter", () => {
+        let player = null;
+        const pointerPlayEvt = isTouch ? "touchstart" : "mouseenter";
+        const pointerLeaveEvt = isTouch ? "touchend" : "mouseleave";
+
+        thumb.addEventListener(pointerPlayEvt, () => {
           pauseAllVideos();
-
-          if (!iframe) {
-            iframe = document.createElement("iframe");
-            iframe.src = `${thumb.dataset.src}?autoplay=1&mute=0`;
-            iframe.setAttribute("allow", "autoplay; encrypted-media");
-            iframe.allowFullscreen = true;
-            iframe.frameBorder = "0";
-            iframe.className = "w-full h-full rounded-xl";
-
-            thumb.innerHTML = '';
-            thumb.appendChild(iframe);
+          if (!player) {
+            player = document.createElement("iframe");
+            player.allowFullscreen = true;
+            player.frameBorder = "0";
+            player.className = "w-full h-full rounded-xl";
+            thumb.replaceChildren(player);
           }
+          player.src = `${thumb.dataset.src}?autoplay=1&mute=0`;
         });
 
-        thumb.addEventListener("mouseleave", () => {
-          thumb.innerHTML = `
-            <img
-              src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg"
-              alt="YouTube thumbnail"
-              class="rounded-xl shadow-lg hover:scale-105 transition-transform duration-300 w-full h-full object-cover thumbnail"
-            />
-          `;
-          iframe = null;
-        });
+        if (!isTouch) {
+          thumb.addEventListener(pointerLeaveEvt, () => {
+            player.src = "";
+            thumb.replaceChildren(img);
+          });
+        }
       }
     });
   };
 
-  // Input tab change
   document.querySelectorAll('input[name="guidance"]').forEach(input => {
     input.addEventListener("change", () => {
       pauseAllVideos();
-
-      for (let key in sections) {
-        sections[key]?.classList.remove("visible-section");
-      }
-
-      const selected = sections[input.id];
-      selected?.classList.add("visible-section");
+      Object.values(sections).forEach(sec => sec.classList.remove("visible-section"));
+      sections[input.id]?.classList.add("visible-section");
       setupVideoThumbs(input.id);
     });
   });
 
-  // Initialize default section
   const defaultInput = document.querySelector('input[name="guidance"]:checked');
   if (defaultInput) {
-    const key = defaultInput.id;
-    sections[key]?.classList.add("visible-section");
-    setupVideoThumbs(key);
+    sections[defaultInput.id]?.classList.add("visible-section");
+    setupVideoThumbs(defaultInput.id);
   }
 
-  // Theme toggle
   const themeToggle = document.getElementById("themeToggle");
   themeToggle?.addEventListener("click", () => {
     document.body.classList.toggle("bg-white");
     document.body.classList.toggle("text-black");
     document.body.classList.toggle("bg-dark");
     document.body.classList.toggle("text-white");
-
     themeToggle.textContent = themeToggle.textContent === "🌙" ? "☀️" : "🌙";
   });
 });
