@@ -2,20 +2,30 @@
 <html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Lucid ELD Tutorials</title>
+
+  <!-- Favicon -->
   <link rel="icon" href="{{ url_for('static', filename='IFTA5458.png') }}" type="image/png" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" />
+
+  <!-- FontAwesome CDN -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    integrity="sha512-..." crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
+  <!-- Google Fonts: Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
-  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
           colors: {
             primary: '#3b82f6',
             dark: '#0f172a',
@@ -26,552 +36,460 @@
       },
     };
   </script>
- <style>
-  /* Скроллбар */
-  ::-webkit-scrollbar {
-    width: 8px;
-  }
 
-  ::-webkit-scrollbar-thumb {
-    background: #334155;
-    border-radius: 4px;
-  }
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 
-  /* Базовая структура карточки */
-  .video-thumb {
-    position: relative;
-    border-radius: 0.75rem;
-    overflow: hidden;
-    cursor: pointer;
-    background-color: #111827;
-    aspect-ratio: 16 / 9;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  }
+  <!-- Custom Styles -->
+  <style>
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
 
-  .video-thumb:hover {
-    transform: scale(1.04);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
-  }
-
-  .video-thumb video,
-  .video-thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    border-radius: inherit;
-    transition: opacity 0.3s ease;
-  }
-
-  .video-thumb video.invisible {
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  /* Кастомные контролы */
-  .video-controls {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    display: flex;
-    gap: 10px;
-    z-index: 10;
-  }
-
-  .video-controls button {
-    background-color: rgba(0, 0, 0, 0.55);
-    border: none;
-    padding: 8px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .video-controls button:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-    transform: scale(1.1);
-  }
-
-  .video-controls svg {
-    width: 22px;
-    height: 22px;
-    fill: white;
-  }
-
-  /* Переключатели (guidance) */
-  .guidance-toggle input {
-    display: none;
-  }
-
-  .guidance-toggle label {
-    padding: 0.6rem 1.25rem;
-    font-weight: 600;
-    font-size: 0.95rem;
-    border-radius: 0.5rem;
-    color: #cbd5e1;
-    transition: all 0.3s;
-    cursor: pointer;
-  }
-
-  .guidance-toggle input:checked + label {
-    background: linear-gradient(to right, #4b5563, #1f2937);
-    color: white;
-    transform: scale(1.05);
-  }
-
-  /* Плавное появление секций */
-  section {
-    display: none;
-    opacity: 0;
-    transform: translateY(12px);
-    transition: opacity 0.4s ease, transform 0.4s ease;
-  }
-
-  .visible-section {
-    display: block;
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  /* Плавный body при смене темы */
-  body {
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-
-  /* Тема */
-  #themeToggle {
-    transition: all 0.3s ease;
-    cursor: pointer;
-    padding: 0.4rem;
-    font-size: 1.2rem;
-    background: transparent;
-    border: none;
-  }
-
-  #themeToggle:hover {
-    transform: scale(1.1);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-  }
-
-  /* Адаптация под мобильные устройства */
-  @media (hover: none) and (pointer: coarse) {
-    .video-thumb:hover {
-      transform: none;
+    /* Video Thumbnail Base */
+    .video-thumb {
+      position: relative;
+      border-radius: 0.75rem;
+      overflow: hidden;
+      cursor: pointer;
+      background-color: #111827;
+      aspect-ratio: 16 / 9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
-  }
-video.invisible {
-  pointer-events: none;
-  opacity: 0;
-}
+    .video-thumb:hover {
+      transform: scale(1.04);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+    }
 
-.video-thumb video {
-  z-index: 2;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
+    /* Video & Image inside video-thumb */
+    .video-thumb video,
+    .video-thumb img.thumbnail {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: inherit;
+      display: block;
+      transition: opacity 0.3s ease;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+    .video-thumb video.opacity-0 {
+      opacity: 0;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .video-thumb img.thumbnail {
+      z-index: 1;
+      position: relative;
+    }
 
-.video-thumb img.thumbnail {
-  z-index: 1;
-}
-   @media (prefers-color-scheme: dark) {
-  .glass-card {
-    background-color: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-  }
-}
-</style>
-  </head>
+    /* Video Controls */
+    .video-controls {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      display: flex;
+      gap: 10px;
+      z-index: 10;
+    }
+    .video-controls button {
+      background-color: rgba(0, 0, 0, 0.55);
+      border: none;
+      padding: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+    .video-controls button:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      transform: scale(1.1);
+    }
+    .video-controls svg {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+    }
 
-  <body class="bg-dark text-white font-sans min-h-screen transition-colors">
-  
-    <div class="max-w-7xl mx-auto px-4 py-10">
-  
-      <!-- Title and Toggle -->
-  
-      <div class="flex justify-between items-center mb-8">
-  
-        <h1 class="text-4xl sm:text-5xl font-extrabold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-  
-          Lucid ELD Tutorials
-  
-        </h1>
-  
-        <button id="themeToggle" class="bg-accent hover:bg-primary text-white px-3 py-2 rounded-full transition">
-  
-          🌙
-  
-        </button>
-  
-      </div>
-  
+    /* Guidance Toggle */
+    .guidance-toggle input[type="radio"] {
+      display: none;
+    }
+    .guidance-toggle label {
+      padding: 0.6rem 1.25rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border-radius: 0.5rem;
+      color: #cbd5e1;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .guidance-toggle input[type="radio"]:checked + label {
+      background: linear-gradient(to right, #4b5563, #1f2937);
+      color: white;
+      transform: scale(1.05);
+      box-shadow: 0 0 10px rgba(75, 85, 99, 0.6);
+    }
 
-  
-<!-- Guidance Toggle -->
-<div class="guidance-toggle flex justify-center gap-3 bg-[#1a1a1a] p-3 rounded-xl shadow-inner max-w-lg mx-auto mb-12" role="radiogroup" aria-label="Select guidance type">
-  <input type="radio" id="web" name="guidance" checked />
-  <label for="web" id="webLabel" class="flex items-center gap-2">
-    <i class="fas fa-globe text-blue-400"></i> Web Guidance
-  </label>
+    /* Sections visibility & transitions */
+    section {
+      display: none;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    section.visible-section {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
 
-  <input type="radio" id="app" name="guidance" />
-  <label for="app" id="appLabel" class="flex items-center gap-2">
-    <i class="fas fa-mobile-alt text-green-400"></i> App Guidance
-  </label>
+    /* Body theme transition */
+    body {
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
 
-  <input type="radio" id="resources" name="guidance" />
-  <label for="resources" id="resourcesLabel" class="flex items-center gap-2">
-    <i class="fas fa-folder-open text-yellow-400"></i> Resources
-  </label>
-</div>
+    /* Theme toggle button */
+    #themeToggle {
+      transition: transform 0.3s ease;
+      cursor: pointer;
+      padding: 0.4rem;
+      font-size: 1.2rem;
+      background: transparent;
+      border: none;
+      color: inherit;
+    }
+    #themeToggle:hover,
+    #themeToggle:focus {
+      outline: none;
+      transform: scale(1.1);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    }
 
-<!-- Sections -->
-<section id="webSection" class="visible-section">
-  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2 text-white">
-  <i class="fas fa-flag-usa text-blue-400"></i> English Tutorials
-</h2>
-  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-    {% for i in range(1, 9) %}
-    <div class="video-thumb relative">
-      <video
-        src="/static/webttrl/english{{ i }}.mp4"
-        loop
-        preload="metadata"
-        poster="/static/webttrl/english{{ i }}.jpg"
-        title="English Web Tutorial {{ i }}"
-        playsinline
-        muted
-        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"
-      ></video>
-      <img
-        src="/static/webttrl/english{{ i }}.jpg"
-        alt="English Web Tutorial {{ i }}"
-        class="absolute top-0 left-0 w-full h-full object-cover z-0 thumbnail rounded-xl"
-      />
-    </div>
-    {% endfor %}
-  </div>
-
-  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2 text-white">
-  <i class="fas fa-flag text-red-400"></i> Spanish Tutorials
-</h2>
-  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-    {% for i in range(1, 9) %}
-    <div class="video-thumb relative">
-      <video
-        src="/static/webttrl/spanish{{ i }}.mp4"
-        loop
-        preload="metadata"
-        poster="/static/webttrl/spanish{{ i }}.jpg"
-        title="Spanish Web Tutorial {{ i }}"
-        playsinline
-        muted
-        class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"
-      ></video>
-      <img
-        src="/static/webttrl/spanish{{ i }}.jpg"
-        alt="Spanish Web Tutorial {{ i }}"
-        class="absolute top-0 left-0 w-full h-full object-cover z-0 thumbnail rounded-xl"
-      />
-    </div>
-    {% endfor %}
-  </div>
-</section>
-
-<section id="appSection" class="hidden-section">
-  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2 text-white">
-  <i class="fas fa-mobile-alt text-blue-400"></i> English App Tutorials
-</h2>
-  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-    {% set english_app_links = [
-      'J4p1s2QMxkg', '03hSWNy8VZY', 'qWLkn2hgcc0', 'S_Oq-5PTT7U',
-      'PHqGo5uNogY', 'K-1O8aNsaDs', '7gFhHji96rU', 'Qx-0E4M7C0Y'
-    ] %}
-    {% for id in english_app_links %}
-    <div class="video-thumb relative" data-src="https://www.youtube.com/embed/{{ id }}">
-      <img
-        src="https://img.youtube.com/vi/{{ id }}/hqdefault.jpg"
-        alt="English App Tutorial {{ loop.index }}"
-        class="rounded-xl shadow-lg hover:scale-105 transition-transform duration-300 w-full h-full object-cover thumbnail"
-      />
-    </div>
-    {% endfor %}
-  </div>
-
-  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2 text-white">
-  <i class="fas fa-mobile-alt text-red-400"></i> Spanish App Tutorials
-</h2>
-  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    {% set spanish_app_links = [
-      'ATY10BvSVFQ', 'My0ZI28BSO8', 'aCklwsKUckY', 'GZ74l7o6oes',
-      'OjyAhJEW4QE', 'pOmQesXY6uk', 'vd8Fhr6rI70', 'y9FKUj1eeek'
-    ] %}
-    {% for id in spanish_app_links %}
-    <div class="video-thumb relative" data-src="https://www.youtube.com/embed/{{ id }}">
-      <img
-        src="https://img.youtube.com/vi/{{ id }}/hqdefault.jpg"
-        alt="Spanish App Tutorial {{ loop.index }}"
-        class="rounded-xl shadow-lg hover:scale-105 transition-transform duration-300 w-full h-full object-cover thumbnail"
-      />
-    </div>
-    {% endfor %}
-  </div>
-</section>
-
-<section id="resourcesSection" class="hidden-section">
-  <h2 class="text-3xl font-extrabold mb-8 text-center tracking-tight bg-gradient-to-r from-blue-500 to-blue-700 text-transparent bg-clip-text dark:from-blue-400 dark:to-blue-600">
-    <i data-lucide="folder-open" class="inline-block w-7 h-7 text-blue-600 dark:text-blue-400 mr-2 align-middle"></i>
-    Instruction Files
-  </h2>
-
-  <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-    {% set docs = [
-      {'icon': 'file-text', 'title': 'DOT Inspection', 'desc': 'DOT Inspection File', 'file': 'DOT Inspection.pdf'},
-      {'icon': 'check-circle', 'title': 'Certificate of Compliance', 'desc': 'Compliance Documentation', 'file': 'Certificate of Compliance.pdf'},
-      {'icon': 'alert-triangle', 'title': 'Malfunction Manual', 'desc': 'Troubleshooting Guide', 'file': 'Malfunction Manual.pdf'},
-      {'icon': 'truck', 'title': 'Truck Sticker', 'desc': 'Cab Sticker Template', 'file': 'Truck Sticker.pdf'},
-      {'icon': 'book-open', 'title': 'User Manual', 'desc': 'Full Product Manual', 'file': 'Users Manual.pdf'}
-    ] %}
-    {% for doc in docs %}
-    <article class="group backdrop-blur-lg bg-white/80 dark:bg-white/10 border border-gray-200 dark:border-white/10 hover:border-blue-400 dark:hover:border-blue-500 transition duration-300 rounded-2xl p-6 shadow-lg hover:shadow-xl flex flex-col justify-between">
-      <div class="flex items-center mb-4">
-        <div class="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400 rounded-full">
-          <i data-lucide="{{ doc.icon }}" class="w-6 h-6"></i>
-        </div>
-        <h3 class="ml-4 text-lg font-semibold text-gray-900 dark:text-white group-hover:text-blue-500 transition-colors duration-200">
-          {{ doc.title }}
-        </h3>
-      </div>
-
-      <p class="text-sm text-gray-700 dark:text-gray-300 mb-6 leading-relaxed">
-        {{ doc.desc }}
-      </p>
-
-      <div class="flex gap-3 mt-auto">
-        <a
-          href="{{ url_for('static', filename='Instruction/' + doc.file) }}"
-          target="_blank"
-          rel="noopener"
-          class="flex-1 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition"
-        >
-          <i data-lucide="eye" class="w-4 h-4 mr-2"></i> View
-        </a>
-        <a
-          href="{{ url_for('static', filename='Instruction/' + doc.file) }}"
-          download
-          class="flex-1 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition"
-        >
-          <i data-lucide="download" class="w-4 h-4 mr-2"></i> Download
-        </a>
-      </div>
-    </article>
-    {% endfor %}
-  </div>
-</section>
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const sections = {
-    web: document.getElementById("webSection"),
-    app: document.getElementById("appSection"),
-    resources: document.getElementById("resourcesSection")
-  };
-
-  let currentPlayingVideo = null;
-
-  const pauseAllVideos = () => {
-    document.querySelectorAll(".video-thumb video").forEach(video => {
-      video.pause();
-      video.currentTime = 0;
-      video.style.pointerEvents = "none";
-      video.classList.add("opacity-0");
-    });
-    document.querySelectorAll(".video-thumb img.thumbnail").forEach(img => {
-      img.style.display = "block";
-    });
-    currentPlayingVideo = null;
-  };
-
-  const setupVideoThumbs = (key) => {
-    const section = sections[key];
-    if (!section) return;
-
-    section.querySelectorAll(".video-thumb").forEach(thumb => {
-      const video = thumb.querySelector("video");
-      const isYouTube = !video && thumb.dataset.src;
-
-      // Remove any existing controls overlay
-      thumb.querySelectorAll(".video-controls").forEach(c => c.remove());
-
-      if (video) {
-        video.muted = true;
-        video.playsInline = true;
-        video.controls = false;
-
-        const fullscreenBtn = document.createElement("button");
-        fullscreenBtn.className = "absolute bottom-2 right-2 bg-black/60 text-white p-1 rounded z-10 hover:bg-black/80";
-        fullscreenBtn.innerHTML = `
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/>
-          </svg>
-        `;
-        thumb.appendChild(fullscreenBtn);
-
-        const thumbnail = thumb.querySelector("img.thumbnail");
-
-        const showThumbnail = () => {
-          thumbnail.style.display = "block";
-          video.classList.add("opacity-0");
-          video.style.pointerEvents = "none";
-        };
-
-        const hideThumbnail = () => {
-          thumbnail.style.display = "none";
-          video.classList.remove("opacity-0");
-          video.style.pointerEvents = "auto";
-        };
-
-        const playVideo = (manual = false) => {
-          if (currentPlayingVideo && currentPlayingVideo !== video) {
-            currentPlayingVideo.pause();
-            currentPlayingVideo.currentTime = 0;
-            const prevThumb = currentPlayingVideo.closest(".video-thumb");
-            prevThumb?.querySelector("img.thumbnail")?.style?.setProperty("display", "block");
-            currentPlayingVideo.classList.add("opacity-0");
-            currentPlayingVideo.style.pointerEvents = "none";
-          }
-
-          hideThumbnail();
-          if (manual) {
-            video.muted = false;
-            video.controls = true;
-          } else {
-            video.muted = true;
-            video.controls = false;
-          }
-
-          video.play().catch(e => console.warn("Autoplay failed:", e));
-          currentPlayingVideo = video;
-        };
-
-        const togglePlayback = () => {
-          if (video.paused) {
-            playVideo(true);
-          } else {
-            video.pause();
-            showThumbnail();
-            currentPlayingVideo = null;
-          }
-        };
-
-        fullscreenBtn.addEventListener("click", e => {
-          e.stopPropagation();
-          const requestFull = video.requestFullscreen || video.webkitRequestFullscreen || video.msRequestFullscreen;
-          requestFull?.call(video);
-        });
-
-        thumb.addEventListener("click", togglePlayback);
-        thumb.addEventListener("mouseenter", () => playVideo(false));
-        thumb.addEventListener("mouseleave", () => {
-          if (!video.controls) {
-            video.pause();
-            video.currentTime = 0;
-            showThumbnail();
-            currentPlayingVideo = null;
-          }
-        });
-
-        video.addEventListener("ended", () => {
-          showThumbnail();
-          currentPlayingVideo = null;
-        });
-
-        showThumbnail();
+    /* Mobile Hover Fix */
+    @media (hover: none) and (pointer: coarse) {
+      .video-thumb:hover {
+        transform: none;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
       }
+    }
 
-      // YouTube logic
-      else if (isYouTube) {
-        let iframe = null;
-        const videoId = thumb.dataset.src.split("/embed/")[1];
+    /* Dark theme glass card */
+    @media (prefers-color-scheme: dark) {
+      .glass-card {
+        background-color: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+    }
+  </style>
+</head>
+<body class="bg-dark text-white font-sans min-h-screen transition-colors">
 
-        thumb.addEventListener("mouseenter", () => {
-          pauseAllVideos();
-          if (!iframe) {
-            iframe = document.createElement("iframe");
-            iframe.src = `${thumb.dataset.src}?autoplay=1&mute=0`;
-            iframe.setAttribute("allow", "autoplay; encrypted-media");
-            iframe.allowFullscreen = true;
-            iframe.frameBorder = "0";
-            iframe.className = "w-full h-full rounded-xl";
-            thumb.innerHTML = '';
-            thumb.appendChild(iframe);
-          }
-        });
+  <div class="max-w-7xl mx-auto px-4 py-10">
 
-        thumb.addEventListener("mouseleave", () => {
-          thumb.innerHTML = `
+    <!-- Header -->
+    <header class="flex justify-between items-center mb-8" role="banner">
+      <h1 class="text-4xl sm:text-5xl font-extrabold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent" tabindex="0">
+        Lucid ELD Tutorials
+      </h1>
+
+      <button
+        id="themeToggle"
+        aria-label="Toggle light and dark theme"
+        title="Toggle theme"
+        aria-pressed="false"
+      >
+        🌙
+      </button>
+    </header>
+
+    <!-- Guidance Toggle -->
+    <nav
+      class="guidance-toggle flex justify-center gap-3 bg-[#1a1a1a] p-3 rounded-xl shadow-inner max-w-lg mx-auto mb-12"
+      role="radiogroup"
+      aria-label="Select guidance type"
+    >
+      <input type="radio" id="web" name="guidance" checked aria-checked="true" />
+      <label for="web" id="webLabel" class="flex items-center gap-2" tabindex="0">
+        <i class="fas fa-globe text-blue-400" aria-hidden="true"></i> Web Guidance
+      </label>
+
+      <input type="radio" id="app" name="guidance" aria-checked="false" />
+      <label for="app" id="appLabel" class="flex items-center gap-2" tabindex="0">
+        <i class="fas fa-mobile-alt text-green-400" aria-hidden="true"></i> App Guidance
+      </label>
+
+      <input type="radio" id="resources" name="guidance" aria-checked="false" />
+      <label for="resources" id="resourcesLabel" class="flex items-center gap-2" tabindex="0">
+        <i class="fas fa-folder-open text-yellow-400" aria-hidden="true"></i> Resources
+      </label>
+    </nav>
+
+    <!-- Sections -->
+    <main role="main" tabindex="-1">
+      <!-- Web Tutorials -->
+      <section id="webSection" class="visible-section" aria-labelledby="webLabel">
+        <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2 text-white">
+          <i class="fas fa-flag-usa text-blue-400" aria-hidden="true"></i> English Tutorials
+        </h2>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+          {% for i in range(1, 9) %}
+          <article class="video-thumb relative" tabindex="0" role="button" aria-pressed="false" aria-label="Play English Web Tutorial {{ i }}">
+            <video
+              src="/static/webttrl/english{{ i }}.mp4"
+              loop
+              preload="metadata"
+              poster="/static/webttrl/english{{ i }}.jpg"
+              title="English Web Tutorial {{ i }}"
+              muted
+              playsinline
+              class="opacity-0"
+              aria-hidden="true"
+            ></video>
             <img
-              src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg"
-              alt="YouTube thumbnail"
-              class="rounded-xl shadow-lg hover:scale-105 transition-transform duration-300 w-full h-full object-cover thumbnail"
+              src="/static/webttrl/english{{ i }}.jpg"
+              alt="Thumbnail for English Web Tutorial {{ i }}"
+              class="thumbnail"
+              loading="lazy"
+              decoding="async"
+              aria-hidden="true"
             />
-          `;
-          iframe = null;
+            <div class="video-controls" aria-hidden="true">
+              <button class="btn-play" aria-label="Play video">
+                <i data-lucide="play-circle" aria-hidden="true"></i>
+              </button>
+              <button class="btn-pause hidden" aria-label="Pause video">
+                <i data-lucide="pause-circle" aria-hidden="true"></i>
+              </button>
+            </div>
+          </article>
+          {% endfor %}
+        </div>
+      </section>
+
+      <!-- App Tutorials -->
+      <section id="appSection" aria-labelledby="appLabel">
+        <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2 text-white">
+          <i class="fas fa-flag-es text-green-400" aria-hidden="true"></i> Spanish Tutorials
+        </h2>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+          {% for i in range(1, 9) %}
+          <article class="video-thumb relative" tabindex="0" role="button" aria-pressed="false" aria-label="Play Spanish App Tutorial {{ i }}">
+            <video
+              src="/static/appttrl/spanish{{ i }}.mp4"
+              loop
+              preload="metadata"
+              poster="/static/appttrl/spanish{{ i }}.jpg"
+              title="Spanish App Tutorial {{ i }}"
+              muted
+              playsinline
+              class="opacity-0"
+              aria-hidden="true"
+            ></video>
+            <img
+              src="/static/appttrl/spanish{{ i }}.jpg"
+              alt="Thumbnail for Spanish App Tutorial {{ i }}"
+              class="thumbnail"
+              loading="lazy"
+              decoding="async"
+              aria-hidden="true"
+            />
+            <div class="video-controls" aria-hidden="true">
+              <button class="btn-play" aria-label="Play video">
+                <i data-lucide="play-circle" aria-hidden="true"></i>
+              </button>
+              <button class="btn-pause hidden" aria-label="Pause video">
+                <i data-lucide="pause-circle" aria-hidden="true"></i>
+              </button>
+            </div>
+          </article>
+          {% endfor %}
+        </div>
+      </section>
+
+      <!-- Resources -->
+      <section id="resourcesSection" aria-labelledby="resourcesLabel">
+        <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2 text-white">
+          <i class="fas fa-flag-fr text-yellow-400" aria-hidden="true"></i> French Tutorials
+        </h2>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+          {% for i in range(1, 9) %}
+          <article class="video-thumb relative" tabindex="0" role="button" aria-pressed="false" aria-label="Play French Resource Tutorial {{ i }}">
+            <video
+              src="/static/resourcetrl/french{{ i }}.mp4"
+              loop
+              preload="metadata"
+              poster="/static/resourcetrl/french{{ i }}.jpg"
+              title="French Resource Tutorial {{ i }}"
+              muted
+              playsinline
+              class="opacity-0"
+              aria-hidden="true"
+            ></video>
+            <img
+              src="/static/resourcetrl/french{{ i }}.jpg"
+              alt="Thumbnail for French Resource Tutorial {{ i }}"
+              class="thumbnail"
+              loading="lazy"
+              decoding="async"
+              aria-hidden="true"
+            />
+            <div class="video-controls" aria-hidden="true">
+              <button class="btn-play" aria-label="Play video">
+                <i data-lucide="play-circle" aria-hidden="true"></i>
+              </button>
+              <button class="btn-pause hidden" aria-label="Pause video">
+                <i data-lucide="pause-circle" aria-hidden="true"></i>
+              </button>
+            </div>
+          </article>
+          {% endfor %}
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    // Lucide Icons Initialization
+    lucide.createIcons();
+
+    // Theme Toggle Logic
+    const themeToggleBtn = document.getElementById('themeToggle');
+    const darkThemeClass = 'dark';
+    const body = document.body;
+
+    // Load theme preference on load
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      body.classList.add(darkThemeClass);
+      themeToggleBtn.textContent = '☀️';
+      themeToggleBtn.setAttribute('aria-pressed', 'true');
+    } else {
+      body.classList.remove(darkThemeClass);
+      themeToggleBtn.textContent = '🌙';
+      themeToggleBtn.setAttribute('aria-pressed', 'false');
+    }
+
+    themeToggleBtn.addEventListener('click', () => {
+      const isDark = body.classList.toggle(darkThemeClass);
+      if (isDark) {
+        themeToggleBtn.textContent = '☀️';
+        themeToggleBtn.setAttribute('aria-pressed', 'true');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        themeToggleBtn.textContent = '🌙';
+        themeToggleBtn.setAttribute('aria-pressed', 'false');
+        localStorage.setItem('theme', 'light');
+      }
+    });
+
+    // Guidance Sections Toggle
+    const guidanceRadios = document.querySelectorAll('input[name="guidance"]');
+    const sections = {
+      web: document.getElementById('webSection'),
+      app: document.getElementById('appSection'),
+      resources: document.getElementById('resourcesSection'),
+    };
+
+    function setActiveSection(selectedId) {
+      Object.entries(sections).forEach(([key, section]) => {
+        if (key === selectedId) {
+          section.classList.add('visible-section');
+          section.setAttribute('aria-hidden', 'false');
+        } else {
+          section.classList.remove('visible-section');
+          section.setAttribute('aria-hidden', 'true');
+        }
+      });
+    }
+
+    guidanceRadios.forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        setActiveSection(e.target.id);
+      });
+    });
+
+    // Initialize active section on load based on checked radio
+    const initiallyChecked = [...guidanceRadios].find(radio => radio.checked);
+    if (initiallyChecked) setActiveSection(initiallyChecked.id);
+
+    // Video playback control with event delegation
+    document.querySelector('main').addEventListener('click', (event) => {
+      const thumb = event.target.closest('.video-thumb');
+      if (!thumb) return;
+
+      const video = thumb.querySelector('video');
+      const img = thumb.querySelector('img.thumbnail');
+      const btnPlay = thumb.querySelector('.btn-play');
+      const btnPause = thumb.querySelector('.btn-pause');
+
+      if (!video) return;
+
+      if (video.paused) {
+        // Pause any other playing videos
+        document.querySelectorAll('video').forEach(v => {
+          if (v !== video) {
+            v.pause();
+            v.classList.add('opacity-0');
+            const otherThumb = v.closest('.video-thumb');
+            if (otherThumb) {
+              otherThumb.querySelector('img.thumbnail').classList.remove('opacity-0');
+              otherThumb.querySelector('.btn-play').classList.remove('hidden');
+              otherThumb.querySelector('.btn-pause').classList.add('hidden');
+              otherThumb.setAttribute('aria-pressed', 'false');
+            }
+          }
         });
+
+        video.play();
+        video.classList.remove('opacity-0');
+        if (img) img.classList.add('opacity-0');
+        btnPlay.classList.add('hidden');
+        btnPause.classList.remove('hidden');
+        thumb.setAttribute('aria-pressed', 'true');
+      } else {
+        video.pause();
+        video.classList.add('opacity-0');
+        if (img) img.classList.remove('opacity-0');
+        btnPlay.classList.remove('hidden');
+        btnPause.classList.add('hidden');
+        thumb.setAttribute('aria-pressed', 'false');
       }
     });
-  };
 
-  // Switch sections
-  document.querySelectorAll('input[name="guidance"]').forEach(input => {
-    input.addEventListener("change", () => {
-      pauseAllVideos();
-      for (let key in sections) {
-        sections[key]?.classList.remove("visible-section");
-      }
-      const selected = sections[input.id];
-      selected?.classList.add("visible-section");
-      setupVideoThumbs(input.id);
+    // Accessibility: Keyboard support for video thumbs (Enter or Space to toggle play/pause)
+    document.querySelectorAll('.video-thumb').forEach(thumb => {
+      thumb.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          thumb.click();
+        }
+      });
     });
-  });
-
-  // Initialize default
-  const defaultInput = document.querySelector('input[name="guidance"]:checked');
-  if (defaultInput) {
-    const key = defaultInput.id;
-    sections[key]?.classList.add("visible-section");
-    setupVideoThumbs(key);
-  }
-
-  // Theme toggle
-  const themeToggle = document.getElementById("themeToggle");
-  themeToggle?.addEventListener("click", () => {
-    document.body.classList.toggle("bg-white");
-    document.body.classList.toggle("text-black");
-    document.body.classList.toggle("bg-dark");
-    document.body.classList.toggle("text-white");
-    themeToggle.textContent = themeToggle.textContent === "🌙" ? "☀️" : "🌙";
-  });
-});
-</script>
-<script src="https://cdn.jsdelivr.net/npm/lucide/dist/lucide.min.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    lucide.replace();
-  });
-</script>
-     <script>
-  lucide.createIcons();
-</script>
-  </body>
+  </script>
+</body>
 </html>
