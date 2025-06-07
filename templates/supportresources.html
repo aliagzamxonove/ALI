@@ -440,7 +440,7 @@ document.addEventListener("DOMContentLoaded", () => {
       img.style.display = "block";
     });
     document.querySelectorAll(".video-thumb iframe").forEach(iframe => {
-      iframe.src = "";  // unload YouTube frames
+      iframe.src = "";
     });
     currentPlayingVideo = null;
   };
@@ -455,7 +455,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const isYouTube = !video && thumb.dataset.src;
 
       const cleanupControls = () => {
-        thumb.querySelectorAll(".video-controls, .fullscreen-btn").forEach(el => el.remove());
+        thumb.querySelectorAll(".video-controls, .fullscreen-btn, .mute-btn").forEach(el => el.remove());
       };
       cleanupControls();
 
@@ -463,16 +463,6 @@ document.addEventListener("DOMContentLoaded", () => {
         video.muted = true;
         video.playsInline = true;
         video.controls = false;
-
-        const fullscreenBtn = document.createElement("button");
-        fullscreenBtn.className = "fullscreen-btn absolute bottom-2 right-2 bg-black/60 text-white p-1 rounded z-10 hover:bg-black/80";
-        fullscreenBtn.setAttribute("aria-label", "Toggle Full Screen");
-        fullscreenBtn.innerHTML = `
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2 2v-3M16 21h3a2 2 0 0 0-2-2v-3"/>
-          </svg>`;
-        thumb.appendChild(fullscreenBtn);
 
         const showThumbnail = () => {
           thumbnail.style.display = "block";
@@ -501,15 +491,21 @@ document.addEventListener("DOMContentLoaded", () => {
           currentPlayingVideo = video;
         };
 
-        const togglePlayback = () => {
-          if (video.paused) playVideo(true);
-          else {
-            video.pause();
-            showThumbnail();
-            currentPlayingVideo = null;
-          }
+        const toggleMute = () => {
+          video.muted = !video.muted;
+          muteBtn.innerHTML = video.muted ? mutedSVG : unmutedSVG;
         };
 
+        // Fullscreen Button
+        const fullscreenBtn = document.createElement("button");
+        fullscreenBtn.className = "fullscreen-btn absolute bottom-2 right-2 bg-black/60 text-white p-1 rounded z-10 hover:bg-black/80";
+        fullscreenBtn.setAttribute("aria-label", "Toggle Full Screen");
+        fullscreenBtn.innerHTML = `
+          <!-- Your original fullscreen icon preserved -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2 2v-3M16 21h3a2 2 0 0 0-2-2v-3"/>
+          </svg>`;
         fullscreenBtn.addEventListener("click", e => {
           e.stopPropagation();
           hideThumbnail();
@@ -518,6 +514,30 @@ document.addEventListener("DOMContentLoaded", () => {
           video.muted = false;
           video.style.pointerEvents = "auto";
           (video.requestFullscreen || video.webkitRequestFullscreen || video.msRequestFullscreen)?.call(video);
+        });
+
+        // Mute/Unmute Button
+        const muteBtn = document.createElement("button");
+        muteBtn.className = "mute-btn absolute bottom-2 left-2 bg-black/60 text-white p-1 rounded z-10 hover:bg-black/80";
+        muteBtn.setAttribute("aria-label", "Toggle Mute");
+        const mutedSVG = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <line x1="23" y1="9" x2="17" y2="15"/>
+            <line x1="17" y1="9" x2="23" y2="15"/>
+          </svg>`;
+        const unmutedSVG = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+          </svg>`;
+        muteBtn.innerHTML = mutedSVG;
+        muteBtn.addEventListener("click", e => {
+          e.stopPropagation();
+          toggleMute();
         });
 
         const pointerPlayEvt = isTouch ? "touchstart" : "mouseenter";
@@ -545,8 +565,9 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         showThumbnail();
-      } 
-      else if (isYouTube) {
+        thumb.appendChild(fullscreenBtn);
+        thumb.appendChild(muteBtn);
+      } else if (isYouTube) {
         const videoId = thumb.dataset.src.split("/embed/")[1];
         const img = document.createElement("img");
         img.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
