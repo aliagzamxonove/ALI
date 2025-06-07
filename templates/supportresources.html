@@ -7,6 +7,7 @@
   <link rel="icon" href="{{ url_for('static', filename='IFTA5458.png') }}" type="image/png" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -327,30 +328,31 @@ video.invisible {
 </section>
 
 <section id="resourcesSection" class="hidden-section">
-  <h2 class="text-3xl font-extrabold mb-8 text-center tracking-tight bg-gradient-to-r from-blue-400 to-blue-600 text-transparent bg-clip-text">
-    📁 Instruction Files
+  <h2 class="text-3xl font-extrabold mb-8 text-center tracking-tight bg-gradient-to-r from-blue-500 to-blue-700 text-transparent bg-clip-text dark:from-blue-400 dark:to-blue-600">
+    <i data-lucide="folder-open" class="inline-block w-7 h-7 text-blue-600 dark:text-blue-400 mr-2 align-middle"></i>
+    Instruction Files
   </h2>
 
   <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
     {% set docs = [
-      {'icon': 'fa-file-alt', 'title': 'DOT Inspection', 'desc': 'DOT Inspection File', 'file': 'DOT Inspection.pdf'},
-      {'icon': 'fa-check-circle', 'title': 'Certificate of Compliance', 'desc': 'Compliance Documentation', 'file': 'Certificate of Compliance.pdf'},
-      {'icon': 'fa-exclamation-triangle', 'title': 'Malfunction Manual', 'desc': 'Troubleshooting Guide', 'file': 'Malfunction Manual.pdf'},
-      {'icon': 'fa-truck', 'title': 'Truck Sticker', 'desc': 'Cab Sticker Template', 'file': 'Truck Sticker.pdf'},
-      {'icon': 'fa-book-open', 'title': 'User Manual', 'desc': 'Full Product Manual', 'file': 'Users Manual.pdf'}
+      {'icon': 'file-text', 'title': 'DOT Inspection', 'desc': 'DOT Inspection File', 'file': 'DOT Inspection.pdf'},
+      {'icon': 'check-circle', 'title': 'Certificate of Compliance', 'desc': 'Compliance Documentation', 'file': 'Certificate of Compliance.pdf'},
+      {'icon': 'alert-triangle', 'title': 'Malfunction Manual', 'desc': 'Troubleshooting Guide', 'file': 'Malfunction Manual.pdf'},
+      {'icon': 'truck', 'title': 'Truck Sticker', 'desc': 'Cab Sticker Template', 'file': 'Truck Sticker.pdf'},
+      {'icon': 'book-open', 'title': 'User Manual', 'desc': 'Full Product Manual', 'file': 'Users Manual.pdf'}
     ] %}
     {% for doc in docs %}
-    <article class="group backdrop-blur-lg bg-white/5 dark:bg-white/10 border border-white/10 hover:border-white/20 transition duration-300 rounded-2xl p-6 shadow-lg hover:shadow-xl flex flex-col justify-between">
+    <article class="group backdrop-blur-lg bg-white/80 dark:bg-white/10 border border-gray-200 dark:border-white/10 hover:border-blue-400 dark:hover:border-blue-500 transition duration-300 rounded-2xl p-6 shadow-lg hover:shadow-xl flex flex-col justify-between">
       <div class="flex items-center mb-4">
-        <div class="flex items-center justify-center w-12 h-12 bg-primary/20 text-primary rounded-full">
-          <i class="fas {{ doc.icon }} text-xl"></i>
+        <div class="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400 rounded-full">
+          <i data-lucide="{{ doc.icon }}" class="w-6 h-6"></i>
         </div>
-        <h3 class="ml-4 text-lg font-semibold text-white group-hover:text-blue-400 transition-colors duration-200">
+        <h3 class="ml-4 text-lg font-semibold text-gray-900 dark:text-white group-hover:text-blue-500 transition-colors duration-200">
           {{ doc.title }}
         </h3>
       </div>
 
-      <p class="text-sm text-gray-300 mb-6 leading-relaxed">
+      <p class="text-sm text-gray-700 dark:text-gray-300 mb-6 leading-relaxed">
         {{ doc.desc }}
       </p>
 
@@ -361,14 +363,14 @@ video.invisible {
           rel="noopener"
           class="flex-1 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition"
         >
-          <i class="fas fa-eye mr-2"></i> View
+          <i data-lucide="eye" class="w-4 h-4 mr-2"></i> View
         </a>
         <a
           href="{{ url_for('static', filename='Instruction/' + doc.file) }}"
           download
           class="flex-1 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition"
         >
-          <i class="fas fa-download mr-2"></i> Download
+          <i data-lucide="download" class="w-4 h-4 mr-2"></i> Download
         </a>
       </div>
     </article>
@@ -567,6 +569,9 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener('DOMContentLoaded', () => {
     lucide.replace();
   });
+</script>
+     <script>
+  lucide.createIcons();
 </script>
   </body>
 </html>
