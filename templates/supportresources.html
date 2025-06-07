@@ -189,6 +189,44 @@ video.invisible {
     border: 1px solid rgba(255, 255, 255, 0.08);
   }
 }
+   video:-webkit-full-screen {
+  position: static !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  border-radius: 0 !important;
+  z-index: 9999 !important;
+  pointer-events: auto !important;
+  opacity: 1 !important;
+}
+
+video:-moz-full-screen {
+  /* same styles as above */
+}
+
+video:-ms-fullscreen {
+  /* same styles as above */
+}
+
+video:fullscreen {
+  position: static !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  border-radius: 0 !important;
+  z-index: 9999 !important;
+  pointer-events: auto !important;
+  opacity: 1 !important;
+}
+   .video-thumb:-webkit-full-screen,
+.video-thumb:-moz-full-screen,
+.video-thumb:-ms-fullscreen,
+.video-thumb:fullscreen {
+  overflow: visible !important;
+  border-radius: 0 !important;
+}
 </style>
   </head>
 
@@ -387,6 +425,12 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   let currentPlayingVideo = null;
+  let isFullscreen = false;
+
+  // Track fullscreen mode
+  document.addEventListener("fullscreenchange", () => {
+    isFullscreen = !!document.fullscreenElement;
+  });
 
   const pauseAllVideos = () => {
     document.querySelectorAll(".video-thumb video").forEach(video => {
@@ -409,7 +453,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const video = thumb.querySelector("video");
       const isYouTube = !video && thumb.dataset.src;
 
-      // Remove any existing controls overlay
       thumb.querySelectorAll(".video-controls").forEach(c => c.remove());
 
       if (video) {
@@ -476,6 +519,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         fullscreenBtn.addEventListener("click", e => {
           e.stopPropagation();
+
+          video.classList.remove("opacity-0");
+          video.style.pointerEvents = "auto";
+          video.controls = true;
+          video.muted = false;
+
           const requestFull = video.requestFullscreen || video.webkitRequestFullscreen || video.msRequestFullscreen;
           requestFull?.call(video);
         });
@@ -483,7 +532,7 @@ document.addEventListener("DOMContentLoaded", () => {
         thumb.addEventListener("click", togglePlayback);
         thumb.addEventListener("mouseenter", () => playVideo(false));
         thumb.addEventListener("mouseleave", () => {
-          if (!video.controls) {
+          if (!video.controls && !isFullscreen) {
             video.pause();
             video.currentTime = 0;
             showThumbnail();
@@ -492,14 +541,15 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         video.addEventListener("ended", () => {
-          showThumbnail();
-          currentPlayingVideo = null;
+          if (!isFullscreen) {
+            showThumbnail();
+            currentPlayingVideo = null;
+          }
         });
 
         showThumbnail();
       }
 
-      // YouTube logic
       else if (isYouTube) {
         let iframe = null;
         const videoId = thumb.dataset.src.split("/embed/")[1];
@@ -532,7 +582,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
-  // Switch sections
   document.querySelectorAll('input[name="guidance"]').forEach(input => {
     input.addEventListener("change", () => {
       pauseAllVideos();
@@ -545,7 +594,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Initialize default
   const defaultInput = document.querySelector('input[name="guidance"]:checked');
   if (defaultInput) {
     const key = defaultInput.id;
@@ -553,7 +601,6 @@ document.addEventListener("DOMContentLoaded", () => {
     setupVideoThumbs(key);
   }
 
-  // Theme toggle
   const themeToggle = document.getElementById("themeToggle");
   themeToggle?.addEventListener("click", () => {
     document.body.classList.toggle("bg-white");
