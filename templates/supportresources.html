@@ -225,16 +225,22 @@ video.invisible {
   <h2 class="text-2xl font-bold mb-4">📘 English Tutorials</h2>
   <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
     {% for i in range(1, 9) %}
-    <div class="video-thumb">
+    <div class="video-thumb relative">
       <video
         src="/static/webttrl/english{{ i }}.mp4"
         loop
         preload="metadata"
         poster="/static/webttrl/english{{ i }}.jpg"
-        controls
         title="English Web Tutorial {{ i }}"
+        playsinline
+        muted
         class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"
       ></video>
+      <img
+        src="/static/webttrl/english{{ i }}.jpg"
+        alt="English Web Tutorial {{ i }}"
+        class="absolute top-0 left-0 w-full h-full object-cover z-0 thumbnail rounded-xl"
+      />
     </div>
     {% endfor %}
   </div>
@@ -242,16 +248,22 @@ video.invisible {
   <h2 class="text-2xl font-bold mb-4">📙 Spanish Tutorials</h2>
   <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
     {% for i in range(1, 9) %}
-    <div class="video-thumb">
+    <div class="video-thumb relative">
       <video
         src="/static/webttrl/spanish{{ i }}.mp4"
         loop
         preload="metadata"
         poster="/static/webttrl/spanish{{ i }}.jpg"
-        controls
         title="Spanish Web Tutorial {{ i }}"
+        playsinline
+        muted
         class="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105 shadow-lg"
       ></video>
+      <img
+        src="/static/webttrl/spanish{{ i }}.jpg"
+        alt="Spanish Web Tutorial {{ i }}"
+        class="absolute top-0 left-0 w-full h-full object-cover z-0 thumbnail rounded-xl"
+      />
     </div>
     {% endfor %}
   </div>
@@ -260,36 +272,34 @@ video.invisible {
 <section id="appSection" class="hidden-section">
   <h2 class="text-2xl font-bold mb-4">📘 English App Tutorials</h2>
   <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-    <!-- English App Tutorials -->
     {% set english_app_links = [
       'J4p1s2QMxkg', '03hSWNy8VZY', 'qWLkn2hgcc0', 'S_Oq-5PTT7U',
       'PHqGo5uNogY', 'K-1O8aNsaDs', '7gFhHji96rU', 'Qx-0E4M7C0Y'
     ] %}
     {% for id in english_app_links %}
-    <div class="video-thumb" data-src="https://www.youtube.com/embed/{{ id }}">
+    <div class="video-thumb relative" data-src="https://www.youtube.com/embed/{{ id }}">
       <img
         src="https://img.youtube.com/vi/{{ id }}/hqdefault.jpg"
         alt="English App Tutorial {{ loop.index }}"
-        class="rounded-xl shadow-lg hover:scale-105 transition-transform duration-300 w-full h-full object-cover"
-      >
+        class="rounded-xl shadow-lg hover:scale-105 transition-transform duration-300 w-full h-full object-cover thumbnail"
+      />
     </div>
     {% endfor %}
   </div>
 
   <h2 class="text-2xl font-bold mb-4">📙 Spanish App Tutorials</h2>
   <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    <!-- Spanish App Tutorials -->
     {% set spanish_app_links = [
       'ATY10BvSVFQ', 'My0ZI28BSO8', 'aCklwsKUckY', 'GZ74l7o6oes',
       'OjyAhJEW4QE', 'pOmQesXY6uk', 'vd8Fhr6rI70', 'y9FKUj1eeek'
     ] %}
     {% for id in spanish_app_links %}
-    <div class="video-thumb" data-src="https://www.youtube.com/embed/{{ id }}">
+    <div class="video-thumb relative" data-src="https://www.youtube.com/embed/{{ id }}">
       <img
         src="https://img.youtube.com/vi/{{ id }}/hqdefault.jpg"
         alt="Spanish App Tutorial {{ loop.index }}"
-        class="rounded-xl shadow-lg hover:scale-105 transition-transform duration-300 w-full h-full object-cover"
-      >
+        class="rounded-xl shadow-lg hover:scale-105 transition-transform duration-300 w-full h-full object-cover thumbnail"
+      />
     </div>
     {% endfor %}
   </div>
@@ -336,227 +346,191 @@ video.invisible {
   </div>
 </section>
 
-<script>  
-document.addEventListener("DOMContentLoaded", () => {  
-  const sections = {  
-    web: document.getElementById("webSection"),  
-    app: document.getElementById("appSection"),  
-    resources: document.getElementById("resourcesSection"),  
-  };  
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const sections = {
+    web: document.getElementById("webSection"),
+    app: document.getElementById("appSection"),
+    resources: document.getElementById("resourcesSection")
+  };
 
-  let currentPlayingVideo = null;  
+  let currentPlayingVideo = null;
 
-  const pauseAllVideos = () => {  
-    document.querySelectorAll(".video-thumb video").forEach(video => {  
-      video.pause();  
-      video.currentTime = 0;  
-      video.classList.add("invisible");  
-      video.style.pointerEvents = "none";  
-    });  
-    document.querySelectorAll(".video-thumb img.thumbnail").forEach(img => {  
-      img.style.display = "block";  
-    });  
-    currentPlayingVideo = null;  
-  };  
+  const pauseAllVideos = () => {
+    document.querySelectorAll(".video-thumb video").forEach(video => {
+      video.pause();
+      video.currentTime = 0;
+      video.style.pointerEvents = "none";
+      video.classList.add("opacity-0");
+    });
+    document.querySelectorAll(".video-thumb img.thumbnail").forEach(img => {
+      img.style.display = "block";
+    });
+    currentPlayingVideo = null;
+  };
 
-  const setupVideoThumbs = (key) => {  
-    const section = sections[key];  
-    if (!section) return;  
+  const setupVideoThumbs = (key) => {
+    const section = sections[key];
+    if (!section) return;
 
-    section.querySelectorAll(".video-thumb").forEach(thumb => {  
-      const video = thumb.querySelector("video");  
-      const isYouTube = !video && thumb.dataset.src;  
+    section.querySelectorAll(".video-thumb").forEach(thumb => {
+      const video = thumb.querySelector("video");
+      const isYouTube = !video && thumb.dataset.src;
 
-      thumb.querySelectorAll(".video-controls").forEach(c => c.remove());  
+      // Remove any existing controls overlay
+      thumb.querySelectorAll(".video-controls").forEach(c => c.remove());
 
-      if (!video && !isYouTube) return;  
+      if (video) {
+        video.muted = true;
+        video.playsInline = true;
+        video.controls = false;
 
-      if (video) {  
-        let isManuallyPlayed = false;  
+        const fullscreenBtn = document.createElement("button");
+        fullscreenBtn.className = "absolute bottom-2 right-2 bg-black/60 text-white p-1 rounded z-10 hover:bg-black/80";
+        fullscreenBtn.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/>
+          </svg>
+        `;
+        thumb.appendChild(fullscreenBtn);
 
-        const controls = document.createElement("div");  
-        controls.className = "video-controls absolute bottom-2 right-2 z-10";  
+        const thumbnail = thumb.querySelector("img.thumbnail");
 
-        const fullscreenBtn = document.createElement("button");  
-        fullscreenBtn.innerHTML = `  
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">  
-            <path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/>  
-          </svg>`;  
-        fullscreenBtn.className = "bg-black/50 text-white p-1 rounded hover:bg-black/70 transition";  
-        fullscreenBtn.setAttribute("aria-label", "Fullscreen");  
-        controls.appendChild(fullscreenBtn);  
-        thumb.appendChild(controls);  
+        const showThumbnail = () => {
+          thumbnail.style.display = "block";
+          video.classList.add("opacity-0");
+          video.style.pointerEvents = "none";
+        };
 
-        const thumbnail = document.createElement("img");  
-        thumbnail.src = thumb.dataset.thumbnail || video.getAttribute("poster") || "";  
-        thumbnail.alt = "Video thumbnail";  
-        thumbnail.className = "absolute top-0 left-0 w-full h-full object-cover z-0 thumbnail";  
-        thumb.appendChild(thumbnail);  
-        video.classList.add("invisible");  
-        video.style.pointerEvents = "none";  
+        const hideThumbnail = () => {
+          thumbnail.style.display = "none";
+          video.classList.remove("opacity-0");
+          video.style.pointerEvents = "auto";
+        };
 
-        const showThumbnail = () => {  
-          video.classList.add("invisible");  
-          video.style.pointerEvents = "none";  
-          thumbnail.style.display = "block";  
-        };  
+        const playVideo = (manual = false) => {
+          if (currentPlayingVideo && currentPlayingVideo !== video) {
+            currentPlayingVideo.pause();
+            currentPlayingVideo.currentTime = 0;
+            const prevThumb = currentPlayingVideo.closest(".video-thumb");
+            prevThumb?.querySelector("img.thumbnail")?.style?.setProperty("display", "block");
+            currentPlayingVideo.classList.add("opacity-0");
+            currentPlayingVideo.style.pointerEvents = "none";
+          }
 
-        const hideThumbnail = () => {  
-          thumbnail.style.display = "none";  
-          video.classList.remove("invisible");  
-          video.style.pointerEvents = "auto";  
-        };  
+          hideThumbnail();
+          if (manual) {
+            video.muted = false;
+            video.controls = true;
+          } else {
+            video.muted = true;
+            video.controls = false;
+          }
 
-        const playVideo = (manual = false) => {  
-          if (currentPlayingVideo && currentPlayingVideo !== video) {  
-            currentPlayingVideo.pause();  
-            currentPlayingVideo.currentTime = 0;  
-            currentPlayingVideo.classList.add("invisible");  
-            currentPlayingVideo.style.pointerEvents = "none";  
-            const prevThumb = currentPlayingVideo.closest(".video-thumb");  
-            if (prevThumb) {  
-              const prevImg = prevThumb.querySelector("img.thumbnail");  
-              if (prevImg) prevImg.style.display = "block";  
-            }  
-          }  
+          video.play().catch(e => console.warn("Autoplay failed:", e));
+          currentPlayingVideo = video;
+        };
 
-          hideThumbnail();  
+        const togglePlayback = () => {
+          if (video.paused) {
+            playVideo(true);
+          } else {
+            video.pause();
+            showThumbnail();
+            currentPlayingVideo = null;
+          }
+        };
 
-          // Убираем mute для видео в appSection  
-          const isInAppSection = thumb.closest("#appSection") !== null;  
+        fullscreenBtn.addEventListener("click", e => {
+          e.stopPropagation();
+          const requestFull = video.requestFullscreen || video.webkitRequestFullscreen || video.msRequestFullscreen;
+          requestFull?.call(video);
+        });
 
-          if (manual || isInAppSection) {  
-            video.muted = false;  
-            video.controls = true;  
-          } else {  
-            video.muted = true;  
-            video.controls = false;  
-          }  
+        thumb.addEventListener("click", togglePlayback);
+        thumb.addEventListener("mouseenter", () => playVideo(false));
+        thumb.addEventListener("mouseleave", () => {
+          if (!video.controls) {
+            video.pause();
+            video.currentTime = 0;
+            showThumbnail();
+            currentPlayingVideo = null;
+          }
+        });
 
-          video.play().catch(err => console.warn("Play error:", err));  
-          currentPlayingVideo = video;  
-          isManuallyPlayed = manual;  
-        };  
+        video.addEventListener("ended", () => {
+          showThumbnail();
+          currentPlayingVideo = null;
+        });
 
-        const togglePlayback = () => {  
-          if (video.paused) {  
-            playVideo(true);  
-          } else {  
-            video.pause();  
-            showThumbnail();  
-            currentPlayingVideo = null;  
-          }  
-        };  
+        showThumbnail();
+      }
 
-        fullscreenBtn.addEventListener("click", (e) => {  
-          e.stopPropagation();  
-          const reqFull = video.requestFullscreen || video.webkitRequestFullscreen || video.msRequestFullscreen;  
-          if (reqFull) reqFull.call(video);  
-        });  
+      // YouTube logic
+      else if (isYouTube) {
+        let iframe = null;
+        const videoId = thumb.dataset.src.split("/embed/")[1];
 
-        thumb.addEventListener("click", () => togglePlayback());  
+        thumb.addEventListener("mouseenter", () => {
+          pauseAllVideos();
+          if (!iframe) {
+            iframe = document.createElement("iframe");
+            iframe.src = `${thumb.dataset.src}?autoplay=1&mute=0`;
+            iframe.setAttribute("allow", "autoplay; encrypted-media");
+            iframe.allowFullscreen = true;
+            iframe.frameBorder = "0";
+            iframe.className = "w-full h-full rounded-xl";
+            thumb.innerHTML = '';
+            thumb.appendChild(iframe);
+          }
+        });
 
-        // Hover (desktop autoplay muted)  
-        thumb.addEventListener("mouseenter", () => {  
-          if (!isManuallyPlayed) playVideo(false);  
-        });  
+        thumb.addEventListener("mouseleave", () => {
+          thumb.innerHTML = `
+            <img
+              src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg"
+              alt="YouTube thumbnail"
+              class="rounded-xl shadow-lg hover:scale-105 transition-transform duration-300 w-full h-full object-cover thumbnail"
+            />
+          `;
+          iframe = null;
+        });
+      }
+    });
+  };
 
-        thumb.addEventListener("mouseleave", () => {  
-          if (!isManuallyPlayed) {  
-            video.pause();  
-            video.currentTime = 0;  
-            showThumbnail();  
-            currentPlayingVideo = null;  
-          }  
-        });  
+  // Switch sections
+  document.querySelectorAll('input[name="guidance"]').forEach(input => {
+    input.addEventListener("change", () => {
+      pauseAllVideos();
+      for (let key in sections) {
+        sections[key]?.classList.remove("visible-section");
+      }
+      const selected = sections[input.id];
+      selected?.classList.add("visible-section");
+      setupVideoThumbs(input.id);
+    });
+  });
 
-        // Touch (mobile autoplay muted)  
-        thumb.addEventListener("touchstart", () => {  
-          if (!isManuallyPlayed) playVideo(false);  
-        });  
+  // Initialize default
+  const defaultInput = document.querySelector('input[name="guidance"]:checked');
+  if (defaultInput) {
+    const key = defaultInput.id;
+    sections[key]?.classList.add("visible-section");
+    setupVideoThumbs(key);
+  }
 
-        thumb.addEventListener("touchend", () => {  
-          if (!isManuallyPlayed) {  
-            video.pause();  
-            video.currentTime = 0;  
-            showThumbnail();  
-            currentPlayingVideo = null;  
-          }  
-        });  
-
-        video.addEventListener("ended", () => {  
-          showThumbnail();  
-          currentPlayingVideo = null;  
-        });  
-
-        showThumbnail();  
-      }  
-
-      // YouTube (если есть)  
-      else if (isYouTube) {  
-        let iframe = null;  
-
-        thumb.addEventListener("mouseenter", () => {  
-          pauseAllVideos();  
-          if (!iframe) {  
-            const isInAppSection = thumb.closest("#appSection") !== null;  
-            const muteParam = isInAppSection ? "0" : "1";  
-            iframe = document.createElement("iframe");  
-            iframe.src = `${thumb.dataset.src}?autoplay=1&mute=${muteParam}`;  
-            iframe.allow = "autoplay; encrypted-media";  
-            iframe.allowFullscreen = true;  
-            iframe.frameBorder = "0";  
-            iframe.className = "w-full h-full";  
-            thumb.innerHTML = "";  
-            thumb.appendChild(iframe);  
-          }  
-        });  
-
-        thumb.addEventListener("mouseleave", () => {  
-          const match = thumb.dataset.src.match(/embed\/([^?&]+)/);  
-          const videoId = match ? match[1] : null;  
-          if (videoId) {  
-            thumb.innerHTML = `<img src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" class="w-full h-full object-cover" alt="YouTube thumbnail">`;  
-          }  
-          iframe = null;  
-        });  
-      }  
-    });  
-  };  
-
-  // Переключение секций  
-  document.querySelectorAll('input[name="guidance"]').forEach(input => {  
-    input.addEventListener("change", () => {  
-      pauseAllVideos();  
-      for (let key in sections) {  
-        sections[key].classList.remove("visible-section");  
-      }  
-      const selected = sections[input.id];  
-      selected.classList.add("visible-section");  
-      setupVideoThumbs(input.id);  
-    });  
-  });  
-
-  // Инициализация секции по умолчанию  
-  const defaultInput = document.querySelector('input[name="guidance"]:checked');  
-  if (defaultInput) {  
-    const key = defaultInput.id;  
-    if (sections[key]) {  
-      sections[key].classList.add("visible-section");  
-      setupVideoThumbs(key);  
-    }  
-  }  
-
-  // Тоггл темы  
-  const themeToggle = document.getElementById("themeToggle");  
-  themeToggle?.addEventListener("click", () => {  
-    document.body.classList.toggle("bg-white");  
-    document.body.classList.toggle("text-black");  
-    document.body.classList.toggle("bg-dark");  
-    document.body.classList.toggle("text-white");  
-    themeToggle.textContent = themeToggle.textContent === "🌙" ? "☀️" : "🌙";  
-  });  
-});  
+  // Theme toggle
+  const themeToggle = document.getElementById("themeToggle");
+  themeToggle?.addEventListener("click", () => {
+    document.body.classList.toggle("bg-white");
+    document.body.classList.toggle("text-black");
+    document.body.classList.toggle("bg-dark");
+    document.body.classList.toggle("text-white");
+    themeToggle.textContent = themeToggle.textContent === "🌙" ? "☀️" : "🌙";
+  });
+});
 </script>
 <script src="https://cdn.jsdelivr.net/npm/lucide/dist/lucide.min.js"></script>
 <script>
