@@ -1,9 +1,11 @@
-from flask import Flask, request, render_template, redirect, url_for, session, send_file, after_this_request, flash
+from flask import Flask, request, render_template, redirect, current_app, url_for, session, send_file, after_this_request, flash
 from fpdf import FPDF
+import logging
 import os
 import re
 import hashlib
 import html
+import mimetypes
 from flask_mail import Mail, Message
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
