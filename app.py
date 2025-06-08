@@ -34,7 +34,7 @@ msg = MIMEMultipart()
 # Attach HTML
 msg_alt = MIMEMultipart('alternative')
 msg.attach(msg_alt)
-msg_alt.attach(MIMEText(html, 'html'))
+msg_alt.attach(MIMEText(html_content, 'html'))
 
 # Attach the logo image with CID
 with open("static/logolucid.gif", 'rb') as f:
