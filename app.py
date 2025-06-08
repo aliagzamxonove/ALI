@@ -23,6 +23,9 @@ USER_CREDENTIALS = {
     'password': hashlib.sha256('Pass4%33word'.encode()).hexdigest()  # Hashed password
 }
 
+# Create the main multipart message
+msg = MIMEMultipart()
+
 # Attach HTML
 msg_alt = MIMEMultipart('alternative')
 msg.attach(msg_alt)
