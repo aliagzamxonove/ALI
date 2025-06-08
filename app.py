@@ -386,6 +386,7 @@ def mail_page():
                         mime_type = mime_type or 'application/octet-stream'
                         part = MIMEApplication(f.read(), Name=filename)
                         part['Content-Disposition'] = f'attachment; filename="{filename}"'
+                        part.mime_type = mime_type  # save for later
                         full_files.append(part)
                 except Exception as file_err:
                     logger.exception(f"Error reading file {path}")
@@ -394,7 +395,6 @@ def mail_page():
                 flash(f"File not found: {os.path.basename(path)}", "error")
 
         try:
-            # Prepare email content based on type
             if email_type == "instructions":
                 subject = "Required ELD Instruction Pack – Please Print & Keep in Truck"
                 message_html = render_template('emails/instructions.html')
@@ -422,6 +422,7 @@ def mail_page():
                     if file and file.filename:
                         part = MIMEApplication(file.read(), Name=file.filename)
                         part['Content-Disposition'] = f'attachment; filename="{file.filename}"'
+                        part.mime_type = mimetypes.guess_type(file.filename)[0] or 'application/octet-stream'
                         full_files.append(part)
 
             elif email_type == "information":
@@ -451,13 +452,11 @@ def mail_page():
                 flash("Unknown email type!", "error")
                 return redirect(url_for('mail_page'))
 
-            # Create the email message
             msg = Message(subject=subject,
                           sender=current_app.config['MAIL_USERNAME'],
                           recipients=[email],
                           html=message_html)
 
-            # Embed logo in the email through CID
             logo_path = os.path.join(current_app.root_path, 'static', 'logolucid.gif')
             if os.path.exists(logo_path):
                 with open(logo_path, 'rb') as img:
@@ -471,11 +470,10 @@ def mail_page():
             else:
                 logger.warning("Logo file not found at static/logolucid.gif")
 
-            # Attach files
             for part in full_files:
                 msg.attach(
                     filename=part.get_filename(),
-                    content_type='application/octet-stream',
+                    content_type=getattr(part, 'mime_type', 'application/octet-stream'),
                     data=part.get_payload(decode=True)
                 )
 
