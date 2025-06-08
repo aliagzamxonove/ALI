@@ -11,16 +11,21 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 import smtplib
+from werkzeug.security import generate_password_hash, check_password_hash
+
+# Setup logger
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 GENERATED_FOLDER = os.path.join(os.getcwd(), 'generated')
 os.makedirs(GENERATED_FOLDER, exist_ok=True)
 
-# Store the username and hashed password
+# Store the username and hashed password securely
 USER_CREDENTIALS = {
     'username': 'admin',
-    'password': hashlib.sha256('Pass4%33word'.encode()).hexdigest()  # Hashed password
+    'password': generate_password_hash('Pass4%33word')  # Using werkzeug for secure hashing
 }
 
 # Create the main multipart message
@@ -355,6 +360,7 @@ def timezones():
 def tutorial():
     return render_template('tutorial.html')
 
+
 @app.route('/mail', methods=['GET', 'POST'])
 def mail_page():
     if 'username' not in session:
@@ -367,27 +373,31 @@ def mail_page():
 
         if not email or not email_type:
             flash("Email and email type are required!", "error")
-            return redirect('/mail')  # ❗️Make sure to return here
-        else:
-            message = ""
-            subject = ""
-            full_files = []
+            return redirect(url_for('mail_page'))
 
+        subject, message_html, full_files = '', '', []
+
+        def add_file(path):
+            if os.path.exists(path):
+                try:
+                    with open(path, 'rb') as f:
+                        filename = os.path.basename(path)
+                        mime_type, _ = mimetypes.guess_type(filename)
+                        mime_type = mime_type or 'application/octet-stream'
+                        part = MIMEApplication(f.read(), Name=filename)
+                        part['Content-Disposition'] = f'attachment; filename="{filename}"'
+                        full_files.append(part)
+                except Exception as file_err:
+                    logger.exception(f"Error reading file {path}")
+                    flash(f"Error reading file: {os.path.basename(path)}", "error")
+            else:
+                flash(f"File not found: {os.path.basename(path)}", "error")
+
+        try:
+            # Prepare email content based on type
             if email_type == "instructions":
-                message = """Hello,
-
-Attached you will find the official **ELD Instruction Pack** for Lucid ELD. These documents are **required by FMCSA** and **must be printed and kept in the truck at all times**.
-
-They provide essential guidance on how to operate the ELD system, handle malfunction procedures, and understand data transfer methods.
-
-If you have any questions or need help with anything, feel free to reach out—we’re here 24/7 to support you.
-
-Safe driving!
-
-Best regards,  
-Lucid ELD Support Team  
-www.lucideld.com"""
                 subject = "Required ELD Instruction Pack – Please Print & Keep in Truck"
+                message_html = render_template('emails/instructions.html')
 
                 files = [
                     "Users Manual.pdf",
@@ -397,161 +407,88 @@ www.lucideld.com"""
                     "Certificate of Compliance.pdf"
                 ]
                 for file in files:
-                    path = os.path.join(INSTRUCTION_FOLDER, file)
-                    if os.path.exists(path):
-                        with open(path, 'rb') as f:
-                            part = MIMEApplication(f.read(), Name=os.path.basename(path))
-                            part['Content-Disposition'] = f'attachment; filename="{os.path.basename(path)}"'
-                            full_files.append(part)
-                    else:
-                        flash(f"File not found: {file}", "error")
+                    add_file(os.path.join(INSTRUCTION_FOLDER, file))
 
             elif email_type == "ifta":
-                message = """Hello,
-
-As requested, please find attached the IFTA report(s) for your review.
-
-If you need assistance understanding or organizing these documents for your filings, don’t hesitate to reach out. We’re happy to help!
-
-Wishing you continued success and smooth operations.
-
-Best,  
-Lucid ELD Team  
-www.lucideld.com"""
                 subject = "IFTA Report Attached"
+                message_html = render_template('emails/ifta.html')
 
                 uploaded_files = request.files.getlist("ifta_files")
-                if not uploaded_files:
+                if not uploaded_files or all(f.filename == '' for f in uploaded_files):
                     flash("No files selected for IFTA!", "error")
-                    return redirect('/mail')
+                    return redirect(url_for('mail_page'))
 
-@app.route('/mail', methods=['GET', 'POST'])  
-def mail_page():  
-    if 'username' not in session:  
-        flash('Please log in to access the page.', 'warning')  
-        return redirect(url_for('login'))  
-  
-    if request.method == 'POST':  
-        email = request.form.get('email')  
-        email_type = request.form.get('email_type')  
-  
-        if not email or not email_type:  
-            flash("Email and email type are required!", "error")  
-            return redirect(url_for('mail_page'))  
-  
-        subject, message_html, full_files = '', '', []  
-  
-        def add_file(path):  
-            if os.path.exists(path):  
-                try:  
-                    with open(path, 'rb') as f:  
-                        filename = os.path.basename(path)  
-                        mime_type, _ = mimetypes.guess_type(filename)  
-                        mime_type = mime_type or 'application/octet-stream'  
-                        part = MIMEApplication(f.read(), Name=filename)  
-                        part['Content-Disposition'] = f'attachment; filename="{filename}"'  
-                        full_files.append(part)  
-                except Exception as file_err:  
-                    logger.exception(f"Error reading file {path}")  
-                    flash(f"Error reading file: {os.path.basename(path)}", "error")  
-            else:  
-                flash(f"File not found: {os.path.basename(path)}", "error")  
-  
-        try:  
-            # Prepare email content based on type  
-            if email_type == "instructions":  
-                subject = "Required ELD Instruction Pack – Please Print & Keep in Truck"  
-                message_html = render_template('emails/instructions.html')  
-  
-                files = [  
-                    "Users Manual.pdf",  
-                    "Malfunction Manual.pdf",  
-                    "Truck Sticker.pdf",  
-                    "DOT Inspection.pdf",  
-                    "Certificate of Compliance.pdf"  
-                ]  
-                for file in files:  
-                    add_file(os.path.join(INSTRUCTION_FOLDER, file))  
-  
-            elif email_type == "ifta":  
-                subject = "IFTA Report Attached"  
-                message_html = render_template('emails/ifta.html')  
-  
-                uploaded_files = request.files.getlist("ifta_files")  
-                if not uploaded_files or all(f.filename == '' for f in uploaded_files):  
-                    flash("No files selected for IFTA!", "error")  
-                    return redirect(url_for('mail_page'))  
-  
-                for file in uploaded_files:  
-                    if file and file.filename:  
-                        part = MIMEApplication(file.read(), Name=file.filename)  
-                        part['Content-Disposition'] = f'attachment; filename="{file.filename}"'  
-                        full_files.append(part)  
-  
-            elif email_type == "information":  
-                subject = "About Lucid ELD – What We Offer"  
-                message_html = render_template('emails/information.html')  
-  
-            elif email_type == "advertising":  
-                subject = "A Better ELD Solution for Your Fleet"  
-                message_html = render_template('emails/advertising.html')  
-  
-            elif email_type == "api":  
-                username = request.form.get('username')  
-                password = request.form.get('password')  
-                api_key = request.form.get('api_key')  
-  
-                if not username or not password or not api_key:  
-                    flash("Username, password, and API key are required!", "error")  
-                    return redirect(url_for('mail_page'))  
-  
-                subject = "API Credentials and Key"  
-                message_html = render_template('emails/api.html',  
-                                               username=username,  
-                                               password=password,  
-                                               api_key=api_key)  
-  
-            else:  
-                flash("Unknown email type!", "error")  
-                return redirect(url_for('mail_page'))  
-  
-            # Создаём письмо  
-            msg = Message(subject=subject,  
-                          sender=current_app.config['MAIL_USERNAME'],  
-                          recipients=[email],  
-                          html=message_html)  
-  
-            # Встраиваем логотип в письмо через CID  
-            logo_path = os.path.join(current_app.root_path, 'static', 'logolucid.gif')  
-            if os.path.exists(logo_path):  
-                with open(logo_path, 'rb') as img:  
-                    msg.attach(  
-                        filename="logolucid.gif",  
-                        content_type="image/gif",  
-                        data=img.read(),  
-                        disposition='inline',  
-                        headers=[('Content-ID', '<logo_cid>')]  
-                    )  
-            else:  
-                logger.warning("Logo file not found at static/logolucid.gif")  
-  
-            # Прикрепляем файлы  
-            for part in full_files:  
-                msg.attach(  
-                    filename=part.get_filename(),  
-                    content_type='application/octet-stream',  
-                    data=part.get_payload(decode=True)  
-                )  
-  
-            mail_sender.send(msg)  
-            flash("Email successfully sent!", "success")  
-  
-        except Exception as e:  
-            logger.exception("Failed to send email")  
-            flash(f"Failed to send email: {str(e)}", "error")  
-  
-        return redirect(url_for('mail_page'))  
-  
+                for file in uploaded_files:
+                    if file and file.filename:
+                        part = MIMEApplication(file.read(), Name=file.filename)
+                        part['Content-Disposition'] = f'attachment; filename="{file.filename}"'
+                        full_files.append(part)
+
+            elif email_type == "information":
+                subject = "About Lucid ELD – What We Offer"
+                message_html = render_template('emails/information.html')
+
+            elif email_type == "advertising":
+                subject = "A Better ELD Solution for Your Fleet"
+                message_html = render_template('emails/advertising.html')
+
+            elif email_type == "api":
+                username = request.form.get('username')
+                password = request.form.get('password')
+                api_key = request.form.get('api_key')
+
+                if not username or not password or not api_key:
+                    flash("Username, password, and API key are required!", "error")
+                    return redirect(url_for('mail_page'))
+
+                subject = "API Credentials and Key"
+                message_html = render_template('emails/api.html',
+                                               username=username,
+                                               password=password,
+                                               api_key=api_key)
+
+            else:
+                flash("Unknown email type!", "error")
+                return redirect(url_for('mail_page'))
+
+            # Create the email message
+            msg = Message(subject=subject,
+                          sender=current_app.config['MAIL_USERNAME'],
+                          recipients=[email],
+                          html=message_html)
+
+            # Embed logo in the email through CID
+            logo_path = os.path.join(current_app.root_path, 'static', 'logolucid.gif')
+            if os.path.exists(logo_path):
+                with open(logo_path, 'rb') as img:
+                    msg.attach(
+                        filename="logolucid.gif",
+                        content_type="image/gif",
+                        data=img.read(),
+                        disposition='inline',
+                        headers=[('Content-ID', '<logo_cid>')]
+                    )
+            else:
+                logger.warning("Logo file not found at static/logolucid.gif")
+
+            # Attach files
+            for part in full_files:
+                msg.attach(
+                    filename=part.get_filename(),
+                    content_type='application/octet-stream',
+                    data=part.get_payload(decode=True)
+                )
+
+            mail_sender.send(msg)
+            flash("Email successfully sent!", "success")
+            logger.info(f"Email sent to {email} with subject '{subject}'")
+
+        except Exception as e:
+            logger.exception("Failed to send email")
+            flash(f"Failed to send email: {str(e)}", "error")
+
+        return redirect(url_for('mail_page'))
+
     return render_template('mail.html')  
     
 
