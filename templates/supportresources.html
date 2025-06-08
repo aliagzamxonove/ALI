@@ -237,7 +237,7 @@ video:fullscreen {
 }
 </style>
   </head>
-
+<body class="bg-dark text-white font-sans min-h-screen transition-colors">
       <div class="max-w-7xl mx-auto px-4 py-10">
   
       <!-- Title and Toggle -->
@@ -261,22 +261,47 @@ video:fullscreen {
 
   
 <!-- Guidance Toggle -->
-<div class="guidance-toggle flex justify-center items-center gap-3 bg-[#1a1a1a]/70 backdrop-blur p-3 rounded-full shadow-inner max-w-xl mx-auto mb-14 border border-white/10">
-      <input type="radio" id="web" name="guidance" class="hidden peer/web" checked />
-      <label for="web" class="px-4 py-2 rounded-full cursor-pointer flex items-center gap-2 text-sm font-medium transition-all peer-checked/web:bg-blue-500 peer-checked/web:text-white hover:bg-blue-500/20">
-        <i class="fas fa-globe"></i> Web
-      </label>
+<div
+  class="guidance-toggle flex justify-center items-center gap-4 
+         bg-white/10 backdrop-blur-md p-4 rounded-2xl 
+         shadow-lg max-w-xl mx-auto mb-16 border border-white/20
+         transition-colors duration-300"
+  role="radiogroup"
+  aria-label="Select guidance type"
+>
+  <input type="radio" id="web" name="guidance" class="hidden peer/web" checked />
+  <label
+    for="web"
+    class="px-5 py-2 rounded-full cursor-pointer flex items-center gap-3
+           text-sm font-semibold text-white transition-all
+           peer-checked/web:bg-blue-600 peer-checked/web:text-white
+           hover:bg-blue-600/80 hover:scale-105"
+  >
+    <i class="fas fa-globe text-blue-400 peer-checked/web:text-white transition-colors"></i> Web
+  </label>
 
-      <input type="radio" id="app" name="guidance" class="hidden peer/app" />
-      <label for="app" class="px-4 py-2 rounded-full cursor-pointer flex items-center gap-2 text-sm font-medium transition-all peer-checked/app:bg-green-500 peer-checked/app:text-white hover:bg-green-500/20">
-        <i class="fas fa-mobile-alt"></i> App
-      </label>
+  <input type="radio" id="app" name="guidance" class="hidden peer/app" />
+  <label
+    for="app"
+    class="px-5 py-2 rounded-full cursor-pointer flex items-center gap-3
+           text-sm font-semibold text-white transition-all
+           peer-checked/app:bg-green-600 peer-checked/app:text-white
+           hover:bg-green-600/80 hover:scale-105"
+  >
+    <i class="fas fa-mobile-alt text-green-400 peer-checked/app:text-white transition-colors"></i> App
+  </label>
 
-      <input type="radio" id="resources" name="guidance" class="hidden peer/resources" />
-      <label for="resources" class="px-4 py-2 rounded-full cursor-pointer flex items-center gap-2 text-sm font-medium transition-all peer-checked/resources:bg-yellow-500 peer-checked/resources:text-black hover:bg-yellow-500/20">
-        <i class="fas fa-folder-open"></i> Resources
-      </label>
-    </div>
+  <input type="radio" id="resources" name="guidance" class="hidden peer/resources" />
+  <label
+    for="resources"
+    class="px-5 py-2 rounded-full cursor-pointer flex items-center gap-3
+           text-sm font-semibold text-white transition-all
+           peer-checked/resources:bg-yellow-500 peer-checked/resources:text-black
+           hover:bg-yellow-500/80 hover:scale-105"
+  >
+    <i class="fas fa-folder-open text-yellow-400 peer-checked/resources:text-black transition-colors"></i> Resources
+  </label>
+</div>
 
 <!-- Sections -->
 <section id="webSection" class="visible-section">
