@@ -106,33 +106,81 @@
   }
 
   /* Переключатели (guidance) */
-  .guidance-toggle input {
-    display: none;
-  }
-
-  .guidance-toggle label {
-    padding: 0.6rem 1.25rem;
-    font-weight: 600;
-    font-size: 0.95rem;
-    border-radius: 0.5rem;
-    color: #cbd5e1;
-    transition: all 0.3s;
+    .guidance-toggle label {
     cursor: pointer;
+    padding: 0.5rem 1.25rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    /* Use current text color inherited from container */
+    color: currentColor;
+
+    /* Smooth transitions only on bg and transform */
+    transition: background-color 0.25s ease-in-out, transform 0.15s ease-in-out;
+
+    /* GPU optimization hint */
+    will-change: background-color, transform;
   }
 
-  .guidance-toggle input:checked + label {
-    background: linear-gradient(to right, #4b5563, #1f2937);
-    color: white;
-    transform: scale(1.05);
-  }
-     .guidance-toggle label {
-    will-change: background-color, color, transform;
-    transition-property: background-color, color, transform;
-    transition-duration: 250ms;
-    transition-timing-function: ease-in-out;
-  }
   .guidance-toggle label:hover {
-    transform: scale(1.05);
+    background-color: var(--hover-bg, rgba(255 255 255 / 0.1));
+    /* No scale to reduce lag */
+    /* transform: scale(1.03); */
+  }
+
+  /* Checked states */
+  input#web:checked ~ label[for="web"] {
+    background-color: #2563eb; /* blue-600 */
+    color: white;
+  }
+
+  input#app:checked ~ label[for="app"] {
+    background-color: #16a34a; /* green-600 */
+    color: white;
+  }
+
+  input#resources:checked ~ label[for="resources"] {
+    background-color: #eab308; /* yellow-500 */
+    color: black;
+  }
+
+  /* Icons inherit label text color */
+  .guidance-toggle label i {
+    color: inherit !important;
+  }
+
+  /* Container styles */
+  .guidance-toggle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+
+    background-color: rgba(255 255 255 / 0.1); /* soft translucent */
+    border-radius: 1.5rem;
+    padding: 1rem 1.5rem;
+
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255 255 255 / 0.15);
+
+    max-width: 40rem;
+    margin: 0 auto 4rem auto;
+
+    /* Smooth color transition on container bg */
+    transition: background-color 0.3s ease;
+  }
+
+  /* Accessibility: prefers reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .guidance-toggle label,
+    .guidance-toggle label:hover {
+      transition: none !important;
+      transform: none !important;
+    }
   }
 
   /* Плавное появление секций */
@@ -271,44 +319,23 @@ video:fullscreen {
   
 <!-- Guidance Toggle -->
 <div
-  class="guidance-toggle flex justify-center items-center gap-4
-         bg-white/10 backdrop-blur-sm p-4 rounded-2xl
-         shadow-md max-w-xl mx-auto mb-16 border border-white/20
-         transition-colors duration-300"
+  class="guidance-toggle"
   role="radiogroup"
   aria-label="Select guidance type"
 >
-  <input type="radio" id="web" name="guidance" class="hidden peer/web" checked />
-  <label
-    for="web"
-    class="px-5 py-2 rounded-full cursor-pointer flex items-center gap-3
-           text-sm font-semibold text-current
-           peer-checked/web:bg-blue-600 peer-checked/web:text-white
-           hover:bg-blue-600/80"
-  >
-    <i class="fas fa-globe text-blue-400 peer-checked/web:text-white transition-colors"></i> Web
+  <input type="radio" id="web" name="guidance" hidden checked />
+  <label for="web">
+    <i class="fas fa-globe"></i> Web
   </label>
 
-  <input type="radio" id="app" name="guidance" class="hidden peer/app" />
-  <label
-    for="app"
-    class="px-5 py-2 rounded-full cursor-pointer flex items-center gap-3
-           text-sm font-semibold text-current
-           peer-checked/app:bg-green-600 peer-checked/app:text-white
-           hover:bg-green-600/80"
-  >
-    <i class="fas fa-mobile-alt text-green-400 peer-checked/app:text-white transition-colors"></i> App
+  <input type="radio" id="app" name="guidance" hidden />
+  <label for="app">
+    <i class="fas fa-mobile-alt"></i> App
   </label>
 
-  <input type="radio" id="resources" name="guidance" class="hidden peer/resources" />
-  <label
-    for="resources"
-    class="px-5 py-2 rounded-full cursor-pointer flex items-center gap-3
-           text-sm font-semibold text-current
-           peer-checked/resources:bg-yellow-500 peer-checked/resources:text-black
-           hover:bg-yellow-500/80"
-  >
-    <i class="fas fa-folder-open text-yellow-400 peer-checked/resources:text-black transition-colors"></i> Resources
+  <input type="radio" id="resources" name="guidance" hidden />
+  <label for="resources">
+    <i class="fas fa-folder-open"></i> Resources
   </label>
 </div>
 
