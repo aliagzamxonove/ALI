@@ -128,8 +128,6 @@
 
   .guidance-toggle label:hover {
     background-color: var(--hover-bg, rgba(255 255 255 / 0.1));
-    /* No scale to reduce lag */
-    /* transform: scale(1.03); */
   }
 
   /* Checked states */
@@ -148,9 +146,13 @@
     color: black;
   }
 
-  /* Icons inherit label text color */
-  .guidance-toggle label i {
-    color: inherit !important;
+  /* SVG icons inherit label text color */
+  .guidance-toggle label svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    fill: currentColor;
+    flex-shrink: 0;
+    transition: fill 0.25s ease-in-out;
   }
 
   /* Container styles */
@@ -324,18 +326,24 @@ video:fullscreen {
   aria-label="Select guidance type"
 >
   <input type="radio" id="web" name="guidance" hidden checked />
-  <label for="web">
-    <i class="fas fa-globe"></i> Web
+  <label for="web" tabindex="0">
+    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" >
+      <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm5.07 4.57a7.5 7.5 0 0 1 2.5 4.45h-3.16a19.06 19.06 0 0 0-1.67-4.3 8.16 8.16 0 0 1 2.33-.15ZM12 4.12a17.74 17.74 0 0 1 1.89 4.75H10.1a18.25 18.25 0 0 1 1.88-4.75ZM5.14 7.66h3.16a19.1 19.1 0 0 0-1.67 4.31 8.1 8.1 0 0 1-2.33.15 7.47 7.47 0 0 1 2.84-4.46Zm-1 6.62h3.21a18.93 18.93 0 0 0 1.9 4.71 8.27 8.27 0 0 1-2.9.47 7.54 7.54 0 0 1-2.2-5.18Zm3.06 6.5a19.08 19.08 0 0 0 1.6-4.12h4.2a18.9 18.9 0 0 0 1.61 4.12 7.62 7.62 0 0 1-7.41 0Zm9.79-1.2a8.31 8.31 0 0 1-2.92-.5 18.92 18.92 0 0 0 1.91-4.65h3.23a7.67 7.67 0 0 1-2.22 5.15Zm2.35-6.64h-3.16a18.94 18.94 0 0 0-1.67-4.3 8.2 8.2 0 0 1 2.33-.15 7.49 7.49 0 0 1 2.5 4.45ZM12 19.88a17.79 17.79 0 0 1-1.9-4.73h3.79a17.73 17.73 0 0 1-1.89 4.73Z"/>
+    </svg> Web
   </label>
 
   <input type="radio" id="app" name="guidance" hidden />
-  <label for="app">
-    <i class="fas fa-mobile-alt"></i> App
+  <label for="app" tabindex="0">
+    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" >
+      <path d="M16.5 2.75h-9a1.25 1.25 0 0 0-1.25 1.25v16a1.25 1.25 0 0 0 1.25 1.25h9a1.25 1.25 0 0 0 1.25-1.25v-16a1.25 1.25 0 0 0-1.25-1.25Zm-4.5 16.75a.875.875 0 1 1 .875-.875A.876.876 0 0 1 12 19.5Zm4.25-2.25h-8.5v-11h8.5Z"/>
+    </svg> App
   </label>
 
   <input type="radio" id="resources" name="guidance" hidden />
-  <label for="resources">
-    <i class="fas fa-folder-open"></i> Resources
+  <label for="resources" tabindex="0">
+    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" >
+      <path d="M4 6a2 2 0 0 1 2-2h5.6a2 2 0 0 1 1.4.6l1.4 1.4H18a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Zm3 3v7h10v-7Z"/>
+    </svg> Resources
   </label>
 </div>
 
