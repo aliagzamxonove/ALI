@@ -11,6 +11,7 @@ from flask_mail import Mail, Message
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
+from markdown import markdown
 import smtplib
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -51,6 +52,9 @@ def strip_html_tags(text):
     text = re.sub(r'\*\*(.*?)\*\*', r'\1', text)  # Remove bold
     text = re.sub(r'\[(.*?)\]\((.*?)\)', r'\1', text)  # Remove markdown links
     return text
+
+def markdown_to_html(md_text):
+    return markdown(md_text)
 
 @app.route('/')
 def home():
