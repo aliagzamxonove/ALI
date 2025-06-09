@@ -45,6 +45,12 @@ UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
 INSTRUCTION_FOLDER = os.path.join(BASE_DIR, 'Instruction')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+# Helper function to strip markdown-style bold and links
+def strip_html_tags(text):
+    text = re.sub(r'\*\*(.*?)\*\*', r'\1', text)  # Remove bold
+    text = re.sub(r'\[(.*?)\]\((.*?)\)', r'\1', text)  # Remove markdown links
+    return text
+
 @app.route('/')
 def home():
     if 'username' in session:
