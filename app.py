@@ -454,7 +454,7 @@ def mail_page():
                         content_type="image/gif",
                         data=img.read(),
                         disposition='inline',
-                        headers=[('Content-ID', '<logolucid>')]
+                        headers=[('Content-ID': '<logolucid>')]
                     )
             else:
                 logger.warning("Logo file not found at static/logolucid.gif")
