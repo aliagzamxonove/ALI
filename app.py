@@ -47,14 +47,10 @@ UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
 INSTRUCTION_FOLDER = os.path.join(BASE_DIR, 'Instruction')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# Helper function to strip markdown-style bold and links
+# Helpers
 def strip_html_tags(text):
-    text = re.sub(r'\*\*(.*?)\*\*', r'\1', text)  # Remove bold
-    text = re.sub(r'\[(.*?)\]\((.*?)\)', r'\1', text)  # Remove markdown links
+    text = re.sub(r'<[^>]+>', '', text)
     return text
-
-def markdown_to_html(md_text):
-    return markdown(md_text)
 
 @app.route('/')
 def home():
@@ -363,6 +359,11 @@ def tutorial():
 
 @app.route('/mail', methods=['GET', 'POST'])
 def mail_page():
+    # 🔐 Require login
+    if 'username' not in session:
+        flash('Please log in to access the page.', 'warning')
+        return redirect(url_for('login'))
+
     if request.method == 'POST':
         email = request.form.get('email')
         email_type = request.form.get('email_type')
@@ -371,183 +372,101 @@ def mail_page():
             flash("Email and email type are required!", "error")
             return redirect('/mail')
 
-        subject = ""
-        message = ""
+        subject = None
+        html_message = None
         attachments = []
 
+        # Attach instruction pack files if needed
         if email_type == "instructions":
             subject = "Required ELD Instruction Pack – Please Print & Keep in Truck"
-            message = """Hello,
-
-Attached you will find the official **ELD Instruction Pack** for Lucid ELD. These documents are **required by FMCSA** and **must be printed and kept in the truck at all times**.
-
-They provide essential guidance on how to operate the ELD system, handle malfunction procedures, and understand data transfer methods.
-
-If you have any questions or need help with anything, feel free to reach out—we’re here 24/7 to support you.
-
-Safe driving!
-
-Best regards,  
-Lucid ELD Support Team  
-www.lucideld.com"""
-
-            files = [
-                "Users Manual.pdf",
-                "Malfunction Manual.pdf",
-                "Truck Sticker.pdf",
-                "DOT Inspection.pdf",
-                "Certificate of Compliance.pdf"
-            ]
-            for file in files:
-                path = os.path.join(INSTRUCTION_FOLDER, file)
+            html_message = render_template('emails/instructions.html')
+            for fname in [
+                "Users Manual.pdf", "Malfunction Manual.pdf", "Truck Sticker.pdf",
+                "DOT Inspection.pdf", "Certificate of Compliance.pdf"
+            ]:
+                path = os.path.join(INSTRUCTION_FOLDER, fname)
                 if os.path.exists(path):
                     with open(path, 'rb') as f:
-                        part = MIMEApplication(f.read(), Name=os.path.basename(path))
-                        part['Content-Disposition'] = f'attachment; filename="{file}"'
-                        attachments.append(part)
+                        part = MIMEApplication(f.read(), Name=fname)
+                        attachments.append((fname, part))
                 else:
-                    flash(f"File not found: {file}", "error")
+                    flash(f"File not found: {fname}", "error")
 
         elif email_type == "ifta":
             subject = "IFTA Report Attached"
-            message = """Hello,
-
-As requested, please find attached the IFTA report(s) for your review.
-
-If you need assistance understanding or organizing these documents for your filings, don’t hesitate to reach out. We’re happy to help!
-
-Wishing you continued success and smooth operations.
-
-Best,  
-Lucid ELD Team  
-www.lucideld.com"""
-
-            uploaded_files = request.files.getlist("ifta_files")
-            if not uploaded_files:
-                flash("No files selected for IFTA!", "error")
+            html_message = render_template('emails/ifta.html')
+            uploaded = request.files.getlist("ifta_files")
+            if not uploaded:
+                flash("No IFTA file supplied", "error")
                 return redirect('/mail')
-
-            for file in uploaded_files:
-                if file and file.filename:
-                    part = MIMEApplication(file.read(), Name=file.filename)
-                    part['Content-Disposition'] = f'attachment; filename="{file.filename}"'
-                    attachments.append(part)
+            for f in uploaded:
+                if f and f.filename:
+                    part = MIMEApplication(f.read(), Name=f.filename)
+                    attachments.append((f.filename, part))
 
         elif email_type == "information":
             subject = "About Lucid ELD – What We Offer"
-            message = """Hello,
-
-Thank you for your interest in Lucid ELD! Here’s a quick overview of what we provide:
-
-- **FMCSA Certified ELD system**  
-- **24/7 support from real humans**  
-- **Dedicated individual assistance for every driver**  
-- **IFTA calculation and reporting support**  
-- **Live GPS tracking and trip history**  
-- **User-friendly mobile app for iOS and Android**  
-- **Instant malfunction & compliance alerts**  
-- And much more...
-
-Our goal is to make your compliance journey as smooth, efficient, and stress-free as possible.
-
-If you’d like to get started or ask any questions, we’re always just a call or message away.
-
-Warm regards,  
-Lucid ELD Team  
-www.lucideld.com"""
+            html_message = render_template('emails/information.html')
 
         elif email_type == "advertising":
             subject = "A Better ELD Solution for Your Fleet"
-            message = """Hello!
-
-Managing a fleet is challenging enough—your ELD system shouldn’t make it harder.
-
-At **Lucid ELD**, we’ve built a platform that just works:
-
-✔ FMCSA-compliant, rock-solid performance  
-✔ Real-time GPS tracking & automated IFTA reports  
-✔ Transparent pricing—no hidden fees, ever  
-✔ 24/7 live support from real humans (yes, real people!)  
-✔ Easy-to-use app your drivers will actually like
-
-If your current system is frustrating—or if you just want something smoother and more reliable—we’d love to show you the difference.
-
-**Are you available for a quick 5-minute call today?**
-
-In the meantime, feel free to visit us at [www.lucideld.com](http://www.lucideld.com) or call me directly at (267) 578-8580.  
-Or just reply to this email—I’ll respond right away.
-
-Looking forward to helping you drive forward with confidence.
-
-Best,  
-Adam  
-Lucid ELD  
-(267) 578-8580  
-www.lucideld.com"""
+            html_message = render_template('emails/advertising.html')
 
         elif email_type == "api":
             username = request.form.get('username')
-            password = request.form.get('password')
+            password_field = request.form.get('password')
             api_key = request.form.get('api_key')
-
-            if not username or not password or not api_key:
-                flash("Username, password, and API key are required!", "error")
+            if not all([username, password_field, api_key]):
+                flash("Username, Password, and API Key are required!", "error")
                 return redirect('/mail')
-
             subject = "API Credentials and Key"
-            message = f"""Hello,
-
-Here are the credentials and API Key you requested for accessing our system:
-
-**Username:** {username}  
-**Password:** {password}  
-**API Key:** {api_key}
-
-Please make sure to keep this information secure. You can use these credentials to access our API and integrate with our system.
-
-If you need further assistance or have any questions, don't hesitate to reach out.
-
-Best regards,  
-Lucid ELD Support Team"""
-
-# Send email
-try:
-    msg = Message(
-        subject=subject,
-        sender=app.config['MAIL_USERNAME'],
-        recipients=[email]
-    )
-
-    msg.body = strip_html_tags(message)  # fallback plain text
-    msg.html = markdown_to_html(message)  # convert markdown to HTML
-
-    # Attach logo inline (GIF)
-    try:
-        with open("static/logolucid.gif", 'rb') as img:
-            msg.attach(
-                filename="logolucid.gif",
-                content_type="image/gif",
-                data=img.read(),
-                disposition='inline',
-                headers=[['Content-ID', '<logolucid>']]
+            html_message = render_template(
+                'emails/api.html',
+                username=username,
+                password=password_field,
+                api_key=api_key
             )
-    except FileNotFoundError:
-        print("Warning: static/logolucid.gif not found. Email will be sent without logo.")
 
-    # Attach uploaded files
-    for part in attachments:
-        msg.attach(
-            filename=part.get_filename(),
-            content_type='application/octet-stream',
-            data=part.get_payload(decode=True)
-        )
+        else:
+            flash("Unknown email type!", "error")
+            return redirect('/mail')
 
-    mail_sender.send(msg)
-    flash("Email successfully sent!", "success")
+        # Send email
+        try:
+            msg = Message(
+                subject=subject,
+                sender=app.config['MAIL_USERNAME'],
+                recipients=[email]
+            )
+            msg.body = strip_html_tags(html_message)
+            msg.html = html_message
 
-except Exception as e:
-    print(f"Error sending email: {e}")
-    flash(f"Failed to send email: {str(e)}", "error")
+            # Attach inline logo
+            try:
+                with open(os.path.join(BASE_DIR, 'static/logolucid.gif'), 'rb') as img:
+                    msg.attach(
+                        filename="logolucid.gif",
+                        content_type="image/gif",
+                        data=img.read(),
+                        disposition='inline',
+                        headers=[['Content-ID', '<logolucid>']]
+                    )
+            except FileNotFoundError:
+                logger.warning("Inline logo not found, skipping.")
+
+            # Attach other files
+            for fname, part in attachments:
+                msg.attach(
+                    filename=fname,
+                    content_type='application/octet-stream',
+                    data=part.get_payload(decode=True)
+                )
+
+            mail.send(msg)
+            flash("Email successfully sent!", "success")
+        except Exception as err:
+            logger.error(f"Error sending email: {err}")
+            flash(f"Failed to send email: {err}", "error")
 
         return redirect('/mail')
 
