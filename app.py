@@ -510,27 +510,44 @@ If you need further assistance or have any questions, don't hesitate to reach ou
 Best regards,  
 Lucid ELD Support Team"""
 
-        # Send email
-        try:
-            msg = Message(subject=subject,
-                          sender=app.config['MAIL_USERNAME'],
-                          recipients=[email])
+# Send email
+try:
+    msg = Message(
+        subject=subject,
+        sender=app.config['MAIL_USERNAME'],
+        recipients=[email]
+    )
 
-            msg.body = strip_html_tags(message)  # fallback plain text
-            msg.html = markdown_to_html(message)  # direct markdown to HTML
+    msg.body = strip_html_tags(message)  # fallback plain text
+    msg.html = markdown_to_html(message)  # convert markdown to HTML
 
-            for part in attachments:
-                msg.attach(
-                    filename=part.get_filename(),
-                    content_type='application/octet-stream',
-                    data=part.get_payload(decode=True)
-                )
+    # Attach logo inline (GIF)
+    try:
+        with open("static/logolucid.gif", 'rb') as img:
+            msg.attach(
+                filename="logolucid.gif",
+                content_type="image/gif",
+                data=img.read(),
+                disposition='inline',
+                headers=[['Content-ID', '<logolucid>']]
+            )
+    except FileNotFoundError:
+        print("Warning: static/logolucid.gif not found. Email will be sent without logo.")
 
-            mail_sender.send(msg)
-            flash("Email successfully sent!", "success")
-        except Exception as e:
-            print(f"Error sending email: {e}")
-            flash(f"Failed to send email: {str(e)}", "error")
+    # Attach uploaded files
+    for part in attachments:
+        msg.attach(
+            filename=part.get_filename(),
+            content_type='application/octet-stream',
+            data=part.get_payload(decode=True)
+        )
+
+    mail_sender.send(msg)
+    flash("Email successfully sent!", "success")
+
+except Exception as e:
+    print(f"Error sending email: {e}")
+    flash(f"Failed to send email: {str(e)}", "error")
 
         return redirect('/mail')
 
