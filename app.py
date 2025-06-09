@@ -503,8 +503,10 @@ Lucid ELD Support Team"""
         try:
             msg = Message(subject=subject,
                           sender=app.config['MAIL_USERNAME'],
-                          recipients=[email],
-                          body=message)
+                          recipients=[email])
+
+            msg.body = strip_html_tags(message)  # fallback plain text
+            msg.html = render_template('emails/base_email.html', content=markdown_to_html(message))
 
             for part in attachments:
                 msg.attach(
