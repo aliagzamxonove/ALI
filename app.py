@@ -27,20 +27,6 @@ USER_CREDENTIALS = {
     'username': 'admin',
     'password': generate_password_hash('Pass4%33word')  # Using werkzeug for secure hashing
 }
-
-# Create the main multipart message
-msg = MIMEMultipart()
-
-# Attach HTML
-msg_alt = MIMEMultipart('alternative')
-msg.attach(msg_alt)
-msg_alt.attach(MIMEText(html_content, 'html'))
-
-# Attach the logo image with CID
-with open("static/logolucid.gif", 'rb') as f:
-    img = MIMEImage(f.read())
-    img.add_header('Content-ID', '<logolucid>')
-    msg.attach(img)
     
 # Flask-Mail Configuration (use environment variables for security)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
