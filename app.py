@@ -517,7 +517,7 @@ Lucid ELD Support Team"""
                           recipients=[email])
 
             msg.body = strip_html_tags(message)  # fallback plain text
-            msg.html = render_template('emails/base_email.html', content=markdown_to_html(message))
+            msg.html = markdown_to_html(message)  # direct markdown to HTML
 
             for part in attachments:
                 msg.attach(
