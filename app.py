@@ -364,22 +364,22 @@ def mail_page():
             flash("Email and email type are required!", "error")
             return redirect(url_for('mail_page'))
 
-        subject, message_html, full_files = '', '', []
+        subject = ""
+        message_html = ""
+        attachments = []
 
         def add_file(path):
             if os.path.exists(path):
                 try:
                     with open(path, 'rb') as f:
                         filename = os.path.basename(path)
-                        mime_type, _ = mimetypes.guess_type(filename)
-                        mime_type = mime_type or 'application/octet-stream'
-                        part = MIMEApplication(f.read(), Name=filename)
-                        part['Content-Disposition'] = f'attachment; filename="{filename}"'
-                        part.mime_type = mime_type  # save for later
-                        full_files.append(part)
+                        content_type = mimetypes.guess_type(filename)[0] or 'application/octet-stream'
+                        file_data = f.read()
+                        attachments.append((filename, content_type, file_data))
+                        logger.info(f"File attached: {filename}")
                 except Exception as file_err:
                     logger.exception(f"Error reading file {path}")
-                    flash(f"Error reading file: {os.path.basename(path)}", "error")
+                    flash(f"Error reading file: {filename}", "error")
             else:
                 flash(f"File not found: {os.path.basename(path)}", "error")
 
@@ -387,7 +387,6 @@ def mail_page():
             if email_type == "instructions":
                 subject = "Required ELD Instruction Pack – Please Print & Keep in Truck"
                 message_html = render_template('emails/instructions.html')
-
                 files = [
                     "Users Manual.pdf",
                     "Malfunction Manual.pdf",
@@ -409,10 +408,9 @@ def mail_page():
 
                 for file in uploaded_files:
                     if file and file.filename:
-                        part = MIMEApplication(file.read(), Name=file.filename)
-                        part['Content-Disposition'] = f'attachment; filename="{file.filename}"'
-                        part.mime_type = mimetypes.guess_type(file.filename)[0] or 'application/octet-stream'
-                        full_files.append(part)
+                        content_type = mimetypes.guess_type(file.filename)[0] or 'application/octet-stream'
+                        attachments.append((file.filename, content_type, file.read()))
+                        logger.info(f"Uploaded file attached: {file.filename}")
 
             elif email_type == "information":
                 subject = "About Lucid ELD – What We Offer"
@@ -436,7 +434,6 @@ def mail_page():
                                                username=username,
                                                password=password,
                                                api_key=api_key)
-
             else:
                 flash("Unknown email type!", "error")
                 return redirect(url_for('mail_page'))
@@ -446,6 +443,7 @@ def mail_page():
                           recipients=[email],
                           html=message_html)
 
+            # Attach logo inline (if exists)
             logo_path = os.path.join(current_app.root_path, 'static', 'logolucid.gif')
             if os.path.exists(logo_path):
                 with open(logo_path, 'rb') as img:
@@ -457,18 +455,15 @@ def mail_page():
                         headers=[('Content-ID', '<logolucid>')]
                     )
             else:
-                logger.warning("Logo file not found at static/logolucid.gif")
+                logger.warning("Logo not found: static/logolucid.gif")
 
-            for part in full_files:
-                msg.attach(
-                    filename=part.get_filename(),
-                    content_type=getattr(part, 'mime_type', 'application/octet-stream'),
-                    data=part.get_payload(decode=True)
-                )
+            # Attach additional files
+            for filename, content_type, data in attachments:
+                msg.attach(filename=filename, content_type=content_type, data=data)
 
             mail_sender.send(msg)
+            logger.info(f"Email sent to {email} | Subject: {subject}")
             flash("Email successfully sent!", "success")
-            logger.info(f"Email sent to {email} with subject '{subject}'")
 
         except Exception as e:
             logger.exception("Failed to send email")
