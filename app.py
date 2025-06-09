@@ -15,42 +15,45 @@ from markdown import markdown
 import smtplib
 from werkzeug.security import generate_password_hash, check_password_hash
 
-# Setup logger
+# -------------------- Setup Logger --------------------
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
+# -------------------- Flask App Setup --------------------
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
-GENERATED_FOLDER = os.path.join(os.getcwd(), 'generated')
-os.makedirs(GENERATED_FOLDER, exist_ok=True)
 
-# Store the username and hashed password securely
-USER_CREDENTIALS = {
-    'username': 'admin',
-    'password': generate_password_hash('Pass4%33word')  # Using werkzeug for secure hashing
-}
-    
-# Flask-Mail Configuration (use environment variables for security)
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'bluestarelduzb@gmail.com'
-app.config['MAIL_PASSWORD'] = 'xmuz oyrx zdda qywm'  # Enclosed in quotes
-app.config['MAIL_DEFAULT_SENDER'] = 'bluestarelduzb@gmail.com'
-app.config['MAIL_USE_SSL'] = False
-
-mail_sender = Mail(app)
-
-# Пути
+# -------------------- Folders --------------------
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+GENERATED_FOLDER = os.path.join(BASE_DIR, 'generated')
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
 INSTRUCTION_FOLDER = os.path.join(BASE_DIR, 'Instruction')
+os.makedirs(GENERATED_FOLDER, exist_ok=True)
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(INSTRUCTION_FOLDER, exist_ok=True)
 
-# Helpers
+# -------------------- Credentials --------------------
+USER_CREDENTIALS = {
+    'username': 'admin',
+    'password': generate_password_hash('Pass4%33word')
+}
+
+# -------------------- Mail Configuration --------------------
+app.config.update(
+    MAIL_SERVER='smtp.gmail.com',
+    MAIL_PORT=587,
+    MAIL_USE_TLS=True,
+    MAIL_USE_SSL=False,
+    MAIL_USERNAME=os.getenv("MAIL_USERNAME", 'bluestarelduzb@gmail.com'),
+    MAIL_PASSWORD=os.getenv("MAIL_PASSWORD", 'xmuz oyrx zdda qywm'),
+    MAIL_DEFAULT_SENDER=os.getenv("MAIL_DEFAULT_SENDER", 'bluestarelduzb@gmail.com')
+)
+
+mail = Mail(app)
+
+# -------------------- Helper --------------------
 def strip_html_tags(text):
-    text = re.sub(r'<[^>]+>', '', text)
-    return text
+    return re.sub(r'<[^>]+>', '', text)
 
 @app.route('/')
 def home():
@@ -357,9 +360,9 @@ def tutorial():
     return render_template('tutorial.html')
 
 
+# -------------------- Mail Page --------------------
 @app.route('/mail', methods=['GET', 'POST'])
 def mail_page():
-    # 🔐 Require login
     if 'username' not in session:
         flash('Please log in to access the page.', 'warning')
         return redirect(url_for('login'))
@@ -370,80 +373,74 @@ def mail_page():
 
         if not email or not email_type:
             flash("Email and email type are required!", "error")
-            return redirect('/mail')
+            return redirect(url_for('mail_page'))
 
-        subject = None
-        html_message = None
+        subject = html_message = None
         attachments = []
 
-        # Attach instruction pack files if needed
-        if email_type == "instructions":
-            subject = "Required ELD Instruction Pack – Please Print & Keep in Truck"
-            html_message = render_template('emails/instructions.html')
-            for fname in [
-                "Users Manual.pdf", "Malfunction Manual.pdf", "Truck Sticker.pdf",
-                "DOT Inspection.pdf", "Certificate of Compliance.pdf"
-            ]:
-                path = os.path.join(INSTRUCTION_FOLDER, fname)
-                if os.path.exists(path):
-                    with open(path, 'rb') as f:
-                        part = MIMEApplication(f.read(), Name=fname)
-                        attachments.append((fname, part))
-                else:
-                    flash(f"File not found: {fname}", "error")
-
-        elif email_type == "ifta":
-            subject = "IFTA Report Attached"
-            html_message = render_template('emails/ifta.html')
-            uploaded = request.files.getlist("ifta_files")
-            if not uploaded:
-                flash("No IFTA file supplied", "error")
-                return redirect('/mail')
-            for f in uploaded:
-                if f and f.filename:
-                    part = MIMEApplication(f.read(), Name=f.filename)
-                    attachments.append((f.filename, part))
-
-        elif email_type == "information":
-            subject = "About Lucid ELD – What We Offer"
-            html_message = render_template('emails/information.html')
-
-        elif email_type == "advertising":
-            subject = "A Better ELD Solution for Your Fleet"
-            html_message = render_template('emails/advertising.html')
-
-        elif email_type == "api":
-            username = request.form.get('username')
-            password_field = request.form.get('password')
-            api_key = request.form.get('api_key')
-            if not all([username, password_field, api_key]):
-                flash("Username, Password, and API Key are required!", "error")
-                return redirect('/mail')
-            subject = "API Credentials and Key"
-            html_message = render_template(
-                'emails/api.html',
-                username=username,
-                password=password_field,
-                api_key=api_key
-            )
-
-        else:
-            flash("Unknown email type!", "error")
-            return redirect('/mail')
-
-        # Send email
         try:
-            msg = Message(
-                subject=subject,
-                sender=app.config['MAIL_USERNAME'],
-                recipients=[email]
-            )
+            if email_type == "instructions":
+                subject = "Required ELD Instruction Pack – Please Print & Keep in Truck"
+                html_message = render_template('emails/instructions.html')
+                for fname in [
+                    "Users Manual.pdf", "Malfunction Manual.pdf", "Truck Sticker.pdf",
+                    "DOT Inspection.pdf", "Certificate of Compliance.pdf"
+                ]:
+                    path = os.path.join(INSTRUCTION_FOLDER, fname)
+                    if os.path.exists(path):
+                        with open(path, 'rb') as f:
+                            part = MIMEApplication(f.read(), Name=fname)
+                            attachments.append((fname, part))
+                    else:
+                        flash(f"File not found: {fname}", "error")
+
+            elif email_type == "ifta":
+                subject = "IFTA Report Attached"
+                html_message = render_template('emails/ifta.html')
+                uploaded = request.files.getlist("ifta_files")
+                if not uploaded:
+                    flash("No IFTA file supplied", "error")
+                    return redirect(url_for('mail_page'))
+                for f in uploaded:
+                    if f and f.filename:
+                        part = MIMEApplication(f.read(), Name=f.filename)
+                        attachments.append((f.filename, part))
+
+            elif email_type == "information":
+                subject = "About Lucid ELD – What We Offer"
+                html_message = render_template('emails/information.html')
+
+            elif email_type == "advertising":
+                subject = "A Better ELD Solution for Your Fleet"
+                html_message = render_template('emails/advertising.html')
+
+            elif email_type == "api":
+                username = request.form.get('username')
+                password_field = request.form.get('password')
+                api_key = request.form.get('api_key')
+                if not all([username, password_field, api_key]):
+                    flash("Username, Password, and API Key are required!", "error")
+                    return redirect(url_for('mail_page'))
+                subject = "API Credentials and Key"
+                html_message = render_template(
+                    'emails/api.html',
+                    username=username,
+                    password=password_field,
+                    api_key=api_key
+                )
+
+            else:
+                flash("Unknown email type!", "error")
+                return redirect(url_for('mail_page'))
+
+            msg = Message(subject=subject, recipients=[email])
             msg.body = strip_html_tags(html_message)
             msg.html = html_message
 
-            # Attach inline logo
-            try:
-                with open(os.path.join(BASE_DIR, 'static/logolucid.gif'), 'rb') as img:
+            # Inline logo attachment (optional)
+            logo_path = os.path.join(BASE_DIR, 'static/logolucid.gif')
+            if os.path.exists(logo_path):
+                with open(logo_path, 'rb') as img:
                     msg.attach(
                         filename="logolucid.gif",
                         content_type="image/gif",
@@ -451,10 +448,10 @@ def mail_page():
                         disposition='inline',
                         headers=[['Content-ID', '<logolucid>']]
                     )
-            except FileNotFoundError:
-                logger.warning("Inline logo not found, skipping.")
+            else:
+                logger.warning("Logo not found. Skipping inline logo.")
 
-            # Attach other files
+            # Attach additional files
             for fname, part in attachments:
                 msg.attach(
                     filename=fname,
@@ -464,11 +461,12 @@ def mail_page():
 
             mail.send(msg)
             flash("Email successfully sent!", "success")
-        except Exception as err:
-            logger.error(f"Error sending email: {err}")
-            flash(f"Failed to send email: {err}", "error")
 
-        return redirect('/mail')
+        except Exception as e:
+            logger.error(f"Email sending failed: {e}", exc_info=True)
+            flash(f"Failed to send email: {str(e)}", "error")
+
+        return redirect(url_for('mail_page'))
 
     return render_template('mail.html')
     
