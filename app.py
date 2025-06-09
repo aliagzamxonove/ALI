@@ -456,7 +456,7 @@ try:
                 content_type="image/gif",
                 data=img.read(),
                 disposition='inline',
-                headers=[('Content-ID', '<logolucid>')]  # safer to use list of tuples
+                headers=[('Content-ID', '<logolucid>')]
             )
     else:
         logger.warning("Logo file not found at static/logolucid.gif")
@@ -477,8 +477,6 @@ except Exception as e:
     flash(f"Failed to send email: {str(e)}", "error")
 
 return redirect(url_for('mail_page'))
-
-    return render_template('mail.html')  
     
 
 @app.route('/eldquiz')
