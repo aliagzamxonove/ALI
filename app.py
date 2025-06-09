@@ -447,17 +447,17 @@ def mail_page():
                           html=message_html)
 
             logo_path = os.path.join(current_app.root_path, 'static', 'logolucid.gif')
-            if os.path.exists(logo_path):
-                with open(logo_path, 'rb') as img:
-                    msg.attach(
-                        filename="logolucid.gif",
-                        content_type="image/gif",
-                        data=img.read(),
-                        disposition='inline',
-                        headers=[('Content-ID': '<logolucid>')]
-                    )
-            else:
-                logger.warning("Logo file not found at static/logolucid.gif")
+if os.path.exists(logo_path):
+    with open(logo_path, 'rb') as img:
+        msg.attach(
+            filename="logolucid.gif",
+            content_type="image/gif",
+            data=img.read(),
+            disposition='inline',
+            headers={'Content-ID': '<logolucid>'}
+        )
+else:
+    logger.warning("Logo file not found at static/logolucid.gif")
 
             for part in full_files:
                 msg.attach(
