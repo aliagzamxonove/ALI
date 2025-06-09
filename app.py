@@ -6,6 +6,7 @@ import re
 import hashlib
 import html
 import mimetypes
+import markdown
 from flask_mail import Mail, Message
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
