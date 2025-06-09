@@ -437,19 +437,19 @@ def mail_page():
             msg.body = strip_html_tags(html_message)
             msg.html = html_message
 
-# Inline logo attachment (optional)
-logo_path = os.path.join(BASE_DIR, 'static/logolucid.gif')
-if os.path.exists(logo_path):
-    with open(logo_path, 'rb') as img:
-        msg.attach(
-            filename="logolucid.gif",
-            content_type="image/gif",
-            data=img.read(),
-            disposition='inline',
-            headers=[("Content-ID", "<logolucid>")]
-        )
-else:
-    logger.warning("Logo not found. Skipping inline logo.")
+            # Inline logo attachment (optional)
+            logo_path = os.path.join(BASE_DIR, 'static/logolucid.gif')
+            if os.path.exists(logo_path):
+                with open(logo_path, 'rb') as img:
+                    msg.attach(
+                        filename="logolucid.gif",
+                        content_type="image/gif",
+                        data=img.read(),
+                        disposition='inline',
+                        headers=[("Content-ID", "<logolucid>")]
+                    )
+            else:
+                logger.warning("Logo not found. Skipping inline logo.")
 
             # Attach additional files
             for fname, part in attachments:
