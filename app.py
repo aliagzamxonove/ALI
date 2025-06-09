@@ -446,37 +446,37 @@ def mail_page():
                           recipients=[email],
                           html=message_html)
 
-logo_path = os.path.join(current_app.root_path, 'static', 'logolucid.gif')
+            logo_path = os.path.join(current_app.root_path, 'static', 'logolucid.gif')
+            if os.path.exists(logo_path):
+                with open(logo_path, 'rb') as img:
+                    msg.attach(
+                        filename="logolucid.gif",
+                        content_type="image/gif",
+                        data=img.read(),
+                        disposition='inline',
+                        headers=[('Content-ID', '<logolucid>')]
+                    )
+            else:
+                logger.warning("Logo file not found at static/logolucid.gif")
 
-try:
-    if os.path.exists(logo_path):
-        with open(logo_path, 'rb') as img:
-            msg.attach(
-                filename="logolucid.gif",
-                content_type="image/gif",
-                data=img.read(),
-                disposition='inline',
-                headers=[('Content-ID', '<logolucid>')]
-            )
-    else:
-        logger.warning("Logo file not found at static/logolucid.gif")
+            for part in full_files:
+                msg.attach(
+                    filename=part.get_filename(),
+                    content_type=getattr(part, 'mime_type', 'application/octet-stream'),
+                    data=part.get_payload(decode=True)
+                )
 
-    for part in full_files:
-        msg.attach(
-            filename=part.get_filename(),
-            content_type=getattr(part, 'mime_type', 'application/octet-stream'),
-            data=part.get_payload(decode=True)
-        )
+            mail_sender.send(msg)
+            flash("Email successfully sent!", "success")
+            logger.info(f"Email sent to {email} with subject '{subject}'")
 
-    mail_sender.send(msg)
-    flash("Email successfully sent!", "success")
-    logger.info(f"Email sent to {email} with subject '{subject}'")
+        except Exception as e:
+            logger.exception("Failed to send email")
+            flash(f"Failed to send email: {str(e)}", "error")
 
-except Exception as e:
-    logger.exception("Failed to send email")
-    flash(f"Failed to send email: {str(e)}", "error")
+        return redirect(url_for('mail_page'))
 
-return redirect(url_for('mail_page'))
+    return render_template('mail.html')
     
 
 @app.route('/eldquiz')
