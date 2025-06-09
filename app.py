@@ -55,15 +55,18 @@ def home():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        if username == USER_CREDENTIALS['username'] and hashlib.sha256(password.encode()).hexdigest() == USER_CREDENTIALS['password']:
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '')
+
+        if username == USER_CREDENTIALS['username'] and check_password_hash(USER_CREDENTIALS['password'], password):
             session['username'] = username
-            print("Login successful, redirecting to dashboard")  # Debug log
+            logger.info(f"User {username} logged in successfully.")
             return redirect(url_for('dashboard'))
         else:
             flash('Invalid credentials, please try again.', 'error')
-            return redirect(url_for('login'))  # Ensure to redirect after flashing the message
+            logger.warning(f"Failed login attempt for username: {username}")
+            return redirect(url_for('login'))
+
     return render_template('login.html')
 
 # Dashboard page
