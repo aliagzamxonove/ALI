@@ -17,7 +17,7 @@ import smtplib
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # -------------------- Setup Logger --------------------
-RECAPTCHA_SECRET_KEY = 'YOUR_SECRET_KEY'  # Replace this with your actual secret key
+RECAPTCHA_SECRET_KEY = '6LcpJVsrAAAAAKOhLJdLqLHQSjkaqGUdJdSKOwij'  # Replace this with your actual secret key
 RECAPTCHA_SITE_KEY = '6LcpJVsrAAAAAFwC3XqO05l-MEZXj4A5tNDmm-xI'  # Your public site key
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -72,7 +72,6 @@ def login():
         password = request.form.get('password', '')
         recaptcha_response = request.form.get('g-recaptcha-response')
 
-        # Verify reCAPTCHA
         if not recaptcha_response:
             flash('Please complete the reCAPTCHA.', 'error')
             logger.warning(f"Login attempt without completing reCAPTCHA by: {username}")
@@ -82,18 +81,16 @@ def login():
             'https://www.google.com/recaptcha/api/siteverify',
             data={
                 'secret': RECAPTCHA_SECRET_KEY,
-                'response': recaptcha_response
+                'response': recaptcha_response,
+                'remoteip': request.remote_addr
             }
         )
         result = recaptcha_verification.json()
+        logger.info(f"reCAPTCHA response: {result}")
+
         if not result.get('success'):
             flash('reCAPTCHA verification failed. Please try again.', 'error')
             logger.warning(f"Failed reCAPTCHA for username: {username}")
-            return redirect(url_for('login'))
-
-        if not username or not password:
-            flash('Username and password are required.', 'error')
-            logger.warning("Login attempt with missing fields.")
             return redirect(url_for('login'))
 
         if username == USER_CREDENTIALS.get('username') and check_password_hash(USER_CREDENTIALS.get('password', ''), password):
