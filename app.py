@@ -503,6 +503,14 @@ def eldquiz():
 def supportresources():
     return render_template('supportresources.html')
 
+@app.route('/lucidgame')
+def lucid_game():
+    try:
+        return render_template('lucidgame.html')
+    except Exception as e:
+        # Optional: Log error here with logging library
+        return abort(500, description="Internal Server Error: Could not load the Lucid Game page.")
+
 @app.route('/logout')
 def logout():
     session.pop('username', None)
