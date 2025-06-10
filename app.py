@@ -18,7 +18,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 # -------------------- Setup Logger --------------------
 RECAPTCHA_SECRET_KEY = 'YOUR_SECRET_KEY'  # Replace this with your actual secret key
-RECAPTCHA_SITE_KEY = '6LfUIlsrAAAAABhQTrkkayajxiCiuEUrP--XtxcB'  # Your public site key
+RECAPTCHA_SITE_KEY = '6LcpJVsrAAAAAFwC3XqO05l-MEZXj4A5tNDmm-xI'  # Your public site key
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
