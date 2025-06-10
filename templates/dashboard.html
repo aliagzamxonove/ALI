@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Dashboard - IFTA Report Generator</title>
 
     <!-- SEO + Meta -->
@@ -49,6 +49,7 @@
         flex-direction: column;
         align-items: center;
         padding: 2rem;
+        min-height: 100vh;
         overflow-x: hidden;
       }
 
@@ -65,6 +66,7 @@
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         animation: pulseText 3s infinite;
+        user-select: none;
       }
 
       @keyframes pulseText {
@@ -81,20 +83,47 @@
         margin-top: 3rem;
       }
 
-      .dashboard-btn {
-        background: linear-gradient(145deg, var(--primary), var(--primary-dark));
-        border: none;
-        padding: 1.4rem;
-        font-size: 1rem;
-        font-weight: 600;
-        color: white;
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        cursor: pointer;
-        text-align: center;
-        text-decoration: none;
-        transition: var(--transition);
-        position: relative;
+.dashboard-btn {
+  background: linear-gradient(145deg, var(--primary), var(--primary-dark));
+  border: none;
+  padding: 1.4rem 1.6rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  transition: var(--transition);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  user-select: none; 
+  min-width: 240px; /* same as your grid min column size */
+  height: 80px; /* example fixed height */
+}
+
+      .dashboard-btn svg {
+        stroke-width: 1.8;
+        width: 24px;
+        height: 24px;
+        flex-shrink: 0;
+        stroke: white;
+        transition: stroke var(--transition);
+      }
+
+      .dashboard-btn:hover,
+      .dashboard-btn:focus-visible {
+        transform: translateY(-4px) scale(1.03);
+        outline: none;
+      }
+
+      .dashboard-btn:hover svg,
+      .dashboard-btn:focus-visible svg {
+        stroke: var(--accent);
       }
 
       .dashboard-btn::after {
@@ -107,11 +136,8 @@
         transition: opacity var(--transition);
       }
 
-      .dashboard-btn:hover {
-        transform: translateY(-5px) scale(1.02);
-      }
-
-      .dashboard-btn:hover::after {
+      .dashboard-btn:hover::after,
+      .dashboard-btn:focus-visible::after {
         opacity: 1;
       }
 
@@ -129,10 +155,24 @@
         cursor: pointer;
         z-index: 999;
         transition: background-color var(--transition);
+        user-select: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1rem;
       }
 
-      #logoutBtn:hover {
+      #logoutBtn svg {
+        stroke-width: 1.8;
+        width: 20px;
+        height: 20px;
+        stroke: white;
+      }
+
+      #logoutBtn:hover,
+      #logoutBtn:focus-visible {
         background-color: var(--danger-dark);
+        outline: none;
       }
 
       .modal {
@@ -146,6 +186,10 @@
         padding: 20px;
       }
 
+      .modal.active {
+        display: flex;
+      }
+
       .modal-content {
         background-color: var(--card-bg);
         padding: 2rem;
@@ -153,17 +197,21 @@
         box-shadow: var(--shadow);
         max-width: 400px;
         text-align: center;
-        animation: fadeIn 0.3s ease;
+        animation: fadeIn 0.3s ease forwards;
+        user-select: none;
       }
 
       .modal h2 {
         font-size: 1.8rem;
         margin-bottom: 1rem;
+        font-weight: 700;
+        color: var(--accent);
       }
 
       .modal p {
         font-size: 1rem;
         margin-bottom: 1.5rem;
+        color: var(--text);
       }
 
       .modal-buttons {
@@ -181,10 +229,14 @@
         font-weight: 600;
         cursor: pointer;
         transition: var(--transition);
+        user-select: none;
+        min-width: 110px;
       }
 
-      .modal-btn:hover {
+      .modal-btn:hover,
+      .modal-btn:focus-visible {
         background-color: var(--primary-dark);
+        outline: none;
       }
 
       @keyframes fadeIn {
@@ -201,6 +253,16 @@
         }
         #logoutBtn {
           padding: 10px 16px;
+          font-size: 0.9rem;
+        }
+        .dashboard-btn {
+          font-size: 0.95rem;
+          padding: 1rem 1.2rem;
+          gap: 0.6rem;
+        }
+        .dashboard-btn svg {
+          width: 20px;
+          height: 20px;
         }
       }
     </style>
@@ -210,25 +272,78 @@
       <h1>Welcome, {{ username|e }}!</h1>
     </header>
 
-    <div class="dashboard-buttons">
-      <a href="{{ url_for('generate_report') }}" class="dashboard-btn" aria-label="Generate IFTA Report">📄 Generate IFTA Report</a>
-      <a href="{{ url_for('eld_malfunction_letter') }}" class="dashboard-btn" aria-label="ELD Malfunction Letter">⚠️ ELD Malfunction Letter</a>
-      <a href="{{ url_for('tutorial') }}" class="dashboard-btn" aria-label="Tutorial Viewer">🎓 Tutorial Viewer</a>
-      <a href="{{ url_for('timezones') }}" class="dashboard-btn" aria-label="Time Zones">🕒 Time Zones</a>
-      <a href="{{ url_for('mail_page') }}" class="dashboard-btn" aria-label="Send Email">📧 Send Email</a>
-      <a href="{{ url_for('eldquiz') }}" class="dashboard-btn" aria-label="ELD Quiz">📝 ELD Quiz</a>
-      <a href="{{ url_for('supportresources') }}" class="dashboard-btn" aria-label="Support Resources">🛠️ Support Resources</a>
-    </div>
+<nav class="dashboard-buttons" role="navigation" aria-label="Dashboard navigation">
+  <a href="{{ url_for('generate_report') }}" class="dashboard-btn" aria-label="Generate IFTA Report">
+    <svg xmlns="http://www.w3.org/2000/svg" class="lucide" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l7 7v9a2 2 0 0 1-2 2z"/>
+      <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h6"/>
+    </svg>
+    Generate IFTA Report
+  </a>
 
-    <button id="logoutBtn">Logout</button>
+  <!-- Malfunction icon replaced with wrench (repair) -->
+  <a href="{{ url_for('eld_malfunction_letter') }}" class="dashboard-btn" aria-label="ELD Malfunction Letter">
+    <svg xmlns="http://www.w3.org/2000/svg" class="lucide" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
+      <path d="M14.7 5.3a4 4 0 0 0-5.4 5.4l-4 4a1.5 1.5 0 0 0 2.1 2.1l4-4a4 4 0 0 0 5.4-5.4z" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M12 12l4 4" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    ELD Malfunction Letter
+  </a>
 
-    <div id="logoutModal" class="modal">
+  <!-- Tutorial Viewer icon replaced with a book -->
+  <a href="{{ url_for('tutorial') }}" class="dashboard-btn" aria-label="Tutorial Viewer">
+    <svg xmlns="http://www.w3.org/2000/svg" class="lucide" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M6.5 2H20a2 2 0 0 1 2 2v15a2 2 0 0 1-2 2H6.5A2.5 2.5 0 0 0 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Tutorial Viewer
+  </a>
+
+  <!-- Time Zones replaced with US map icon -->
+  <a href="{{ url_for('timezones') }}" class="dashboard-btn" aria-label="Time Zones">
+    <svg xmlns="http://www.w3.org/2000/svg" class="lucide" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h1l1 2 1-1 1 1v3l-1 2v2l2 1 2-2 1-1 3 1 1-1 2-1v-3l-2-3h-3l-2-1-3 1-1-1-1 1-1-1z"/>
+    </svg>
+    Time Zones
+  </a>
+
+  <a href="{{ url_for('mail_page') }}" class="dashboard-btn" aria-label="Send Email">
+    <svg xmlns="http://www.w3.org/2000/svg" class="lucide" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
+      <path d="M4 4h16v16H4z" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M4 4l8 8 8-8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Send Email
+  </a>
+
+  <a href="{{ url_for('eldquiz') }}" class="dashboard-btn" aria-label="ELD Quiz">
+    <svg xmlns="http://www.w3.org/2000/svg" class="lucide" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
+      <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/>
+      <path d="M12 6v6l4 2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    ELD Quiz
+  </a>
+
+  <!-- Support Resources icon replaced with tutorial/play (polygon) icon -->
+  <a href="{{ url_for('supportresources') }}" class="dashboard-btn" aria-label="Support Resources">
+    <svg xmlns="http://www.w3.org/2000/svg" class="lucide" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
+      <polygon points="5 3 19 12 5 21 5 3"/>
+    </svg>
+    Support Resources
+  </a>
+</nav>
+
+    <button id="logoutBtn" aria-haspopup="dialog" aria-controls="logoutModal" aria-expanded="false" aria-label="Logout">
+      <svg xmlns="http://www.w3.org/2000/svg" class="lucide" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7"/><path stroke-linecap="round" stroke-linejoin="round" d="M7 16v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h.1a2 2 0 0 1 2 2v1"/></svg>
+      Logout
+    </button>
+
+    <div id="logoutModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="logoutModalTitle" aria-describedby="logoutModalDesc" tabindex="-1">
       <div class="modal-content">
-        <h2>Confirm Logout</h2>
-        <p>Are you sure you want to log out?</p>
+        <h2 id="logoutModalTitle">Confirm Logout</h2>
+        <p id="logoutModalDesc">Are you sure you want to log out?</p>
         <div class="modal-buttons">
-          <button class="modal-btn" id="confirmLogout">Yes, Logout</button>
-          <button class="modal-btn" id="cancelLogout">Cancel</button>
+          <button id="confirmLogoutBtn" class="modal-btn" type="button">Yes, Logout</button>
+          <button id="cancelLogoutBtn" class="modal-btn" type="button" style="background-color: var(--danger);">Cancel</button>
         </div>
       </div>
     </div>
@@ -236,30 +351,72 @@
     <script>
       const logoutBtn = document.getElementById('logoutBtn');
       const logoutModal = document.getElementById('logoutModal');
-      const confirmLogout = document.getElementById('confirmLogout');
-      const cancelLogout = document.getElementById('cancelLogout');
+      const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+      const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+
+      // To store the element that triggered modal for returning focus
+      let lastFocusedElement;
+
+      // Show modal and manage ARIA states
+      function openModal() {
+        lastFocusedElement = document.activeElement;
+        logoutModal.classList.add('active');
+        logoutBtn.setAttribute('aria-expanded', 'true');
+        logoutModal.focus();
+        trapFocus(logoutModal);
+      }
+
+      // Hide modal and restore ARIA states
+      function closeModal() {
+        logoutModal.classList.remove('active');
+        logoutBtn.setAttribute('aria-expanded', 'false');
+        if (lastFocusedElement) lastFocusedElement.focus();
+      }
 
       logoutBtn.addEventListener('click', () => {
-        logoutModal.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
+        openModal();
       });
 
-      cancelLogout.addEventListener('click', () => {
-        logoutModal.style.display = 'none';
-        document.body.style.overflow = 'auto';
+      cancelLogoutBtn.addEventListener('click', () => {
+        closeModal();
       });
 
-      confirmLogout.addEventListener('click', () => {
-        logoutBtn.innerHTML = 'Logging out...';
+      // Confirm logout triggers form submission or link navigation
+      confirmLogoutBtn.addEventListener('click', () => {
+        // Redirect to logout URL (adjust as needed)
         window.location.href = "{{ url_for('logout') }}";
       });
 
-      window.addEventListener('click', (event) => {
-        if (event.target === logoutModal) {
-          logoutModal.style.display = 'none';
-          document.body.style.overflow = 'auto';
+      // Close modal on Escape key press
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && logoutModal.classList.contains('active')) {
+          closeModal();
         }
       });
+
+      // Focus trap within modal
+      function trapFocus(element) {
+        const focusableElements = element.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length -1];
+
+        element.addEventListener('keydown', function(e) {
+          const isTabPressed = (e.key === 'Tab' || e.keyCode === 9);
+          if (!isTabPressed) return;
+
+          if (e.shiftKey) { // Shift + Tab
+            if (document.activeElement === firstElement) {
+              lastElement.focus();
+              e.preventDefault();
+            }
+          } else { // Tab
+            if (document.activeElement === lastElement) {
+              firstElement.focus();
+              e.preventDefault();
+            }
+          }
+        });
+      }
     </script>
   </body>
 </html>
