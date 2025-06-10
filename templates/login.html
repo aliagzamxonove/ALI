@@ -5,59 +5,76 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login - IFTA Report Generator</title>
   <link rel="icon" href="{{ url_for('static', filename='IFTA5458.png') }}" type="image/png" />
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
   <script>
-    window.onload = function() {
+    window.onload = () => {
       const savedTheme = localStorage.getItem('theme') || 'light-theme';
       document.body.classList.add(savedTheme);
       const themeText = document.querySelector('.theme-toggle-text');
-      if (themeText) {
-        themeText.textContent = savedTheme === 'dark-theme' ? 'Light' : 'Dark';
+      if (themeText) themeText.textContent = savedTheme === 'dark-theme' ? 'Light' : 'Dark';
+
+      const savedUsername = localStorage.getItem('savedUsername');
+      if (savedUsername) {
+        document.getElementById('username').value = savedUsername;
+        document.getElementById('remember').checked = true;
       }
     };
 
-    function toggleTheme() {
-      const currentTheme = document.body.classList.contains('dark-theme') ? 'dark-theme' : 'light-theme';
-      const newTheme = currentTheme === 'dark-theme' ? 'light-theme' : 'dark-theme';
-      document.body.classList.replace(currentTheme, newTheme);
+    const toggleTheme = () => {
+      const isDark = document.body.classList.contains('dark-theme');
+      const newTheme = isDark ? 'light-theme' : 'dark-theme';
+      document.body.classList.replace(isDark ? 'dark-theme' : 'light-theme', newTheme);
       localStorage.setItem('theme', newTheme);
-      const themeText = document.querySelector('.theme-toggle-text');
-      themeText.textContent = newTheme === 'dark-theme' ? 'Light' : 'Dark';
-      document.body.offsetHeight;
+      document.querySelector('.theme-toggle-text').textContent = newTheme === 'dark-theme' ? 'Light' : 'Dark';
+    };
+
+    const togglePassword = () => {
+      const password = document.getElementById('password');
+      const toggle = document.getElementById('toggle-password');
+      if (password.type === 'password') {
+        password.type = 'text';
+        toggle.textContent = 'Hide';
+      } else {
+        password.type = 'password';
+        toggle.textContent = 'Show';
+      }
+    };
+
+    const saveUsername = () => {
+      const remember = document.getElementById('remember');
+      const username = document.getElementById('username').value;
+      remember.checked
+        ? localStorage.setItem('savedUsername', username)
+        : localStorage.removeItem('savedUsername');
+    };
+
+    const triggerShake = () => {
+      const box = document.querySelector('.login-box');
+      box.classList.add('shake');
+      setTimeout(() => box.classList.remove('shake'), 500);
+    };
+  </script>
+
+  <style>
+    * {
+      box-sizing: border-box;
     }
 
-    function togglePassword() {
-      const passwordField = document.getElementById('password');
-      const toggleButton = document.getElementById('toggle-password');
-      if (passwordField.type === 'password') {
-        passwordField.type = 'text';
-        toggleButton.textContent = 'Hide';
-      } else {
-        passwordField.type = 'password';
-        toggleButton.textContent = 'Show';
-      }
-    }
-  </script>
-  <style>
     body {
-      font-family: 'Arial', sans-serif;
-      background-color: #f7f7f7;
-      color: #333;
+      font-family: 'Segoe UI', sans-serif;
       margin: 0;
       padding: 0;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      transition: background-color 0.3s ease, color 0.3s ease;
-    }
-
-    body.light-theme {
-      background-color: #f7f7f7;
-      color: #333;
+      background: linear-gradient(135deg, #e3efff, #f7f9fc);
+      transition: background 0.3s ease;
     }
 
     body.dark-theme {
-      background-color: #101d2e;
+      background: linear-gradient(135deg, #101d2e, #1e2a3a);
       color: #dbe2e9;
     }
 
@@ -65,80 +82,71 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100%;
       width: 100%;
+      padding: 20px;
     }
 
     .login-box {
-      background-color: #ffffff;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      background-color: #fff;
+      padding: 30px 25px;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
       width: 100%;
       max-width: 400px;
       text-align: center;
-      transition: background-color 0.3s ease, color 0.3s ease;
+      transition: background-color 0.3s ease;
     }
 
     body.dark-theme .login-box {
-      background-color: #000000;
-      color: #dbe2e9;
+      background-color: #111a25;
+    }
+
+    .shake {
+      animation: shake 0.5s;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      50% { transform: translateX(8px); }
+      75% { transform: translateX(-4px); }
     }
 
     .login-logo {
-      width: 50px;
-      margin-bottom: 20px;
+      width: 60px;
+      margin-bottom: 15px;
     }
 
     .login-heading {
-      font-size: 24px;
-      color: #000000;
+      font-size: 22px;
+      font-weight: 600;
       margin-bottom: 20px;
-      font-weight: bold;
-    }
-
-    body.dark-theme .login-heading {
-      color: #ffffff;
     }
 
     .input-group {
-      margin-bottom: 20px;
+      margin-bottom: 18px;
       text-align: left;
     }
 
     .input-group label {
       display: block;
-      font-size: 14px;
       font-weight: bold;
-      color: #003366;
-    }
-
-    body.dark-theme .input-group label {
-      color: #dbe2e9;
+      font-size: 14px;
     }
 
     .input-field {
       width: 100%;
-      padding: 12px;
-      font-size: 14px;
+      padding: 10px;
+      font-size: 15px;
       border: 1px solid #ccc;
-      border-radius: 4px;
-      box-sizing: border-box;
-      margin-top: 5px;
-      transition: border-color 0.3s ease;
-      background-color: #ffffff;
-      color: #333;
+      border-radius: 6px;
+      margin-top: 6px;
     }
 
     body.dark-theme .input-field {
       background-color: #1e2a3a;
       color: #dbe2e9;
       border: 1px solid #3c4c66;
-    }
-
-    .input-field:focus {
-      border-color: #003366;
-      outline: none;
     }
 
     .password-container {
@@ -152,121 +160,136 @@
       transform: translateY(-50%);
       background: none;
       border: none;
-      font-size: 14px;
-      color: #000000;
+      color: #003366;
+      font-size: 13px;
       cursor: pointer;
-      transition: color 0.3s ease;
     }
 
     body.dark-theme .password-toggle {
       color: #dbe2e9;
     }
 
-    .password-toggle:hover {
-      color: #49759c;
-    }
-
-    .flashes {
-      margin: 10px 0;
-      padding: 0;
-      list-style-type: none;
-      font-size: 14px;
-    }
-
-    .flashes .error-message {
-      color: #e74c3c;
-      background-color: #fbe3e4;
-      padding: 10px;
-      border-radius: 4px;
-    }
-
-    .btn,
-    .login-btn {
-      padding: 12px 20px;
+    .btn, .login-btn {
       background-color: #003366;
-      color: white;
+      color: #fff;
       border: none;
-      border-radius: 4px;
-      cursor: pointer;
+      padding: 12px;
       font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
       width: 100%;
+      margin-top: 10px;
       transition: background-color 0.3s ease;
     }
 
-    .btn:hover,
-    .login-btn:hover {
+    .btn:hover, .login-btn:hover {
       background-color: #00509e;
-    }
-
-    .form-text {
-      font-size: 12px;
-      color: #888;
-      margin-top: 5px;
-    }
-
-    body.dark-theme .form-text {
-      color: #aab4c5;
     }
 
     .theme-toggle-btn {
       position: fixed;
-      bottom: 10px;
-      right: 10px;
+      bottom: 20px;
+      right: 20px;
       background-color: #003366;
       color: white;
-      border: none;
       padding: 10px 15px;
+      border: none;
+      border-radius: 6px;
       cursor: pointer;
-      font-size: 14px;
-      border-radius: 4px;
-      transition: background-color 0.3s ease;
+      z-index: 1000;
     }
 
     .theme-toggle-btn:hover {
       background-color: #00509e;
     }
 
-    .theme-toggle-text {
+    .remember-container {
+      display: flex;
+      align-items: center;
+      gap: 6px;
       font-size: 14px;
-      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    .flashes {
+      list-style: none;
+      padding: 0;
+      margin-bottom: 15px;
+    }
+
+    .error-message {
+      background-color: #fbe3e4;
+      color: #e74c3c;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    body.dark-theme .error-message {
+      background-color: #330000;
+    }
+
+    @media (max-width: 480px) {
+      .login-box {
+        padding: 20px 15px;
+      }
+
+      .login-heading {
+        font-size: 20px;
+      }
     }
   </style>
 </head>
+
 <body>
   <div class="login-container">
     <div class="login-box">
-      <img src="{{ url_for('static', filename='IFTA5458.png') }}" alt="IFTA Logo" class="login-logo" role="img" aria-label="IFTA logo"/>
+      <img src="{{ url_for('static', filename='IFTA5458.png') }}" alt="IFTA Logo" class="login-logo" />
       <div class="login-heading">Log in to your Account</div>
 
+      <!-- 🔔 Flash Messages Block -->
       {% with messages = get_flashed_messages() %}
         {% if messages %}
           <ul class="flashes">
             {% for message in messages %}
-              <li class="error-message">{{ message }}</li>
+              <li class="error-message" onclick="triggerShake()">{{ message }}</li>
             {% endfor %}
           </ul>
         {% endif %}
       {% endwith %}
 
-      <form method="POST" autocomplete="off">
+      <form method="POST" autocomplete="off" onsubmit="saveUsername()">
         <div class="input-group">
           <label for="username">Username</label>
-          <input type="text" name="username" id="username" class="input-field" required placeholder="Enter your username" aria-describedby="usernameHelp"/>
-          <small id="usernameHelp" class="form-text">Your unique username to access the system.</small>
+          <input type="text" name="username" id="username" class="input-field" required placeholder="Enter your username" />
         </div>
 
         <div class="input-group">
           <label for="password">Password</label>
           <div class="password-container">
-            <input type="password" name="password" id="password" class="input-field" required placeholder="Enter your password" aria-label="Password field"/>
-            <button type="button" id="toggle-password" class="password-toggle" onclick="togglePassword()" aria-label="Toggle password visibility">Show</button>
+            <input type="password" name="password" id="password" class="input-field" required placeholder="Enter your password" />
+            <button type="button" id="toggle-password" class="password-toggle" onclick="togglePassword()">Show</button>
           </div>
         </div>
+
+        <div class="remember-container">
+          <input type="checkbox" id="remember" />
+          <label for="remember">Remember me</label>
+        </div>
+
+        <div class="g-recaptcha" data-sitekey="6LfUIlsrAAAAABhQTrkkayajxiCiuEUrP--XtxcB
+"></div>
 
         <button type="submit" class="btn login-btn">Login</button>
       </form>
     </div>
   </div>
+
+  <button onclick="toggleTheme()" class="theme-toggle-btn">
+    <span class="theme-toggle-text">Dark</span>
+  </button>
+</body>
 
   <button onclick="toggleTheme()" class="theme-toggle-btn">
     <span class="theme-toggle-text">Dark</span>
