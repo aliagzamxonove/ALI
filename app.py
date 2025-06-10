@@ -16,6 +16,8 @@ import smtplib
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # -------------------- Setup Logger --------------------
+RECAPTCHA_SECRET_KEY = 'YOUR_SECRET_KEY'  # Replace this with your actual secret key
+RECAPTCHA_SITE_KEY = '6LfUIlsrAAAAABhQTrkkayajxiCiuEUrP--XtxcB'  # Your public site key
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
@@ -67,17 +69,42 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username', '').strip()
         password = request.form.get('password', '')
+        recaptcha_response = request.form.get('g-recaptcha-response')
 
-        if username == USER_CREDENTIALS['username'] and check_password_hash(USER_CREDENTIALS['password'], password):
-            session['username'] = username
-            logger.info(f"User {username} logged in successfully.")
-            return redirect(url_for('dashboard'))
-        else:
-            flash('Invalid credentials, please try again.', 'error')
-            logger.warning(f"Failed login attempt for username: {username}")
+        # Verify reCAPTCHA
+        if not recaptcha_response:
+            flash('Please complete the reCAPTCHA.', 'error')
+            logger.warning(f"Login attempt without completing reCAPTCHA by: {username}")
             return redirect(url_for('login'))
 
-    return render_template('login.html')
+        recaptcha_verification = requests.post(
+            'https://www.google.com/recaptcha/api/siteverify',
+            data={
+                'secret': RECAPTCHA_SECRET_KEY,
+                'response': recaptcha_response
+            }
+        )
+        result = recaptcha_verification.json()
+        if not result.get('success'):
+            flash('reCAPTCHA verification failed. Please try again.', 'error')
+            logger.warning(f"Failed reCAPTCHA for username: {username}")
+            return redirect(url_for('login'))
+
+        if not username or not password:
+            flash('Username and password are required.', 'error')
+            logger.warning("Login attempt with missing fields.")
+            return redirect(url_for('login'))
+
+        if username == USER_CREDENTIALS.get('username') and check_password_hash(USER_CREDENTIALS.get('password', ''), password):
+            session['username'] = username
+            logger.info(f"User '{username}' logged in successfully.")
+            return redirect(url_for('dashboard'))
+        else:
+            flash('Invalid username or password. Please try again.', 'error')
+            logger.warning(f"Invalid login attempt for username: {username}")
+            return redirect(url_for('login'))
+
+    return render_template('login.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
 # Dashboard page
 @app.route('/dashboard')
