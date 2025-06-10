@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GameLucid Pro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
+  
+  <!-- Preload Audio -->
+  <link rel="preload" href="coin.wav" as="audio" type="audio/wav">
+  <link rel="preload" href="wrong.wav" as="audio" type="audio/wav">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background: radial-gradient(circle at center, #0d1117, #000);
+      background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+      color: #fff;
+      overflow: hidden;
+      user-select: none;
+      touch-action: manipulation;
+    }
+
+    /* Homepage */
+    #home-screen {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #000428, #004e92);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      flex-direction: column;
+      animation: bgPulse 8s infinite alternate;
+    }
+
+    @keyframes bgPulse {
+      0% { background: linear-gradient(135deg, #000428, #004e92); }
+      100% { background: linear-gradient(135deg, #1a1a1a, #005f99); }
+    }
+
+    .home-content {
+      text-align: center;
+      color: white;
+      max-width: 600px;
+      padding: 2rem;
+      animation: fadeInUp 1.5s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      0% { transform: translateY(30px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    #start-btn {
+      margin-top: 2rem;
+      padding: 1rem 2.5rem;
+      font-size: 1.6rem;
+      background: linear-gradient(135deg, #00ffc8, #007f5f);
+      color: black;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 0 16px rgba(0, 255, 204, 0.5);
+      transition: all 0.3s ease;
+    }
+
+    #start-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 24px rgba(0, 255, 204, 0.8);
+    }
+
+    #game-container {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 1.5rem;
+      position: relative;
+    }
+
+    #score-panel {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    #score-panel div {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 0.6rem 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+      backdrop-filter: blur(12px);
+      min-width: 120px;
+      font-size: 1.2rem;
+    }
+
+    #score-panel img.icon {
+      width: 22px;
+      height: 22px;
+    }
+
+    #equation-box h1 {
+      font-size: 3.2rem;
+      text-align: center;
+      text-shadow: 0 0 18px #0ff;
+      animation: pulse 2.5s ease-in-out infinite;
+      margin: 2rem 0;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    #answers {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    #answers button {
+      flex: 1 1 40%;
+      max-width: 45%;
+      padding: 1.2rem;
+      font-size: 1.6rem;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #00ffc8, #007f5f);
+      color: #000;
+      box-shadow: 0 6px 20px rgba(0, 255, 170, 0.3);
+      transition: transform 0.25s ease, background 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+    }
+
+    #answers button:hover, #answers button:focus {
+      background: #5fffc8;
+      transform: scale(1.07);
+      box-shadow: 0 8px 25px rgba(0, 255, 170, 0.5);
+      outline: none;
+    }
+
+    #timer-bar {
+      height: 24px;
+      margin-top: 2.5rem;
+      background: #1a1a1a;
+      border-radius: 14px;
+      border: 1px solid #333;
+      overflow: hidden;
+    }
+
+    #timer-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(to right, #00ff00, #ffff00, #ff0000);
+      transition: width 0s;
+    }
+
+    .coin-animation {
+      width: 26px;
+      height: 26px;
+      background: radial-gradient(circle, gold 0%, orange 80%);
+      border-radius: 50%;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      z-index: 9999;
+      opacity: 0;
+      animation: burst 1s ease-out forwards;
+      box-shadow: 0 0 12px #ffc, 0 0 24px #ff0;
+    }
+
+    .coin-animation:nth-child(odd) { animation-delay: var(--delay); }
+
+    @keyframes burst {
+      0% { transform: translate(-50%, -50%) scale(0.9); opacity: 1; }
+      100% {
+        transform: translate(calc(-50% + 180px * (0.5 - var(--x))), calc(-50% + 180px * var(--x))) scale(1.2);
+        opacity: 0;
+      }
+    }
+
+    #level-up-banner {
+      display: none;
+      position: fixed;
+      top: 12%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2.8rem;
+      color: #0ff;
+      text-shadow: 0 0 25px #0ff, 0 0 10px #0ff;
+      z-index: 1001;
+    }
+
+    #end-screen {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 10, 10, 0.96);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 2rem;
+      z-index: 1000;
+      text-align: center;
+    }
+
+    #end-screen button {
+      background: #00f8ff;
+      color: #000;
+      padding: 1rem 2.5rem;
+      font-size: 1.5rem;
+      border: none;
+      border-radius: 14px;
+      margin-top: 2rem;
+      cursor: pointer;
+      box-shadow: 0 4px 20px #00f8ff;
+      transition: transform 0.2s ease;
+    }
+
+    #end-screen button:hover {
+      transform: scale(1.08);
+    }
+
+    .flash-wrong {
+      animation: flashRed 0.3s ease;
+    }
+
+    @keyframes flashRed {
+      0% { background-color: #ff4a4a; }
+      100% { background-color: transparent; }
+    }
+
+    audio { display: none; }
+
+    @media (max-width: 768px) {
+      #equation-box h1 { font-size: 2.2rem; }
+      #answers button {
+        font-size: 1.2rem;
+        padding: 0.9rem;
+        max-width: 100%;
+      }
+      #score-panel { flex-direction: column; gap: 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <noscript>
+    <div style="color:white; background:black; text-align:center; padding:2rem;">
+      ⚠️ JavaScript is required to play GameLucid Pro.
+    </div>
+  </noscript>
+
+  <!-- Home Screen -->
+  <div id="home-screen">
+    <div class="home-content">
+      <h1>🚀 Welcome to GameLucid Pro</h1>
+      <p>Sharpen your mind. Collect coins. Beat your highest score!</p>
+      <button id="start-btn">Start Game</button>
+    </div>
+  </div>
+
+  <!-- Game UI -->
+  <div id="game-container" role="main">
+    <div id="score-panel">
+      <div><img class="icon" src="..." alt="Coins Icon" />Coins: <span id="coins">0</span></div>
+      <div><img class="icon" src="..." alt="Score Icon" />Score: <span id="score">0</span></div>
+      <div><img class="icon" src="..." alt="High Score Icon" />High: <span id="high-score">0</span></div>
+    </div>
+    <div id="equation-box"><h1 id="equation" aria-live="polite"></h1></div>
+    <div id="answers" role="group" aria-label="Answer choices"></div>
+    <div id="timer-bar" aria-label="Timer progress"><div id="timer-fill"></div></div>
+  </div>
+
+  <div id="level-up-banner" aria-live="assertive">Level Up!</div>
+
+  <div id="end-screen" role="dialog" aria-modal="true">
+    <p>⏰ Time's up!</p>
+    <p>Your Score: <span id="final-score"></span></p>
+    <p>High Score: <span id="final-high-score"></span></p>
+    <p>Coins Earned: <span id="final-coins"></span></p>
+    <button onclick="location.reload()">Play Again</button>
+  </div>
+
+  <audio id="coin-sound" src="coin.wav" preload="auto"></audio>
+  <audio id="wrong-sound" src="wrong.wav" preload="auto"></audio>
+
+  <script>
+    const CONFIG = { MIN_TIMER: 1200, BASE_TIMER: 3500, DECAY_RATE: 150 };
+    const DOM = {
+      eqEl: document.getElementById('equation'),
+      ansCon: document.getElementById('answers'),
+      scoreEl: document.getElementById('score'),
+      highEl: document.getElementById('high-score'),
+      coinsEl: document.getElementById('coins'),
+      timerFill: document.getElementById('timer-fill'),
+      lvlBanner: document.getElementById('level-up-banner'),
+      endScreen: document.getElementById('end-screen'),
+      finalScore: document.getElementById('final-score'),
+      finalHigh: document.getElementById('final-high-score'),
+      finalCoins: document.getElementById('final-coins'),
+      coinSnd: document.getElementById('coin-sound'),
+      wrongSnd: document.getElementById('wrong-sound')
+    };
+
+    let score = 0, coins = 0, level = 1, timer;
+
+    const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+    function evaluateExpression(expr) {
+      try {
+        const tokens = expr.split(' ');
+        let result = parseInt(tokens[0]);
+        for (let i = 1; i < tokens.length; i += 2) {
+          const op = tokens[i], val = parseInt(tokens[i + 1]);
+          result += (op === '+') ? val : -val;
+        }
+        return result;
+      } catch { return 0; }
+    }
+
+    function generateEquation(lv) {
+      let q;
+      if (lv <= 5) q = `${rand(1, 9)} ${Math.random() > 0.5 ? '+' : '-'} ${rand(1, 9)}`;
+      else if (lv <= 10) q = `${rand(1, 9)} - ${rand(1, 9)} + ${rand(1, 9)}`;
+      else q = `${rand(10, 50)} ${Math.random() > 0.5 ? '+' : '-'} ${rand(10, 50)}`;
+      const correct = evaluateExpression(q);
+      const opts = new Set([correct]);
+      while (opts.size < 4) opts.add(correct + rand(-10, 10));
+      return { question: `${q} = ?`, correct, options: Array.from(opts).sort(() => Math.random() - 0.5) };
+    }
+
+    function startTimer() {
+      const dur = Math.max(CONFIG.MIN_TIMER, CONFIG.BASE_TIMER - level * CONFIG.DECAY_RATE);
+      DOM.timerFill.style.transition = 'none';
+      DOM.timerFill.style.width = '100%';
+      setTimeout(() => {
+        DOM.timerFill.style.transition = `width ${dur}ms linear`;
+        DOM.timerFill.style.width = '0%';
+      }, 50);
+      timer = setTimeout(endGame, dur);
+    }
+
+    function showLevelUp() {
+      DOM.lvlBanner.style.display = 'block';
+      setTimeout(() => DOM.lvlBanner.style.display = 'none', 800);
+    }
+
+    function playCoinAnimation() {
+      for (let i = 0; i < 6; i++) {
+        const coin = document.createElement('div');
+        coin.className = 'coin-animation';
+        coin.style.setProperty('--x', Math.random().toFixed(2));
+        coin.style.setProperty('--delay', `${i * 0.1}s`);
+        document.body.appendChild(coin);
+        setTimeout(() => coin.remove(), 1200);
+      }
+    }
+
+    function loadQuestion() {
+      clearTimeout(timer);
+      const eq = generateEquation(level);
+      DOM.eqEl.textContent = eq.question;
+      DOM.ansCon.innerHTML = '';
+      eq.options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.setAttribute('aria-label', `Answer: ${opt}`);
+        btn.onclick = () => handleAnswer(opt === eq.correct);
+        DOM.ansCon.appendChild(btn);
+      });
+      startTimer();
+    }
+
+    function handleAnswer(correct) {
+      clearTimeout(timer);
+      if (correct) {
+        DOM.coinSnd.play();
+        score++; coins++; level++;
+        DOM.scoreEl.textContent = score;
+        DOM.coinsEl.textContent = coins;
+        showLevelUp();
+        playCoinAnimation();
+        loadQuestion();
+      } else {
+        DOM.wrongSnd.play();
+        endGame();
+      }
+    }
+
+    function endGame() {
+      clearTimeout(timer);
+      DOM.finalScore.textContent = score;
+      DOM.finalCoins.textContent = coins;
+      DOM.finalHigh.textContent = DOM.highEl.textContent;
+      DOM.endScreen.style.display = 'flex';
+    }
+
+    // Start game from home screen
+    document.getElementById('start-btn').addEventListener('click', () => {
+      document.getElementById('home-screen').style.display = 'none';
+      const countdown = ['3', '2', '1', '<span style="display:flex;align-items:center;justify-content:center;gap:0.5rem;"><svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="cyan" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>START!</span>'];
+      let idx = 0;
+      const ci = setInterval(() => {
+        DOM.eqEl.innerHTML = countdown[idx++];
+        if (idx === countdown.length) {
+          clearInterval(ci);
+          setTimeout(loadQuestion, 500);
+        }
+      }, 700);
+    });
+  </script>
+</body>
+</html>
