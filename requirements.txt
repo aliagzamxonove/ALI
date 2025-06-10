@@ -5,3 +5,4 @@ flask-mail
 email-validator
 python-dotenv
 markdown
+requests
