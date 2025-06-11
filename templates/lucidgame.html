@@ -5,8 +5,6 @@
   <title>GameLucid Pro</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 
-  <link rel="icon" href="{{ url_for('static', filename='IFTA5458.png') }}" type="image/png" />
-
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
@@ -17,7 +15,7 @@
   <link rel="preload" href="/static/audio/coin.wav" as="audio" type="audio/wav">
   <link rel="preload" href="/static/audio/wrong.wav" as="audio" type="audio/wav">
   <link rel="preload" href="/static/audio/menu-loop.mp3" as="audio" type="audio/mp3">
-
+   
   <link rel="preload" as="image" href="/static/backgrounds/bghome.png">
   <link rel="preload" as="image" href="/static/backgrounds/bg1.png">
   <link rel="preload" as="image" href="/static/backgrounds/bg2.png">
@@ -87,14 +85,16 @@ body {
   z-index: 2000;
   padding: 2rem;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  overflow: hidden;
+
+  /* ⬇️ Background Image Setup */
+  background-image: url('./static/backgrounds/bghome.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 
   /* Optional dark overlay */
   background-color: rgba(0, 0, 0, 0.6);
   background-blend-mode: overlay;
-}
-#home-screen {
-  overflow: hidden;
 }
 
 .home-content {
@@ -127,10 +127,10 @@ body {
 }
 
 #stars-canvas {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
-  z-index: 0; 
+  z-index: 2001;
   width: 100vw;
   height: 100vh;
   pointer-events: none;
@@ -149,45 +149,68 @@ body {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
 }
 
-/* Start Button (Glow & Neon) */
+/* PRO-LEVEL Start Button */
 #start-btn {
   margin-top: 2rem;
-  padding: 1rem 2.8rem;
-  font-size: 1.6rem;
-  background: linear-gradient(135deg, #00ffc8, #007f5f);
-  color: black;
-  border: none;
-  border-radius: 50px;
+  padding: 1rem 2.6rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  font-family: 'Segoe UI', 'Roboto', sans-serif;
+  color: #f4fefc;
+  background: linear-gradient(135deg, #0f3d2e, #1e7e4e, #3ed39b);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
   cursor: pointer;
-  box-shadow: 0 0 20px rgba(0, 255, 204, 0.5);
   position: relative;
   overflow: hidden;
-  transition: all 0.4s ease;
-  font-weight: bold;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.08em;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  box-shadow:
+    0 4px 10px rgba(0, 64, 32, 0.3),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(4px);
+  will-change: transform, box-shadow;
 }
 
+/* Subtle Shimmer Line */
 #start-btn::after {
   content: "";
   position: absolute;
-  top: -100%;
-  left: 0;
-  width: 100%;
-  height: 300%;
-  background: linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%);
-  animation: shimmerLine 3s infinite;
+  top: 0;
+  left: -70%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.05), transparent);
+  transform: skewX(-25deg);
+  animation: shimmerLine 2.6s ease-in-out infinite;
 }
 
 @keyframes shimmerLine {
-  0% { top: -100%; }
-  100% { top: 100%; }
+  0% { left: -70%; }
+  100% { left: 130%; }
 }
 
+/* Hover Interaction */
 #start-btn:hover {
-  transform: scale(1.08);
-  box-shadow: 0 0 30px rgba(0, 255, 204, 0.8);
+  transform: scale(1.02);
+  box-shadow:
+    0 6px 14px rgba(30, 150, 100, 0.3),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
+
+#start-btn:active {
+  transform: scale(0.98);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Optional Active Click */
+#start-btn:active {
+  transform: scale(0.99);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) inset;
+}
+
 
 /* Score Panel with Enhanced Glass Effect */
 #score-panel {
@@ -220,64 +243,52 @@ body {
   color: #00ffff;
 }
 /* Game Container */
-#game-screen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex
-  justify-content: center;
-  align-items: center;
-  background: transparent; /* background handled elsewhere */
-  z-index: 10;
-}
-
 #game-container {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -40%);
-  opacity: 1; /* ensure it's visible */
+  opacity: 1;
   width: 92vw;
   max-width: 740px;
-  padding: 3rem 2.2rem;
+  padding: 3rem 2.4rem;
+
   z-index: 100;
-  background: rgba(255, 255, 255, 0.07);
-  backdrop-filter: blur(18px) saturate(180%);
-  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  border-radius: 24px;
+
+  background: rgba(20, 24, 28, 0.65);
+  backdrop-filter: blur(20px) saturate(200%);
+  -webkit-backdrop-filter: blur(20px) saturate(200%);
 
   box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.2),
-    inset 0 1px 2px rgba(255, 255, 255, 0.1),
-    0 0 0 1px rgba(255, 255, 255, 0.04),
-    0 12px 40px rgba(0, 255, 204, 0.1);
+    0 10px 24px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  transition: all 0.4s ease-in-out;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.4s ease;
 }
 
 /* Equation Box Title with Neon Gradient */
 #equation-box h1 {
-  font-size: clamp(2.8rem, 6vw, 4.2rem);
-  font-weight: 900;
+  font-size: clamp(2.8rem, 6vw, 4rem);
+  font-weight: 800;
   text-align: center;
-  margin: 2.2rem 0;
+  margin: 2rem 0;
 
-  background: linear-gradient(90deg, #ffffff, #e0fffa, #ffffff);
+  background: linear-gradient(90deg, #e0f7fa, #ffffff, #d1f2eb);
   background-size: 300%;
   background-position: center;
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
-  -webkit-text-fill-color: transparent;
 
   text-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.4),
-    0 0 10px rgba(0, 255, 255, 0.1),
-    0 0 18px rgba(0, 255, 204, 0.2);
+    0 2px 3px rgba(0, 0, 0, 0.3),
+    0 0 12px rgba(0, 255, 255, 0.2),
+    0 0 22px rgba(0, 200, 180, 0.25);
 
-  animation: textGlowMaster 6s ease-in-out infinite, gradientFlow 10s linear infinite;
+  animation: gradientFlow 12s linear infinite;
 }
 
 @keyframes textGlowMaster {
@@ -313,161 +324,139 @@ body {
 }
 
 #answers button {
-  flex: 1 1 40%;
-  max-width: 45%;
-  padding: 1.3rem;
-  font-size: 1.5rem;
+  flex: 1 1 45%;
+  padding: 1.1rem 1.5rem;
+  font-size: 1.4rem;
   font-weight: 600;
-  color: #000;
+  color: #fefefe;
+  background: linear-gradient(135deg, #00796b, #00cba9);
   border: none;
-  border-radius: 18px;
+  border-radius: 16px;
   cursor: pointer;
   position: relative;
   overflow: hidden;
 
-  background: linear-gradient(135deg, #00ffc8, #007f5f);
   box-shadow:
-    0 6px 16px rgba(0, 255, 170, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  transition: all 0.25s ease-in-out;
+    0 6px 16px rgba(0, 255, 170, 0.2),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  transition: all 0.25s ease;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
 }
 
+#answers button:hover {
+  transform: translateY(-2px) scale(1.05);
+  background: linear-gradient(135deg, #00bfa5, #1de9b6);
+  box-shadow: 0 12px 24px rgba(0, 255, 170, 0.4);
+}
 
 #answers button::after {
   content: '';
   position: absolute;
-  width: 180%;
+  width: 160%;
   height: 100%;
   top: 0;
-  left: -100%;
-  background: linear-gradient(
-    120deg,
-    rgba(255, 255, 255, 0.1) 0%,
-    rgba(255, 255, 255, 0.25) 50%,
-    rgba(255, 255, 255, 0.1) 100%
-  );
+  left: -80%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.12), transparent);
   transform: skewX(-25deg);
   transition: all 0.4s ease;
   opacity: 0;
 }
 
-#answers button:hover {
-  transform: scale(1.05);
-  box-shadow:
-    0 10px 24px rgba(0, 255, 170, 0.35),
-    inset 0 0 8px rgba(255, 255, 255, 0.08);
-}
-
 #answers button:hover::after {
   left: 100%;
   opacity: 1;
-}
+} 
 
-#answers button:hover {
-  transform: scale(1.07);
-  background: #5fffc8;
-  box-shadow: 0 8px 26px rgba(0, 255, 170, 0.5);
-}
-
-#answers button:hover::after {
-  left: 100%;
-  opacity: 1;
-}
-
-/* Base Container */
+/* Pro-Level Timer Bar */
 #timer-bar {
-  position: relative;
-  height: 30px;
-  margin-top: 3rem;
-  border-radius: 100px;
+  height: 24px;
+  margin-top: 2.5rem;
+  background: linear-gradient(to right, #1e1e1e, #2a2a2a);
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   overflow: hidden;
-  background: radial-gradient(ellipse at center, rgba(0, 255, 200, 0.08), rgba(0, 0, 0, 0.1));
-  border: 1px solid rgba(0, 255, 200, 0.2);
-  box-shadow: 0 0 20px rgba(0, 255, 200, 0.15);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  box-shadow:
+    inset 0 1px 3px rgba(255, 255, 255, 0.05),
+    inset 0 -1px 4px rgba(0, 0, 0, 0.2),
+    0 2px 6px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(6px);
 }
 
-/* Fill Line */
+/* Progress Fill */
 #timer-fill {
   height: 100%;
-  width: 100%; /* update via JS */
-  background: linear-gradient(90deg, #00f0ff, #00c8d6);
-  background-size: 200% 100%;
-  animation: pulseGradient 4s ease-in-out infinite;
-  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 100px;
-  position: relative;
-  z-index: 2;
-  box-shadow: inset 0 0 10px rgba(0, 255, 255, 0.25);
-}
-
-/* Glow Overlay */
-.timer-glow {
-  content: '';
-  position: absolute;
-  top: 0; left: 0;
   width: 100%;
-  height: 100%;
-  border-radius: 100px;
-  background: radial-gradient(circle at 50% 50%, rgba(0, 255, 255, 0.1), transparent 70%);
-  opacity: 0.5;
-  animation: glowBreath 6s ease-in-out infinite;
-  z-index: 1;
-  pointer-events: none;
+  background: linear-gradient(90deg, #8e0000, #c43e00, #dcdcdc);
+  background-size: 200% auto;
+  animation: timerPulse 4s ease-in-out infinite;
+  transition: width 0.3s ease;
+  border-radius: 14px;
+  box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.05);
 }
 
-/* Gradient shimmer movement */
-@keyframes pulseGradient {
+/* Subtle, Elegant Animation */
+@keyframes timerPulse {
   0% {
-    background-position: 0% 50%;
+    background-position: 0% 0%;
   }
   50% {
-    background-position: 100% 50%;
+    background-position: 100% 0%;
   }
   100% {
-    background-position: 0% 50%;
-  }
-}
-
-/* Breathing light effect */
-@keyframes glowBreath {
-  0%, 100% {
-    opacity: 0.5;
-  }
-  50% {
-    opacity: 0.9;
+    background-position: 0% 0%;
   }
 }
 
 
 /* Level Up Banner */
 #level-up-banner {
-  animation: fadeInOut 1.5s ease forwards;
   position: absolute;
   top: 12%;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(0, 255, 255, 0.12);
-  padding: 1rem 2rem;
-  border-radius: 12px;
-  font-size: 2.1rem;
   display: none;
-  backdrop-filter: blur(10px);
+  padding: 1.2rem 2.5rem;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #e6fdfc;
+  background: linear-gradient(135deg, rgba(0, 64, 64, 0.5), rgba(0, 128, 128, 0.2));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  box-shadow:
+    0 8px 32px rgba(0, 255, 255, 0.1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(12px);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  animation: levelUpReveal 1.6s ease forwards;
+  z-index: 10000;
+  will-change: opacity, transform;
 }
 
-@keyframes fadeInOut {
-  0% { opacity: 0; transform: scale(0.9); }
-  50% { opacity: 1; transform: scale(1.1); }
-  100% { opacity: 0; transform: scale(1); }
+@keyframes levelUpReveal {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px) scale(0.9);
+  }
+  40% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1.05);
+  }
+  70% {
+    transform: translateX(-50%) scale(1.02);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px) scale(1);
+  }
 }
 
-/* Coin Animation */
+/* Professional Coin Animation */
 .coin-animation {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   position: fixed;
   top: 50%;
@@ -475,71 +464,41 @@ body {
   z-index: 9999;
   opacity: 0;
 
-  background: radial-gradient(circle at 40% 40%, #ffd700 0%, #ffa500 65%, #cc8800 100%);
+  background: radial-gradient(circle at 35% 35%, #f8e58c 0%, #d4a232 60%, #7a5d1c 100%);
   box-shadow:
-    0 0 6px rgba(255, 255, 200, 0.5),
-    0 0 12px rgba(255, 255, 100, 0.6),
-    0 0 24px rgba(255, 230, 0, 0.6);
-
-  animation: coinBurst 1.2s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+    inset 0 1px 1px rgba(255, 255, 255, 0.3),
+    inset -1px -1px 2px rgba(0, 0, 0, 0.2),
+    0 2px 8px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(1px);
+  animation: coinBurst 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   pointer-events: none;
+
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+  will-change: transform, opacity;
 }
+
 
 @keyframes coinBurst {
   0% {
-    transform: translate(-50%, -50%) scale(0.5);
+    transform: translate(-50%, -50%) scale(0.4) rotate(0deg);
     opacity: 1;
     filter: blur(0);
   }
-  30% {
-    transform: translate(-50%, -52%) scale(1.2);
-    filter: blur(1px);
-  }
-  60% {
-    transform: translate(calc(-50% + 160px * (0.5 - var(--x))), calc(-50% + 160px * var(--x))) scale(1.4);
+  25% {
+    transform: translate(-50%, -52%) scale(1.2) rotate(120deg);
     filter: blur(0.5px);
   }
-  100% {
-    transform: translate(calc(-50% + 220px * (0.5 - var(--x))), calc(-50% + 220px * var(--x))) scale(0.8);
-    opacity: 0;
-    filter: blur(2px);
-  }
-}
-
-/* End Screen */
-/* End Screen (Glassmorphic Overlay) */
-#end-screen {
-  position: fixed;
-  inset: 0;
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  pointer-events: auto;
-
-  background: rgba(18, 18, 18, 0.85);
-  backdrop-filter: blur(18px) saturate(160%);
-  -webkit-backdrop-filter: blur(18px) saturate(160%);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-
-  color: #e0f7fa;
-  font-size: 1.9rem;
-  z-index: 1000;
-  animation: fadeInEnd 0.8s ease-out forwards;
-}
-
-@keyframes fadeInEnd {
-  0% {
-    opacity: 0;
-    transform: scale(0.96);
+  60% {
+    transform: translate(calc(-50% + 140px * (0.5 - var(--x))), calc(-50% + 140px * var(--x))) scale(1.05) rotate(240deg);
+    filter: blur(0.2px);
   }
   100% {
-    opacity: 1;
-    transform: scale(1);
+    transform: translate(calc(-50% + 220px * (0.5 - var(--x))), calc(-50% + 220px * var(--x))) scale(0.75) rotate(360deg);
+    opacity: 0;
+    filter: blur(1.2px);
   }
 }
+
 /* End Screen (Glassmorphic Overlay) */
 #end-screen {
   position: fixed;
@@ -815,30 +774,31 @@ audio { display: none; }
 <canvas id="hero-particles"></canvas>
 <div id="bg-overlay"></div>
 
-  <!-- Home screen UI --> 
-  <div id="home-screen" class="hero fade-in">
+<!-- Home screen UI --> 
+<div id="home-screen" class="hero fade-in">
+  
+  <!-- 🌌 Stars canvas background -->
+  <canvas id="stars-canvas"></canvas>
 
-    <!-- 🌌 Stars canvas background (absolute within home-screen) -->
-    <canvas id="stars-canvas"></canvas>
+  <!-- Main content -->
+  <div class="hero-content">
+    <h1><i class="bi bi-controller"></i> Welcome to <span class="highlight">GameLucid Pro</span></h1>
+    <p>Sharpen your mind. Collect coins. Beat your highest score!</p>
 
-    <!-- Main content (z-indexed above canvas) -->
-    <div class="hero-content">
-      <h1><i class="bi bi-controller"></i> Welcome to <span class="highlight">GameLucid Pro</span></h1>
-      <p>Sharpen your mind. Collect coins. Beat your highest score!</p>
-
-      <div class="home-info">
-        <div><i class="fas fa-trophy"></i> High Score: <span id="home-high-score">0</span></div>
-        <div><i class="fas fa-coins"></i> Coins: <span id="home-coins">0</span></div>
-      </div>
+    <div class="home-info">
+      <div><i class="fas fa-trophy"></i> High Score: <span id="home-high-score">0</span></div>
+      <div><i class="fas fa-coins"></i> Coins: <span id="home-coins">0</span></div>
     </div>
+</div>
 
     <div class="controls">
       <button id="start-btn"><i class="bi bi-play-circle"></i> Start Game</button>
-      <button id="mute-btn" title="Toggle Sound">
+        <button id="mute-btn" title="Toggle Sound">
         <i class="fas fa-volume-up"></i>
       </button>
     </div>
   </div>
+</div>
 
 <!-- GAME SCREEN: Wrap everything related to gameplay here -->
 <div id="game-screen" style="display: none;">
@@ -852,10 +812,8 @@ audio { display: none; }
   <div id="game-container">
     <div id="equation-box"><h1 id="equation"></h1></div>
     <div id="answers"></div>
-<div id="timer-bar">
-  <div id="timer-fill"></div>
-  <div class="timer-glow"></div>
-</div>
+    <div id="timer-bar"><div id="timer-fill"></div></div>
+  </div>
 
 <!-- Extra Effects & Banners -->
 <div id="dynamic-bg" aria-hidden="true"></div>
@@ -1073,21 +1031,6 @@ document.getElementById('start-btn').addEventListener('click', () => {
 
   function endGame() {
     clearTimeout(timer);
-
-
-function updateTimer(percent) {
-  const fill = document.getElementById("timer-fill");
-  fill.style.width = percent + "%";
-
-  // Color changes based on progress
-  if (percent < 15) {
-    fill.style.background = "linear-gradient(90deg, #ff1744, #d50000)";
-  } else if (percent < 40) {
-    fill.style.background = "linear-gradient(90deg, #ffab00, #ff6f00)";
-  } else {
-    fill.style.background = "linear-gradient(90deg, #00f0ff, #00c8d6)";
-  }
-}
 
     // Save high score if needed
     if (score > highScore) {
