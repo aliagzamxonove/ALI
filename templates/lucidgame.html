@@ -816,6 +816,15 @@ audio { display: none; }
 #game-container {
   opacity: 1 !important;
 }
+.hidden {
+  display: none !important;
+  visibility: hidden;
+  opacity: 0 !important;
+}
+#home-screen.hidden::before {
+  content: none;
+  display: none !important;
+}
   </style>
 </head>
 <body>
@@ -955,7 +964,7 @@ document.getElementById('start-btn').addEventListener('click', () => {
   const homeScreen = document.getElementById('home-screen');
   const gameScreen = document.getElementById('game-screen');
 
-  homeScreen.style.display = 'none';
+  homeScreen.classList.add('hidden');
   gameScreen.style.display = 'block';
 
   // Ensure the animation triggers after layout
