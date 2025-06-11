@@ -99,6 +99,9 @@ body {
   background-color: rgba(0, 0, 0, 0.6);
   background-blend-mode: overlay;
 }
+#home-screen {
+  overflow: hidden;
+}
 
 .home-content {
   max-width: 700px;
@@ -821,22 +824,22 @@ audio { display: none; }
 <canvas id="hero-particles"></canvas>
 <div id="bg-overlay"></div>
 
-<!-- Home screen UI --> 
-<div id="home-screen" class="hero fade-in">
-  
-  <!-- 🌌 Stars canvas background -->
-  <canvas id="stars-canvas"></canvas>
+  <!-- Home screen UI --> 
+  <div id="home-screen" class="hero fade-in">
+    
+    <!-- 🌌 Stars canvas background (absolute within home-screen) -->
+    <canvas id="stars-canvas"></canvas>
 
-  <!-- Main content -->
-  <div class="hero-content">
-    <h1><i class="bi bi-controller"></i> Welcome to <span class="highlight">GameLucid Pro</span></h1>
-    <p>Sharpen your mind. Collect coins. Beat your highest score!</p>
+    <!-- Main content (z-indexed above canvas) -->
+    <div class="hero-content">
+      <h1><i class="bi bi-controller"></i> Welcome to <span class="highlight">GameLucid Pro</span></h1>
+      <p>Sharpen your mind. Collect coins. Beat your highest score!</p>
 
-    <div class="home-info">
-      <div><i class="fas fa-trophy"></i> High Score: <span id="home-high-score">0</span></div>
-      <div><i class="fas fa-coins"></i> Coins: <span id="home-coins">0</span></div>
+      <div class="home-info">
+        <div><i class="fas fa-trophy"></i> High Score: <span id="home-high-score">0</span></div>
+        <div><i class="fas fa-coins"></i> Coins: <span id="home-coins">0</span></div>
+      </div>
     </div>
-</div>
 
     <div class="controls">
       <button id="start-btn"><i class="bi bi-play-circle"></i> Start Game</button>
@@ -845,7 +848,6 @@ audio { display: none; }
       </button>
     </div>
   </div>
-</div>
 
 <!-- GAME SCREEN: Wrap everything related to gameplay here -->
 <div id="game-screen" style="display: none;">
