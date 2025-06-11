@@ -77,25 +77,76 @@ body {
 #home-screen {
   position: fixed;
   inset: 0;
-  background: linear-gradient(135deg, #000428, #004e92);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
   z-index: 2000;
-  animation: bgPulse 8s ease-in-out infinite alternate;
-}
+  padding: 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 
-@keyframes bgPulse {
-  0% { background: linear-gradient(135deg, #000428, #004e92); }
-  100% { background: linear-gradient(135deg, #1a1a1a, #005f99); }
+  /* ⬇️ Background Image Setup */
+  background-image: url('./static/backgrounds/bghome.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  /* Optional dark overlay */
+  background-color: rgba(0, 0, 0, 0.6);
+  background-blend-mode: overlay;
 }
 
 .home-content {
-  max-width: 600px;
-  padding: 2rem;
+  max-width: 700px;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 2.5rem;
+  border-radius: 20px;
+  box-shadow: 0 0 25px rgba(0, 255, 255, 0.08);
   animation: fadeInUp 1.4s cubic-bezier(0.25, 1, 0.5, 1);
+  color: #f0f0f0;
+}
+#home-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: inherit;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transform: scale(1.1);
+  opacity: 1;
+  animation: kenBurns 30s ease-in-out infinite alternate;
+}
+
+@keyframes kenBurns {
+  0% { transform: scale(1.1); }
+  100% { transform: scale(1.15); }
+}
+
+#stars-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -2;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+/* Darker Task Section */
+.home-content h2 {
+  font-size: 2.2rem;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.6); /* Darkened backdrop */
+  padding: 0.8rem 1.2rem;
+  border-radius: 12px;
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
 }
 
 /* Start Button (Glow & Neon) */
@@ -138,66 +189,109 @@ body {
   box-shadow: 0 0 30px rgba(0, 255, 204, 0.8);
 }
 
-/* Score Panel with Glass Effect */
+/* Score Panel with Enhanced Glass Effect */
 #score-panel {
   position: fixed;
-  top: 10px;
+  top: 20px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   gap: 1rem;
   z-index: 9999;
-  padding: 0.5rem 1rem;
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: 12px;
-  backdrop-filter: blur(8px);
-  box-shadow: inset 1px 1px 8px rgba(255, 255, 255, 0.1), 0 2px 12px rgba(0, 0, 0, 0.2);
+  padding: 0.8rem 1.2rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+  box-shadow: inset 1px 1px 10px rgba(255, 255, 255, 0.08), 0 4px 14px rgba(0, 0, 0, 0.3);
 }
 
 #score-panel div {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 1.1rem;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 0.4rem 0.9rem;
-  border-radius: 8px;
+  gap: 0.6rem;
+  font-size: 1.15rem;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
 }
 
 #score-panel i {
-  color: #0ff;
+  color: #00ffff;
 }
-
 /* Game Container */
 #game-container {
-  position: fixed;
+  position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -40%);
+  opacity: 1; /* ensure it's visible */
   width: 92vw;
-  max-width: 720px;
-  padding: 1.5rem;
+  max-width: 740px;
+  padding: 3rem 2.2rem;
+
   z-index: 100;
-  margin-top: 80px;
+  border-radius: 28px;
+
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.04),
+    0 12px 40px rgba(0, 255, 204, 0.1);
+
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transition: all 0.4s ease-in-out;
 }
 
 /* Equation Box Title with Neon Gradient */
 #equation-box h1 {
-  font-size: 3.8rem;
+  font-size: clamp(2.8rem, 6vw, 4.2rem);
+  font-weight: 900;
   text-align: center;
-  font-weight: 800;
-  background: linear-gradient(to right, #0ff, #00f);
+  margin: 2.2rem 0;
+
+  background: linear-gradient(90deg, #ffffff, #e0fffa, #ffffff);
+  background-size: 300%;
+  background-position: center;
+  background-clip: text;
   -webkit-background-clip: text;
+  color: transparent;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 8px #0ff, 0 0 24px #0ff, 0 0 42px #00f;
-  animation: pulse 2.8s ease-in-out infinite;
-  margin: 2rem 0;
+
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.4),
+    0 0 10px rgba(0, 255, 255, 0.1),
+    0 0 18px rgba(0, 255, 204, 0.2);
+
+  animation: textGlowMaster 6s ease-in-out infinite, gradientFlow 10s linear infinite;
 }
 
-/* Pulse Animation */
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.06); }
+@keyframes textGlowMaster {
+  0%, 100% {
+    text-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.4),
+      0 0 10px rgba(0, 255, 255, 0.1),
+      0 0 18px rgba(0, 255, 204, 0.2);
+  }
+  50% {
+    text-shadow:
+      0 2px 6px rgba(0, 0, 0, 0.5),
+      0 0 14px rgba(0, 255, 255, 0.25),
+      0 0 26px rgba(0, 255, 204, 0.4);
+  }
+}
+
+@keyframes gradientFlow {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
 }
 
 /* Answers Buttons with Hover Effect */
@@ -211,30 +305,54 @@ body {
 #answers button {
   flex: 1 1 40%;
   max-width: 45%;
-  padding: 1.2rem;
-  font-size: 1.6rem;
-  border: none;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #00ffc8, #007f5f);
+  padding: 1.3rem;
+  font-size: 1.5rem;
+  font-weight: 600;
   color: #000;
-  box-shadow: 0 6px 22px rgba(0, 255, 170, 0.3);
+  border: none;
+  border-radius: 18px;
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  transition: all 0.3s ease;
+
+  background: linear-gradient(135deg, #00ffc8, #007f5f);
+  box-shadow:
+    0 6px 16px rgba(0, 255, 170, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.25s ease-in-out;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
+
 
 #answers button::after {
   content: '';
   position: absolute;
-  width: 140%;
+  width: 180%;
   height: 100%;
   top: 0;
-  left: -20%;
-  background: linear-gradient(120deg, rgba(255,255,255,0.1), rgba(255,255,255,0.03), rgba(255,255,255,0.1));
+  left: -100%;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.25) 50%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
   transform: skewX(-25deg);
-  transition: all 0.5s ease;
+  transition: all 0.4s ease;
   opacity: 0;
+}
+
+#answers button:hover {
+  transform: scale(1.05);
+  box-shadow:
+    0 10px 24px rgba(0, 255, 170, 0.35),
+    inset 0 0 8px rgba(255, 255, 255, 0.08);
+}
+
+#answers button:hover::after {
+  left: 100%;
+  opacity: 1;
 }
 
 #answers button:hover {
@@ -250,20 +368,35 @@ body {
 
 /* Timer Bar */
 #timer-bar {
-  height: 26px;
+  height: 28px;
   margin-top: 2.5rem;
-  background: #1a1a1a;
-  border-radius: 16px;
-  border: 1px solid #333;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   overflow: hidden;
+  box-shadow: inset 0 0 10px rgba(0, 255, 204, 0.1);
 }
 
 #timer-fill {
   height: 100%;
   width: 100%;
   background: linear-gradient(to right, #00c853, #ffab00, #d50000);
+  background-size: 300% 100%;
+  animation: timerPulse 3s linear infinite;
   transition: width 0.2s linear;
+  border-radius: 20px;
 }
+
+@keyframes timerPulse {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+
 
 /* Level Up Banner */
 #level-up-banner {
@@ -288,54 +421,137 @@ body {
 
 /* Coin Animation */
 .coin-animation {
-  width: 28px;
-  height: 28px;
-  background: radial-gradient(circle, gold 0%, orange 90%);
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   position: fixed;
   top: 50%;
   left: 50%;
   z-index: 9999;
   opacity: 0;
-  animation: burst 1.2s ease-out forwards;
-  box-shadow: 0 0 14px #ffc, 0 0 28px #ff0;
+
+  background: radial-gradient(circle at 40% 40%, #ffd700 0%, #ffa500 65%, #cc8800 100%);
+  box-shadow:
+    0 0 6px rgba(255, 255, 200, 0.5),
+    0 0 12px rgba(255, 255, 100, 0.6),
+    0 0 24px rgba(255, 230, 0, 0.6);
+
+  animation: coinBurst 1.2s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+  pointer-events: none;
 }
 
-@keyframes burst {
-  0% { transform: translate(-50%, -50%) scale(0.8); opacity: 1; }
-  100% { transform: translate(calc(-50% + 180px * (0.5 - var(--x))), calc(-50% + 180px * var(--x))) scale(1.2); opacity: 0; }
+@keyframes coinBurst {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 1;
+    filter: blur(0);
+  }
+  30% {
+    transform: translate(-50%, -52%) scale(1.2);
+    filter: blur(1px);
+  }
+  60% {
+    transform: translate(calc(-50% + 160px * (0.5 - var(--x))), calc(-50% + 160px * var(--x))) scale(1.4);
+    filter: blur(0.5px);
+  }
+  100% {
+    transform: translate(calc(-50% + 220px * (0.5 - var(--x))), calc(-50% + 220px * var(--x))) scale(0.8);
+    opacity: 0;
+    filter: blur(2px);
+  }
 }
 
 /* End Screen */
+/* End Screen (Glassmorphic Overlay) */
 #end-screen {
   position: fixed;
   inset: 0;
-  background: rgba(10, 10, 10, 0.97);
   display: none;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: white;
-  font-size: 2.1rem;
-  z-index: 1000;
   text-align: center;
+  pointer-events: auto;
+
+  background: rgba(18, 18, 18, 0.85);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+  color: #e0f7fa;
+  font-size: 1.9rem;
+  z-index: 1000;
+  animation: fadeInEnd 0.8s ease-out forwards;
 }
 
+@keyframes fadeInEnd {
+  0% {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+/* End Screen (Glassmorphic Overlay) */
+#end-screen {
+  position: fixed;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  background: rgba(18, 18, 18, 0.85);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+  color: #e0f7fa;
+  font-size: 1.9rem;
+  z-index: 1000;
+  animation: fadeInEnd 0.8s ease-out forwards;
+}
+
+@keyframes fadeInEnd {
+  0% {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
 #end-screen button {
-  background: #00f8ff;
+  background: linear-gradient(135deg, #00ffc8, #0ff);
   color: #000;
   padding: 1.1rem 2.8rem;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   border: none;
-  border-radius: 16px;
-  margin-top: 2rem;
+  border-radius: 18px;
+  margin-top: 2.5rem;
   cursor: pointer;
-  box-shadow: 0 4px 24px #00f8ff;
-  transition: transform 0.3s ease;
+
+  box-shadow:
+    0 6px 16px rgba(0, 255, 255, 0.3),
+    0 0 12px rgba(0, 255, 204, 0.4);
+
+  transition: all 0.3s ease;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 #end-screen button:hover {
-  transform: scale(1.1);
+  transform: scale(1.08);
+  box-shadow:
+    0 10px 26px rgba(0, 255, 255, 0.4),
+    0 0 18px rgba(0, 255, 204, 0.6);
 }
 
 /* Miscellaneous Effects */
@@ -380,41 +596,74 @@ audio { display: none; }
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 140px;
-  height: 140px;
-  border: 6px solid #0ff;
+  width: 160px;
+  height: 160px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 3rem;
-  font-weight: bold;
-  color: #0ff;
-  text-shadow: 0 0 12px #0ff;
+
+  font-size: 3.2rem;
+  font-weight: 800;
+  color: #e0ffff;
+  text-shadow:
+    0 0 6px rgba(0, 255, 255, 0.4),
+    0 0 12px rgba(0, 255, 255, 0.6);
+
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 8px 20px rgba(0, 255, 255, 0.1),
+    inset 0 0 10px rgba(255, 255, 255, 0.08);
+
+  animation: countdownPulse 1.8s ease-in-out infinite;
   z-index: 10000;
-  animation: pulseCount 1s ease infinite;
 }
 
-@keyframes pulseCount {
-  0%, 100% { transform: translate(-50%, -50%) scale(1); }
-  50% { transform: translate(-50%, -50%) scale(1.2); }
+
+@keyframes countdownPulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow:
+      0 8px 20px rgba(0, 255, 255, 0.1),
+      inset 0 0 10px rgba(255, 255, 255, 0.08);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+    box-shadow:
+      0 12px 28px rgba(0, 255, 255, 0.25),
+      inset 0 0 12px rgba(255, 255, 255, 0.12);
+  }
 }
 
 .particle {
   position: fixed;
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: radial-gradient(circle, #0ff, #00f);
+  background: radial-gradient(circle, #a8ffff 0%, #0ff 80%, #00f 100%);
   pointer-events: none;
-  animation: explode 0.8s ease-out forwards;
-  opacity: 0.7;
+  opacity: 0.9;
   z-index: 9999;
+  animation: explode 0.8s ease-out forwards;
+  box-shadow:
+    0 0 6px rgba(0, 255, 255, 0.3),
+    0 0 12px rgba(0, 100, 255, 0.2);
 }
 
 @keyframes explode {
-  0% { opacity: 1; transform: translate(0, 0) scale(1); }
-  100% { opacity: 0; transform: translate(var(--x), var(--y)) scale(0.4); }
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--x), var(--y)) scale(0.6);
+    filter: blur(2px);
+  }
 }
 
 /* Responsive */
@@ -510,237 +759,316 @@ audio { display: none; }
       z-index: -1;
       pointer-events: none;
     }
+#game-container {
+  opacity: 1 !important;
+}
   </style>
 </head>
 <body>
-  <canvas id="firefly-bg"></canvas>
-  <canvas id="hero-particles"></canvas>
+<!-- Background elements -->
+<canvas id="firefly-bg"></canvas>
+<canvas id="hero-particles"></canvas>
+<div id="bg-overlay"></div>
 
-  <!-- Background overlay with your uploaded image -->
-  <div id="bg-overlay"></div>
+<!-- Home screen UI --> 
+<div id="home-screen" class="hero fade-in">
+  
+  <!-- 🌌 Stars canvas background -->
+  <canvas id="stars-canvas"></canvas>
 
-  <!-- Home screen UI -->
-  <div id="home-screen" class="hero fade-in">
-    <div class="hero-content">
-      <h1><i class="bi bi-controller"></i> Welcome to <span class="highlight">GameLucid Pro</span></h1>
-      <p>Sharpen your mind. Collect coins. Beat your highest score!</p>
+  <!-- Main content -->
+  <div class="hero-content">
+    <h1><i class="bi bi-controller"></i> Welcome to <span class="highlight">GameLucid Pro</span></h1>
+    <p>Sharpen your mind. Collect coins. Beat your highest score!</p>
 
-      <div class="home-info">
-        <div><i class="fas fa-trophy"></i> High Score: <span id="home-high-score">0</span></div>
-        <div><i class="fas fa-coins"></i> Coins: <span id="home-coins">0</span></div>
-      </div>
+    <div class="home-info">
+      <div><i class="fas fa-trophy"></i> High Score: <span id="home-high-score">0</span></div>
+      <div><i class="fas fa-coins"></i> Coins: <span id="home-coins">0</span></div>
+    </div>
+</div>
 
-      <div class="controls">
-        <button id="start-btn"><i class="bi bi-play-circle"></i> Start Game</button>
-        <button id="mute-btn" title="Toggle Sound">
-          <i class="fas fa-volume-up"></i>
-        </button>
-      </div>
+    <div class="controls">
+      <button id="start-btn"><i class="bi bi-play-circle"></i> Start Game</button>
+      <button id="mute-btn" title="Toggle Sound">
+        <i class="fas fa-volume-up"></i>
+      </button>
     </div>
   </div>
+</div>
 
+<!-- GAME SCREEN: Wrap everything related to gameplay here -->
+<div id="game-screen" style="display: none;">
+  <!-- Score Panel -->
+  <div id="score-panel">
+    <div><i class="fas fa-star"></i> <span id="score">0</span></div>
+    <div><i class="fas fa-coins"></i> <span id="coins">0</span></div>
+  </div>
+
+  <!-- Game Container -->
   <div id="game-container">
-    <div id="score-panel">
-      <div><i class="fas fa-star"></i> <span id="score">0</span></div>
-      <div><i class="fas fa-coins"></i> <span id="coins">0</span></div>
-    </div>
     <div id="equation-box"><h1 id="equation"></h1></div>
     <div id="answers"></div>
     <div id="timer-bar"><div id="timer-fill"></div></div>
   </div>
 
-  <div id="dynamic-bg"></div>
-  <div id="level-up-banner">Level Up!</div>
-  <div id="end-screen">
-    <p><i class="bi bi-hourglass-bottom"></i> Time's up!</p>
-    <p>Your Score: <span id="final-score"></span></p>
-    <p>High Score: <span id="final-high-score"></span></p>
-    <p>Coins Earned: <span id="final-coins"></span></p>
-    <button onclick="location.reload()"><i class="bi bi-arrow-repeat"></i> Play Again</button>
-  </div>
+<!-- Extra Effects & Banners -->
+<div id="dynamic-bg" aria-hidden="true"></div>
+<div id="level-up-banner" role="alert">Level Up!</div>
+
+<!-- End Screen -->
+<section id="end-screen" role="dialog" aria-modal="true" aria-labelledby="end-screen-heading">
+  <h2 id="end-screen-heading" style="display:none;">End of Game</h2>
+  <p><i class="bi bi-hourglass-bottom"></i> Time's up!</p>
+  <p>Your Score: <span id="final-score">0</span></p>
+  <p>High Score: <span id="final-high-score">0</span></p>
+  <p>Coins Earned: <span id="final-coins">0</span></p>
+  <button id="restart-btn">
+    <i class="bi bi-arrow-repeat"></i> Play Again
+  </button>
+</section>
+
 
   <audio id="coin-sound" src="/static/audio/coin.wav" preload="auto"></audio>
   <audio id="wrong-sound" src="/static/audio/wrong.wav" preload="auto"></audio>
   <audio id="bg-music" src="/static/audio/menu-loop.mp3" loop preload="auto"></audio>
 
-  <script>
-    const fireflyCanvas = document.getElementById('firefly-bg');
-    const fireflyCtx = fireflyCanvas.getContext('2d');
+<script>
+const canvas = document.getElementById('stars-canvas');
+const ctx = canvas.getContext('2d');
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const stars = Array.from({ length: 100 }).map(() => ({
+  x: Math.random() * canvas.width,
+  y: Math.random() * canvas.height,
+  r: Math.random() * 1.2 + 0.3,
+  speed: Math.random() * 0.3 + 0.1
+}));
+
+function animateStars() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (let s of stars) {
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, 2 * Math.PI);
+    ctx.fillStyle = '#ffffffcc';
+    ctx.fill();
+    s.y += s.speed;
+    if (s.y > canvas.height) s.y = 0;
+  }
+  requestAnimationFrame(animateStars);
+}
+
+animateStars();
+
+  // 🟡 Firefly background animation (no changes)
+  const fireflyCanvas = document.getElementById('firefly-bg');
+  const fireflyCtx = fireflyCanvas.getContext('2d');
+  fireflyCanvas.width = window.innerWidth;
+  fireflyCanvas.height = window.innerHeight;
+  const bugs = [...Array(100)].map(() => ({
+    x: Math.random() * fireflyCanvas.width,
+    y: Math.random() * fireflyCanvas.height,
+    r: Math.random() * 2 + 0.5,
+    dx: (Math.random() - 0.5) * 0.6,
+    dy: (Math.random() - 0.5) * 0.6,
+    alpha: Math.random() * 0.5 + 0.5
+  }));
+  function animateFireflies() {
+    fireflyCtx.clearRect(0, 0, fireflyCanvas.width, fireflyCanvas.height);
+    bugs.forEach(b => {
+      fireflyCtx.beginPath();
+      fireflyCtx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+      fireflyCtx.fillStyle = `rgba(255,255,255,${b.alpha})`;
+      fireflyCtx.fill();
+      b.x += b.dx;
+      b.y += b.dy;
+      if (b.x < 0 || b.x > fireflyCanvas.width) b.dx *= -1;
+      if (b.y < 0 || b.y > fireflyCanvas.height) b.dy *= -1;
+    });
+    requestAnimationFrame(animateFireflies);
+  }
+  animateFireflies();
+  window.addEventListener('resize', () => {
     fireflyCanvas.width = window.innerWidth;
     fireflyCanvas.height = window.innerHeight;
-
-    const bugs = [...Array(100)].map(() => ({
-      x: Math.random() * fireflyCanvas.width,
-      y: Math.random() * fireflyCanvas.height,
-      r: Math.random() * 2 + 0.5,
-      dx: (Math.random() - 0.5) * 0.6,
-      dy: (Math.random() - 0.5) * 0.6,
-      alpha: Math.random() * 0.5 + 0.5
-    }));
-
-    function animateFireflies() {
-      fireflyCtx.clearRect(0, 0, fireflyCanvas.width, fireflyCanvas.height);
-      bugs.forEach(b => {
-        fireflyCtx.beginPath();
-        fireflyCtx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
-        fireflyCtx.fillStyle = `rgba(255,255,255,${b.alpha})`;
-        fireflyCtx.fill();
-        b.x += b.dx;
-        b.y += b.dy;
-        if (b.x < 0 || b.x > fireflyCanvas.width) b.dx *= -1;
-        if (b.y < 0 || b.y > fireflyCanvas.height) b.dy *= -1;
-      });
-      requestAnimationFrame(animateFireflies);
-    }
-    animateFireflies();
-
-    window.addEventListener('resize', () => {
-      fireflyCanvas.width = window.innerWidth;
-      fireflyCanvas.height = window.innerHeight;
-    });
-  </script>
-
-  <script>
-    const CONFIG = { MIN_TIMER: 1200, BASE_TIMER: 3500, DECAY_RATE: 150 };
-    const DOM = {
-      eqEl: document.getElementById('equation'),
-      ansCon: document.getElementById('answers'),
-      scoreEl: document.getElementById('score'),
-      highEl: null,
-      coinsEl: document.getElementById('coins'),
-      timerFill: document.getElementById('timer-fill'),
-      lvlBanner: document.getElementById('level-up-banner'),
-      endScreen: document.getElementById('end-screen'),
-      finalScore: document.getElementById('final-score'),
-      finalHigh: document.getElementById('final-high-score'),
-      finalCoins: document.getElementById('final-coins'),
-      coinSnd: document.getElementById('coin-sound'),
-      wrongSnd: document.getElementById('wrong-sound')
-    };
-
-    const scorePanel = document.getElementById('score-panel');
-    const highScoreDiv = document.createElement('div');
-    highScoreDiv.innerHTML = `<i class="fas fa-trophy"></i> <span id="high-score">0</span>`;
-    scorePanel.appendChild(highScoreDiv);
-    DOM.highEl = document.getElementById('high-score');
-
-    let score = 0, coins = 0, level = 1, timer;
-    let highScore = localStorage.getItem('highScore') || 0;
-    DOM.highEl.textContent = highScore;
-
-    const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-
-    function evaluateExpression(expr) {
-      try {
-        const tokens = expr.split(' ');
-        let result = parseInt(tokens[0]);
-        for (let i = 1; i < tokens.length; i += 2) {
-          const op = tokens[i], val = parseInt(tokens[i + 1]);
-          result += (op === '+') ? val : -val;
-        }
-        return result;
-      } catch { return 0; }
-    }
-
-    function generateEquation(lv) {
-      let q;
-      if (lv <= 5) q = `${rand(1, 9)} ${Math.random() > 0.5 ? '+' : '-'} ${rand(1, 9)}`;
-      else if (lv <= 10) q = `${rand(1, 9)} - ${rand(1, 9)} + ${rand(1, 9)}`;
-      else q = `${rand(10, 50)} ${Math.random() > 0.5 ? '+' : '-'} ${rand(10, 50)}`;
-      const correct = evaluateExpression(q);
-      const opts = new Set([correct]);
-      while (opts.size < 4) opts.add(correct + rand(-10, 10));
-      return { question: `${q} = ?`, correct, options: Array.from(opts).sort(() => Math.random() - 0.5) };
-    }
-
-    function startTimer() {
-      const dur = Math.max(CONFIG.MIN_TIMER, CONFIG.BASE_TIMER - level * CONFIG.DECAY_RATE);
-      DOM.timerFill.style.transition = 'none';
-      DOM.timerFill.style.width = '100%';
-      setTimeout(() => {
-        DOM.timerFill.style.transition = `width ${dur}ms linear`;
-        DOM.timerFill.style.width = '0%';
-      }, 50);
-      timer = setTimeout(endGame, dur);
-    }
-
-    function showLevelUp() {
-      DOM.lvlBanner.style.display = 'block';
-      setTimeout(() => DOM.lvlBanner.style.display = 'none', 800);
-    }
-
-    function playCoinAnimation() {
-      for (let i = 0; i < 6; i++) {
-        const coin = document.createElement('div');
-        coin.className = 'coin-animation';
-        coin.style.setProperty('--x', Math.random().toFixed(2));
-        coin.style.setProperty('--delay', `${i * 0.1}s`);
-        document.body.appendChild(coin);
-        setTimeout(() => coin.remove(), 1200);
-      }
-    }
-
-    function loadQuestion() {
-      clearTimeout(timer);
-      const eq = generateEquation(level);
-      DOM.eqEl.textContent = eq.question;
-      DOM.ansCon.innerHTML = '';
-      eq.options.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.textContent = opt;
-        btn.setAttribute('aria-label', `Answer: ${opt}`);
-        btn.onclick = () => handleAnswer(opt === eq.correct);
-        DOM.ansCon.appendChild(btn);
-      });
-      startTimer();
-    }
-
-    function handleAnswer(correct) {
-      clearTimeout(timer);
-      if (correct) {
-        DOM.coinSnd.play().catch(() => {});
-        score++; coins++; level++;
-        DOM.scoreEl.textContent = score;
-        DOM.coinsEl.textContent = coins;
-        showLevelUp();
-        playCoinAnimation();
-        loadQuestion();
-      } else {
-        DOM.wrongSnd.play().catch(() => {});
-        endGame();
-      }
-    }
-
-    function endGame() {
-      clearTimeout(timer);
-      if (score > highScore) {
-        localStorage.setItem('highScore', score);
-        highScore = score;
-        DOM.highEl.textContent = highScore;
-      }
-      DOM.finalScore.textContent = score;
-      DOM.finalCoins.textContent = coins;
-      DOM.finalHigh.textContent = highScore;
-      DOM.endScreen.style.display = 'flex';
-    }
-
-    document.getElementById('start-btn').addEventListener('click', () => {
-      document.getElementById('home-screen').style.display = 'none';
-      loadQuestion();
-    });
-       const muteBtn = document.getElementById('mute-btn');
-let isMuted = false;
-
-muteBtn.addEventListener('click', () => {
-  isMuted = !isMuted;
-  muteBtn.innerHTML = `<i class="fas ${isMuted ? 'fa-volume-mute' : 'fa-volume-up'}"></i>`;
-
-  // Mute/unmute all audio elements
-  document.querySelectorAll('audio').forEach(audio => {
-    audio.muted = isMuted;
   });
+</script>
+
+<script>
+document.getElementById('start-btn').addEventListener('click', () => {
+  const homeScreen = document.getElementById('home-screen');
+  const gameScreen = document.getElementById('game-screen');
+
+  homeScreen.style.display = 'none';
+  gameScreen.style.display = 'block';
+
+  // Ensure the animation triggers after layout
+  setTimeout(() => {
+    gameScreen.classList.add('show');
+  }, 10);
+
+  loadQuestion();
 });
-  </script>
+
+  const CONFIG = { MIN_TIMER: 1200, BASE_TIMER: 3500, DECAY_RATE: 150 };
+  const DOM = {
+    eqEl: document.getElementById('equation'),
+    ansCon: document.getElementById('answers'),
+    scoreEl: document.getElementById('score'),
+    highEl: null,
+    coinsEl: document.getElementById('coins'),
+    timerFill: document.getElementById('timer-fill'),
+    lvlBanner: document.getElementById('level-up-banner'),
+    endScreen: document.getElementById('end-screen'),
+    finalScore: document.getElementById('final-score'),
+    finalHigh: document.getElementById('final-high-score'),
+    finalCoins: document.getElementById('final-coins'),
+    coinSnd: document.getElementById('coin-sound'),
+    wrongSnd: document.getElementById('wrong-sound'),
+    homeHighScore: document.getElementById('home-high-score'),
+    homeCoins: document.getElementById('home-coins')
+  };
+
+  const scorePanel = document.getElementById('score-panel');
+  const highScoreDiv = document.createElement('div');
+  highScoreDiv.innerHTML = `<i class="fas fa-trophy"></i> <span id="high-score">0</span>`;
+  scorePanel.appendChild(highScoreDiv);
+  DOM.highEl = document.getElementById('high-score');
+
+  let score = 0, coins = 0, level = 1, timer;
+  let highScore = parseInt(localStorage.getItem('highScore') || '0');
+  let totalCoins = parseInt(localStorage.getItem('totalCoins') || '0');
+
+  DOM.highEl.textContent = highScore;
+
+  const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+  function evaluateExpression(expr) {
+    try {
+      const tokens = expr.split(' ');
+      let result = parseInt(tokens[0]);
+      for (let i = 1; i < tokens.length; i += 2) {
+        const op = tokens[i], val = parseInt(tokens[i + 1]);
+        result += (op === '+') ? val : -val;
+      }
+      return result;
+    } catch { return 0; }
+  }
+
+  function generateEquation(lv) {
+    let q;
+    if (lv <= 5) q = `${rand(1, 9)} ${Math.random() > 0.5 ? '+' : '-'} ${rand(1, 9)}`;
+    else if (lv <= 10) q = `${rand(1, 9)} - ${rand(1, 9)} + ${rand(1, 9)}`;
+    else q = `${rand(10, 50)} ${Math.random() > 0.5 ? '+' : '-'} ${rand(10, 50)}`;
+    const correct = evaluateExpression(q);
+    const opts = new Set([correct]);
+    while (opts.size < 4) opts.add(correct + rand(-10, 10));
+    return { question: `${q} = ?`, correct, options: Array.from(opts).sort(() => Math.random() - 0.5) };
+  }
+
+  function startTimer() {
+    const dur = Math.max(CONFIG.MIN_TIMER, CONFIG.BASE_TIMER - level * CONFIG.DECAY_RATE);
+    DOM.timerFill.style.transition = 'none';
+    DOM.timerFill.style.width = '100%';
+    setTimeout(() => {
+      DOM.timerFill.style.transition = `width ${dur}ms linear`;
+      DOM.timerFill.style.width = '0%';
+    }, 50);
+    timer = setTimeout(endGame, dur);
+  }
+
+  function showLevelUp() {
+    DOM.lvlBanner.style.display = 'block';
+    setTimeout(() => DOM.lvlBanner.style.display = 'none', 800);
+  }
+
+  function playCoinAnimation() {
+    for (let i = 0; i < 6; i++) {
+      const coin = document.createElement('div');
+      coin.className = 'coin-animation';
+      coin.style.setProperty('--x', Math.random().toFixed(2));
+      coin.style.setProperty('--delay', `${i * 0.1}s`);
+      document.body.appendChild(coin);
+      setTimeout(() => coin.remove(), 1200);
+    }
+  }
+
+  function loadQuestion() {
+    clearTimeout(timer);
+    const eq = generateEquation(level);
+    DOM.eqEl.textContent = eq.question;
+    DOM.ansCon.innerHTML = '';
+    eq.options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.textContent = opt;
+      btn.setAttribute('aria-label', `Answer: ${opt}`);
+      btn.onclick = () => handleAnswer(opt === eq.correct);
+      DOM.ansCon.appendChild(btn);
+    });
+    startTimer();
+  }
+
+  function handleAnswer(correct) {
+    clearTimeout(timer);
+    if (correct) {
+      DOM.coinSnd.play().catch(() => {});
+      score++; coins++; level++;
+      DOM.scoreEl.textContent = score;
+      DOM.coinsEl.textContent = coins;
+      showLevelUp();
+      playCoinAnimation();
+      loadQuestion();
+    } else {
+      DOM.wrongSnd.play().catch(() => {});
+      endGame();
+    }
+  }
+
+  function endGame() {
+    clearTimeout(timer);
+
+    // Save high score if needed
+    if (score > highScore) {
+      localStorage.setItem('highScore', score);
+      highScore = score;
+      DOM.highEl.textContent = highScore;
+    }
+
+    // Save total coins
+    totalCoins += coins;
+    localStorage.setItem('totalCoins', totalCoins);
+
+    // Update end screen
+    DOM.finalScore.textContent = score;
+    DOM.finalCoins.textContent = coins;
+    DOM.finalHigh.textContent = highScore;
+    DOM.endScreen.style.display = 'flex';
+  }
+
+document.getElementById('start-btn').addEventListener('click', () => {
+  document.getElementById('home-screen').style.display = 'none';
+  document.getElementById('game-screen').style.display = 'block';
+  loadQuestion();
+});
+
+  const muteBtn = document.getElementById('mute-btn');
+  let isMuted = false;
+  muteBtn.addEventListener('click', () => {
+    isMuted = !isMuted;
+    muteBtn.innerHTML = `<i class="fas ${isMuted ? 'fa-volume-mute' : 'fa-volume-up'}"></i>`;
+    document.querySelectorAll('audio').forEach(audio => audio.muted = isMuted);
+  });
+
+  // ✅ Load stats when home screen is shown
+  window.onload = () => {
+    const storedHighScore = localStorage.getItem('highScore') || 0;
+    const storedTotalCoins = localStorage.getItem('totalCoins') || 0;
+    DOM.homeHighScore.textContent = storedHighScore;
+    DOM.homeCoins.textContent = storedTotalCoins;
+  };
+</script>
+
 <script>
   window.addEventListener('DOMContentLoaded', () => {
     const backgrounds = [
@@ -753,6 +1081,9 @@ muteBtn.addEventListener('click', () => {
     const randomBg = backgrounds[Math.floor(Math.random() * backgrounds.length)];
     document.getElementById('dynamic-bg').style.backgroundImage = `url('${randomBg}')`;
   });
+document.getElementById("restart-btn").addEventListener("click", () => {
+  location.reload(); // or restartGame() if you're modular
+});
 </script>
 </body>
 </html>
