@@ -967,8 +967,16 @@ animateStars();
 
 <script>
 document.getElementById('start-btn').addEventListener('click', () => {
-  document.getElementById('home-screen').style.display = 'none';
-  document.getElementById('game-screen').style.display = 'block';
+  // Hide home screen COMPLETELY and remove any animation classes
+  const homeScreen = document.getElementById('home-screen');
+  homeScreen.classList.add('hidden');
+  homeScreen.style.display = 'none'; // extra safety
+
+  // Show game screen
+  const gameScreen = document.getElementById('game-screen');
+  gameScreen.classList.remove('hidden');
+  gameScreen.style.display = 'block'; // extra safety
+
   loadQuestion();
 });
 
