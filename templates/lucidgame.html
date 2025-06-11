@@ -368,36 +368,71 @@ body {
   opacity: 1;
 }
 
-/* Timer Bar */
+/* Base Container */
 #timer-bar {
-  height: 28px;
-  margin-top: 2.5rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  height: 30px;
+  margin-top: 3rem;
+  border-radius: 100px;
   overflow: hidden;
-  box-shadow: inset 0 0 10px rgba(0, 255, 204, 0.1);
+  background: radial-gradient(ellipse at center, rgba(0, 255, 200, 0.08), rgba(0, 0, 0, 0.1));
+  border: 1px solid rgba(0, 255, 200, 0.2);
+  box-shadow: 0 0 20px rgba(0, 255, 200, 0.15);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
+/* Fill Line */
 #timer-fill {
   height: 100%;
-  width: 100%;
-  background: linear-gradient(to right, #00c853, #ffab00, #d50000);
-  background-size: 300% 100%;
-  animation: timerPulse 3s linear infinite;
-  transition: width 0.2s linear;
-  border-radius: 20px;
+  width: 100%; /* update via JS */
+  background: linear-gradient(90deg, #00f0ff, #00c8d6);
+  background-size: 200% 100%;
+  animation: pulseGradient 4s ease-in-out infinite;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 100px;
+  position: relative;
+  z-index: 2;
+  box-shadow: inset 0 0 10px rgba(0, 255, 255, 0.25);
 }
 
-@keyframes timerPulse {
+/* Glow Overlay */
+.timer-glow {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 100px;
+  background: radial-gradient(circle at 50% 50%, rgba(0, 255, 255, 0.1), transparent 70%);
+  opacity: 0.5;
+  animation: glowBreath 6s ease-in-out infinite;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Gradient shimmer movement */
+@keyframes pulseGradient {
   0% {
-    background-position: 0% center;
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
   }
   100% {
-    background-position: 200% center;
+    background-position: 0% 50%;
   }
 }
 
+/* Breathing light effect */
+@keyframes glowBreath {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
 
 
 /* Level Up Banner */
@@ -810,8 +845,10 @@ audio { display: none; }
   <div id="game-container">
     <div id="equation-box"><h1 id="equation"></h1></div>
     <div id="answers"></div>
-    <div id="timer-bar"><div id="timer-fill"></div></div>
-  </div>
+<div id="timer-bar">
+  <div id="timer-fill"></div>
+  <div class="timer-glow"></div>
+</div>
 
 <!-- Extra Effects & Banners -->
 <div id="dynamic-bg" aria-hidden="true"></div>
@@ -1029,6 +1066,21 @@ document.getElementById('start-btn').addEventListener('click', () => {
 
   function endGame() {
     clearTimeout(timer);
+
+
+function updateTimer(percent) {
+  const fill = document.getElementById("timer-fill");
+  fill.style.width = percent + "%";
+
+  // Color changes based on progress
+  if (percent < 15) {
+    fill.style.background = "linear-gradient(90deg, #ff1744, #d50000)";
+  } else if (percent < 40) {
+    fill.style.background = "linear-gradient(90deg, #ffab00, #ff6f00)";
+  } else {
+    fill.style.background = "linear-gradient(90deg, #00f0ff, #00c8d6)";
+  }
+}
 
     // Save high score if needed
     if (score > highScore) {
