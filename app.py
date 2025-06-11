@@ -504,7 +504,7 @@ def supportresources():
     return render_template('supportresources.html')
 
 @app.route('/lucidgame')
-def lucid_game():
+def lucidgame():
     try:
         return render_template('lucidgame.html')
     except Exception as e:
