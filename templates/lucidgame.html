@@ -12,8 +12,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
   <!-- Preload Audio -->
-  <link rel="preload" href="coin.wav" as="audio" type="audio/wav">
-  <link rel="preload" href="wrong.wav" as="audio" type="audio/wav">
+  <link rel="preload" href="/static/audio/coin.wav" as="audio" type="audio/wav">
+  <link rel="preload" href="/static/audio/wrong.wav" as="audio" type="audio/wav">
    
   <link rel="preload" as="image" href="/static/backgrounds/bghome.png">
   <link rel="preload" as="image" href="/static/backgrounds/bg1.png">
@@ -558,8 +558,8 @@ audio { display: none; }
     <button onclick="location.reload()"><i class="bi bi-arrow-repeat"></i> Play Again</button>
   </div>
 
-  <audio id="coin-sound" src="coin.wav" preload="auto"></audio>
-  <audio id="wrong-sound" src="wrong.wav" preload="auto"></audio>
+  <audio id="coin-sound" src="/static/audio/coin.wav" preload="auto"></audio>
+  <audio id="wrong-sound" src="/static/audio/wrong.wav" preload="auto"></audio>
   <audio id="bg-music" src="/static/audio/menu-loop.mp3" loop preload="auto"></audio>
 
   <script>
