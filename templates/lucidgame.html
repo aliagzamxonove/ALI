@@ -4,298 +4,600 @@
   <meta charset="UTF-8" />
   <title>GameLucid Pro</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-  
+
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
-  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
   <!-- Preload Audio -->
   <link rel="preload" href="coin.wav" as="audio" type="audio/wav">
   <link rel="preload" href="wrong.wav" as="audio" type="audio/wav">
+   
+  <link rel="preload" as="image" href="/static/backgrounds/bghome.png">
+  <link rel="preload" as="image" href="/static/backgrounds/bg1.png">
+  <link rel="preload" as="image" href="/static/backgrounds/bg2.png">
+  <link rel="preload" as="image" href="/static/backgrounds/bg3.png">
+  <link rel="preload" as="image" href="/static/backgrounds/bg4.png">
+  <link rel="preload" as="image" href="/static/backgrounds/bg5.png">
 
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-    body {
-      font-family: 'Orbitron', sans-serif;
-      background: radial-gradient(circle at center, #0d1117, #000);
-      background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
-      color: #fff;
-      overflow: hidden;
-      user-select: none;
-      touch-action: manipulation;
-    }
+/* Global */
+body {
+  font-family: 'Space Grotesk', 'Orbitron', sans-serif;
+  background: linear-gradient(160deg, #000428, #004e92);
+  color: #e0f7fa;
+  overflow: hidden;
+  height: 100vh;
+  letter-spacing: 0.6px;
+  line-height: 1.6;
+}
 
-    /* Homepage */
-    #home-screen {
+/* Firefly Background */
+#firefly-bg {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.firefly {
+  position: absolute;
+  background: #fff;
+  border-radius: 50%;
+  width: 2px;
+  height: 2px;
+  opacity: 0.5;
+  animation: twinkle 3.5s infinite ease-in-out alternate, moveXY 20s linear infinite;
+  filter: drop-shadow(0 0 4px #0ff);
+}
+
+@keyframes twinkle {
+  from { opacity: 0.3; transform: scale(1); }
+  to { opacity: 1; transform: scale(1.2); }
+}
+
+@keyframes moveXY {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(100vw, 100vh); }
+}
+
+/* Home Screen */
+#home-screen {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(135deg, #000428, #004e92);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  z-index: 2000;
+  animation: bgPulse 8s ease-in-out infinite alternate;
+}
+
+@keyframes bgPulse {
+  0% { background: linear-gradient(135deg, #000428, #004e92); }
+  100% { background: linear-gradient(135deg, #1a1a1a, #005f99); }
+}
+
+.home-content {
+  max-width: 600px;
+  padding: 2rem;
+  animation: fadeInUp 1.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Start Button (Glow & Neon) */
+#start-btn {
+  margin-top: 2rem;
+  padding: 1rem 2.8rem;
+  font-size: 1.6rem;
+  background: linear-gradient(135deg, #00ffc8, #007f5f);
+  color: black;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 0 20px rgba(0, 255, 204, 0.5);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s ease;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+#start-btn::after {
+  content: "";
+  position: absolute;
+  top: -100%;
+  left: 0;
+  width: 100%;
+  height: 300%;
+  background: linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%);
+  animation: shimmerLine 3s infinite;
+}
+
+@keyframes shimmerLine {
+  0% { top: -100%; }
+  100% { top: 100%; }
+}
+
+#start-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 30px rgba(0, 255, 204, 0.8);
+}
+
+/* Score Panel with Glass Effect */
+#score-panel {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 1rem;
+  z-index: 9999;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  box-shadow: inset 1px 1px 8px rgba(255, 255, 255, 0.1), 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+#score-panel div {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.4rem 0.9rem;
+  border-radius: 8px;
+}
+
+#score-panel i {
+  color: #0ff;
+}
+
+/* Game Container */
+#game-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 92vw;
+  max-width: 720px;
+  padding: 1.5rem;
+  z-index: 100;
+  margin-top: 80px;
+}
+
+/* Equation Box Title with Neon Gradient */
+#equation-box h1 {
+  font-size: 3.8rem;
+  text-align: center;
+  font-weight: 800;
+  background: linear-gradient(to right, #0ff, #00f);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 8px #0ff, 0 0 24px #0ff, 0 0 42px #00f;
+  animation: pulse 2.8s ease-in-out infinite;
+  margin: 2rem 0;
+}
+
+/* Pulse Animation */
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+/* Answers Buttons with Hover Effect */
+#answers {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+#answers button {
+  flex: 1 1 40%;
+  max-width: 45%;
+  padding: 1.2rem;
+  font-size: 1.6rem;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #00ffc8, #007f5f);
+  color: #000;
+  box-shadow: 0 6px 22px rgba(0, 255, 170, 0.3);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+#answers button::after {
+  content: '';
+  position: absolute;
+  width: 140%;
+  height: 100%;
+  top: 0;
+  left: -20%;
+  background: linear-gradient(120deg, rgba(255,255,255,0.1), rgba(255,255,255,0.03), rgba(255,255,255,0.1));
+  transform: skewX(-25deg);
+  transition: all 0.5s ease;
+  opacity: 0;
+}
+
+#answers button:hover {
+  transform: scale(1.07);
+  background: #5fffc8;
+  box-shadow: 0 8px 26px rgba(0, 255, 170, 0.5);
+}
+
+#answers button:hover::after {
+  left: 100%;
+  opacity: 1;
+}
+
+/* Timer Bar */
+#timer-bar {
+  height: 26px;
+  margin-top: 2.5rem;
+  background: #1a1a1a;
+  border-radius: 16px;
+  border: 1px solid #333;
+  overflow: hidden;
+}
+
+#timer-fill {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(to right, #00c853, #ffab00, #d50000);
+  transition: width 0.2s linear;
+}
+
+/* Level Up Banner */
+#level-up-banner {
+  animation: fadeInOut 1.5s ease forwards;
+  position: absolute;
+  top: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 255, 255, 0.12);
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-size: 2.1rem;
+  display: none;
+  backdrop-filter: blur(10px);
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.1); }
+  100% { opacity: 0; transform: scale(1); }
+}
+
+/* Coin Animation */
+.coin-animation {
+  width: 28px;
+  height: 28px;
+  background: radial-gradient(circle, gold 0%, orange 90%);
+  border-radius: 50%;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 9999;
+  opacity: 0;
+  animation: burst 1.2s ease-out forwards;
+  box-shadow: 0 0 14px #ffc, 0 0 28px #ff0;
+}
+
+@keyframes burst {
+  0% { transform: translate(-50%, -50%) scale(0.8); opacity: 1; }
+  100% { transform: translate(calc(-50% + 180px * (0.5 - var(--x))), calc(-50% + 180px * var(--x))) scale(1.2); opacity: 0; }
+}
+
+/* End Screen */
+#end-screen {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.97);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 2.1rem;
+  z-index: 1000;
+  text-align: center;
+}
+
+#end-screen button {
+  background: #00f8ff;
+  color: #000;
+  padding: 1.1rem 2.8rem;
+  font-size: 1.5rem;
+  border: none;
+  border-radius: 16px;
+  margin-top: 2rem;
+  cursor: pointer;
+  box-shadow: 0 4px 24px #00f8ff;
+  transition: transform 0.3s ease;
+}
+
+#end-screen button:hover {
+  transform: scale(1.1);
+}
+
+/* Miscellaneous Effects */
+.flash-wrong { animation: flashRed 0.4s ease; }
+
+@keyframes flashRed {
+  0% { background-color: #ff4a4a; }
+  100% { background-color: transparent; }
+}
+
+.score-increment {
+  position: absolute;
+  font-size: 1.4rem;
+  color: #0ff;
+  animation: riseFade 1s ease-out forwards;
+  pointer-events: none;
+  text-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
+}
+
+@keyframes riseFade {
+  0% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-40px) scale(1.4); }
+}
+
+.shake {
+  animation: shakeAnim 0.3s ease-in-out;
+}
+
+@keyframes shakeAnim {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  50% { transform: translateX(6px); }
+  75% { transform: translateX(-6px); }
+  100% { transform: translateX(0); }
+}
+
+audio { display: none; }
+
+/* Countdown Circle */
+#countdown-circle {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 140px;
+  height: 140px;
+  border: 6px solid #0ff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: bold;
+  color: #0ff;
+  text-shadow: 0 0 12px #0ff;
+  z-index: 10000;
+  animation: pulseCount 1s ease infinite;
+}
+
+@keyframes pulseCount {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.2); }
+}
+
+.particle {
+  position: fixed;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #0ff, #00f);
+  pointer-events: none;
+  animation: explode 0.8s ease-out forwards;
+  opacity: 0.7;
+  z-index: 9999;
+}
+
+@keyframes explode {
+  0% { opacity: 1; transform: translate(0, 0) scale(1); }
+  100% { opacity: 0; transform: translate(var(--x), var(--y)) scale(0.4); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  #equation-box h1 {
+    font-size: 2.3rem;
+  }
+  #answers button {
+    font-size: 1.2rem;
+    padding: 1rem;
+    max-width: 100%;
+  }
+  #score-panel {
+    flex-direction: column;
+    gap: 0.6rem;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+#dynamic-bg,
+#hero-particles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  pointer-events: none;
+}
+#mute-btn {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+  color: #0ff;
+  font-size: 1.4rem;
+  cursor: pointer;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+#mute-btn:hover {
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.6);
+  transform: scale(1.05);
+}
+
+#mute-btn i {
+  transition: all 0.3s ease;
+}
+
+#dynamic-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+    #bg-overlay {
       position: fixed;
-      inset: 0;
-      background: linear-gradient(135deg, #000428, #004e92);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-      flex-direction: column;
-      animation: bgPulse 8s infinite alternate;
-    }
-
-    @keyframes bgPulse {
-      0% { background: linear-gradient(135deg, #000428, #004e92); }
-      100% { background: linear-gradient(135deg, #1a1a1a, #005f99); }
-    }
-
-    .home-content {
-      text-align: center;
-      color: white;
-      max-width: 600px;
-      padding: 2rem;
-      animation: fadeInUp 1.5s ease-out;
-    }
-
-    @keyframes fadeInUp {
-      0% { transform: translateY(30px); opacity: 0; }
-      100% { transform: translateY(0); opacity: 1; }
-    }
-
-    #start-btn {
-      margin-top: 2rem;
-      padding: 1rem 2.5rem;
-      font-size: 1.6rem;
-      background: linear-gradient(135deg, #00ffc8, #007f5f);
-      color: black;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      box-shadow: 0 0 16px rgba(0, 255, 204, 0.5);
-      transition: all 0.3s ease;
-    }
-
-    #start-btn:hover {
-      transform: scale(1.1);
-      box-shadow: 0 0 24px rgba(0, 255, 204, 0.8);
-    }
-
-    #game-container {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 1.5rem;
-      position: relative;
-    }
-
-    #score-panel {
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-
-    #score-panel div {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      background: rgba(255, 255, 255, 0.08);
-      padding: 0.6rem 1.5rem;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
-      backdrop-filter: blur(12px);
-      min-width: 120px;
-      font-size: 1.2rem;
-    }
-
-    #score-panel img.icon {
-      width: 22px;
-      height: 22px;
-    }
-
-    #equation-box h1 {
-      font-size: 3.2rem;
-      text-align: center;
-      text-shadow: 0 0 18px #0ff;
-      animation: pulse 2.5s ease-in-out infinite;
-      margin: 2rem 0;
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
-
-    #answers {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 1rem;
-    }
-
-    #answers button {
-      flex: 1 1 40%;
-      max-width: 45%;
-      padding: 1.2rem;
-      font-size: 1.6rem;
-      border: none;
-      border-radius: 14px;
-      background: linear-gradient(135deg, #00ffc8, #007f5f);
-      color: #000;
-      box-shadow: 0 6px 20px rgba(0, 255, 170, 0.3);
-      transition: transform 0.25s ease, background 0.3s, box-shadow 0.3s;
-      cursor: pointer;
-    }
-
-    #answers button:hover, #answers button:focus {
-      background: #5fffc8;
-      transform: scale(1.07);
-      box-shadow: 0 8px 25px rgba(0, 255, 170, 0.5);
-      outline: none;
-    }
-
-    #timer-bar {
-      height: 24px;
-      margin-top: 2.5rem;
-      background: #1a1a1a;
-      border-radius: 14px;
-      border: 1px solid #333;
-      overflow: hidden;
-    }
-
-    #timer-fill {
-      height: 100%;
+      top: 0;
+      left: 0;
       width: 100%;
-      background: linear-gradient(to right, #00ff00, #ffff00, #ff0000);
-      transition: width 0s;
+      height: 100%;
+      background-image: url('/static/backgrounds/bghome.png');
+      background-size: cover;
+      background-position: center;
+      z-index: -2;
+      opacity: 1;
     }
 
-    .coin-animation {
-      width: 26px;
-      height: 26px;
-      background: radial-gradient(circle, gold 0%, orange 80%);
-      border-radius: 50%;
+    canvas#firefly-bg,
+    canvas#hero-particles {
       position: fixed;
-      top: 50%;
-      left: 50%;
-      z-index: 9999;
-      opacity: 0;
-      animation: burst 1s ease-out forwards;
-      box-shadow: 0 0 12px #ffc, 0 0 24px #ff0;
-    }
-
-    .coin-animation:nth-child(odd) { animation-delay: var(--delay); }
-
-    @keyframes burst {
-      0% { transform: translate(-50%, -50%) scale(0.9); opacity: 1; }
-      100% {
-        transform: translate(calc(-50% + 180px * (0.5 - var(--x))), calc(-50% + 180px * var(--x))) scale(1.2);
-        opacity: 0;
-      }
-    }
-
-    #level-up-banner {
-      display: none;
-      position: fixed;
-      top: 12%;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 2.8rem;
-      color: #0ff;
-      text-shadow: 0 0 25px #0ff, 0 0 10px #0ff;
-      z-index: 1001;
-    }
-
-    #end-screen {
-      position: fixed;
-      inset: 0;
-      background: rgba(10, 10, 10, 0.96);
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 2rem;
-      z-index: 1000;
-      text-align: center;
-    }
-
-    #end-screen button {
-      background: #00f8ff;
-      color: #000;
-      padding: 1rem 2.5rem;
-      font-size: 1.5rem;
-      border: none;
-      border-radius: 14px;
-      margin-top: 2rem;
-      cursor: pointer;
-      box-shadow: 0 4px 20px #00f8ff;
-      transition: transform 0.2s ease;
-    }
-
-    #end-screen button:hover {
-      transform: scale(1.08);
-    }
-
-    .flash-wrong {
-      animation: flashRed 0.3s ease;
-    }
-
-    @keyframes flashRed {
-      0% { background-color: #ff4a4a; }
-      100% { background-color: transparent; }
-    }
-
-    audio { display: none; }
-
-    @media (max-width: 768px) {
-      #equation-box h1 { font-size: 2.2rem; }
-      #answers button {
-        font-size: 1.2rem;
-        padding: 0.9rem;
-        max-width: 100%;
-      }
-      #score-panel { flex-direction: column; gap: 0.5rem; }
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
-  <noscript>
-    <div style="color:white; background:black; text-align:center; padding:2rem;">
-      ⚠️ JavaScript is required to play GameLucid Pro.
-    </div>
-  </noscript>
+  <canvas id="firefly-bg"></canvas>
+  <canvas id="hero-particles"></canvas>
 
-  <!-- Home Screen -->
-  <div id="home-screen">
-    <div class="home-content">
-      <h1>🚀 Welcome to GameLucid Pro</h1>
+  <!-- Background overlay with your uploaded image -->
+  <div id="bg-overlay"></div>
+
+  <!-- Home screen UI -->
+  <div id="home-screen" class="hero fade-in">
+    <div class="hero-content">
+      <h1><i class="bi bi-controller"></i> Welcome to <span class="highlight">GameLucid Pro</span></h1>
       <p>Sharpen your mind. Collect coins. Beat your highest score!</p>
-      <button id="start-btn">Start Game</button>
+
+      <div class="home-info">
+        <div><i class="fas fa-trophy"></i> High Score: <span id="home-high-score">0</span></div>
+        <div><i class="fas fa-coins"></i> Coins: <span id="home-coins">0</span></div>
+      </div>
+
+      <div class="controls">
+        <button id="start-btn"><i class="bi bi-play-circle"></i> Start Game</button>
+        <button id="mute-btn" title="Toggle Sound">
+          <i class="fas fa-volume-up"></i>
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- Game UI -->
-  <div id="game-container" role="main">
+  <div id="game-container">
     <div id="score-panel">
-      <div><img class="icon" src="..." alt="Coins Icon" />Coins: <span id="coins">0</span></div>
-      <div><img class="icon" src="..." alt="Score Icon" />Score: <span id="score">0</span></div>
-      <div><img class="icon" src="..." alt="High Score Icon" />High: <span id="high-score">0</span></div>
+      <div><i class="fas fa-star"></i> <span id="score">0</span></div>
+      <div><i class="fas fa-coins"></i> <span id="coins">0</span></div>
     </div>
-    <div id="equation-box"><h1 id="equation" aria-live="polite"></h1></div>
-    <div id="answers" role="group" aria-label="Answer choices"></div>
-    <div id="timer-bar" aria-label="Timer progress"><div id="timer-fill"></div></div>
+    <div id="equation-box"><h1 id="equation"></h1></div>
+    <div id="answers"></div>
+    <div id="timer-bar"><div id="timer-fill"></div></div>
   </div>
 
-  <div id="level-up-banner" aria-live="assertive">Level Up!</div>
-
-  <div id="end-screen" role="dialog" aria-modal="true">
-    <p>⏰ Time's up!</p>
+  <div id="dynamic-bg"></div>
+  <div id="level-up-banner">Level Up!</div>
+  <div id="end-screen">
+    <p><i class="bi bi-hourglass-bottom"></i> Time's up!</p>
     <p>Your Score: <span id="final-score"></span></p>
     <p>High Score: <span id="final-high-score"></span></p>
     <p>Coins Earned: <span id="final-coins"></span></p>
-    <button onclick="location.reload()">Play Again</button>
+    <button onclick="location.reload()"><i class="bi bi-arrow-repeat"></i> Play Again</button>
   </div>
 
   <audio id="coin-sound" src="coin.wav" preload="auto"></audio>
   <audio id="wrong-sound" src="wrong.wav" preload="auto"></audio>
+  <audio id="bg-music" src="/static/audio/menu-loop.mp3" loop preload="auto"></audio>
+
+  <script>
+    const fireflyCanvas = document.getElementById('firefly-bg');
+    const fireflyCtx = fireflyCanvas.getContext('2d');
+    fireflyCanvas.width = window.innerWidth;
+    fireflyCanvas.height = window.innerHeight;
+
+    const bugs = [...Array(100)].map(() => ({
+      x: Math.random() * fireflyCanvas.width,
+      y: Math.random() * fireflyCanvas.height,
+      r: Math.random() * 2 + 0.5,
+      dx: (Math.random() - 0.5) * 0.6,
+      dy: (Math.random() - 0.5) * 0.6,
+      alpha: Math.random() * 0.5 + 0.5
+    }));
+
+    function animateFireflies() {
+      fireflyCtx.clearRect(0, 0, fireflyCanvas.width, fireflyCanvas.height);
+      bugs.forEach(b => {
+        fireflyCtx.beginPath();
+        fireflyCtx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+        fireflyCtx.fillStyle = `rgba(255,255,255,${b.alpha})`;
+        fireflyCtx.fill();
+        b.x += b.dx;
+        b.y += b.dy;
+        if (b.x < 0 || b.x > fireflyCanvas.width) b.dx *= -1;
+        if (b.y < 0 || b.y > fireflyCanvas.height) b.dy *= -1;
+      });
+      requestAnimationFrame(animateFireflies);
+    }
+    animateFireflies();
+
+    window.addEventListener('resize', () => {
+      fireflyCanvas.width = window.innerWidth;
+      fireflyCanvas.height = window.innerHeight;
+    });
+  </script>
 
   <script>
     const CONFIG = { MIN_TIMER: 1200, BASE_TIMER: 3500, DECAY_RATE: 150 };
@@ -303,7 +605,7 @@
       eqEl: document.getElementById('equation'),
       ansCon: document.getElementById('answers'),
       scoreEl: document.getElementById('score'),
-      highEl: document.getElementById('high-score'),
+      highEl: null,
       coinsEl: document.getElementById('coins'),
       timerFill: document.getElementById('timer-fill'),
       lvlBanner: document.getElementById('level-up-banner'),
@@ -315,7 +617,15 @@
       wrongSnd: document.getElementById('wrong-sound')
     };
 
+    const scorePanel = document.getElementById('score-panel');
+    const highScoreDiv = document.createElement('div');
+    highScoreDiv.innerHTML = `<i class="fas fa-trophy"></i> <span id="high-score">0</span>`;
+    scorePanel.appendChild(highScoreDiv);
+    DOM.highEl = document.getElementById('high-score');
+
     let score = 0, coins = 0, level = 1, timer;
+    let highScore = localStorage.getItem('highScore') || 0;
+    DOM.highEl.textContent = highScore;
 
     const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
@@ -387,7 +697,7 @@
     function handleAnswer(correct) {
       clearTimeout(timer);
       if (correct) {
-        DOM.coinSnd.play();
+        DOM.coinSnd.play().catch(() => {});
         score++; coins++; level++;
         DOM.scoreEl.textContent = score;
         DOM.coinsEl.textContent = coins;
@@ -395,32 +705,53 @@
         playCoinAnimation();
         loadQuestion();
       } else {
-        DOM.wrongSnd.play();
+        DOM.wrongSnd.play().catch(() => {});
         endGame();
       }
     }
 
     function endGame() {
       clearTimeout(timer);
+      if (score > highScore) {
+        localStorage.setItem('highScore', score);
+        highScore = score;
+        DOM.highEl.textContent = highScore;
+      }
       DOM.finalScore.textContent = score;
       DOM.finalCoins.textContent = coins;
-      DOM.finalHigh.textContent = DOM.highEl.textContent;
+      DOM.finalHigh.textContent = highScore;
       DOM.endScreen.style.display = 'flex';
     }
 
-    // Start game from home screen
     document.getElementById('start-btn').addEventListener('click', () => {
       document.getElementById('home-screen').style.display = 'none';
-      const countdown = ['3', '2', '1', '<span style="display:flex;align-items:center;justify-content:center;gap:0.5rem;"><svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="cyan" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>START!</span>'];
-      let idx = 0;
-      const ci = setInterval(() => {
-        DOM.eqEl.innerHTML = countdown[idx++];
-        if (idx === countdown.length) {
-          clearInterval(ci);
-          setTimeout(loadQuestion, 500);
-        }
-      }, 700);
+      loadQuestion();
     });
+       const muteBtn = document.getElementById('mute-btn');
+let isMuted = false;
+
+muteBtn.addEventListener('click', () => {
+  isMuted = !isMuted;
+  muteBtn.innerHTML = `<i class="fas ${isMuted ? 'fa-volume-mute' : 'fa-volume-up'}"></i>`;
+
+  // Mute/unmute all audio elements
+  document.querySelectorAll('audio').forEach(audio => {
+    audio.muted = isMuted;
+  });
+});
   </script>
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const backgrounds = [
+      '/static/backgrounds/bg1.png',
+      '/static/backgrounds/bg2.png',
+      '/static/backgrounds/bg3.png',
+      '/static/backgrounds/bg4.png',
+      '/static/backgrounds/bg5.png'
+    ];
+    const randomBg = backgrounds[Math.floor(Math.random() * backgrounds.length)];
+    document.getElementById('dynamic-bg').style.backgroundImage = `url('${randomBg}')`;
+  });
+</script>
 </body>
 </html>
