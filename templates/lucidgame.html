@@ -961,19 +961,11 @@ animateStars();
 
 <script>
 document.getElementById('start-btn').addEventListener('click', () => {
-  const homeScreen = document.getElementById('home-screen');
-  const gameScreen = document.getElementById('game-screen');
-
-  homeScreen.classList.add('hidden');
-  gameScreen.style.display = 'block';
-
-  // Ensure the animation triggers after layout
-  setTimeout(() => {
-    gameScreen.classList.add('show');
-  }, 10);
-
+  document.getElementById('home-screen').style.display = 'none';
+  document.getElementById('game-screen').style.display = 'block';
   loadQuestion();
 });
+
 
   const CONFIG = { MIN_TIMER: 1200, BASE_TIMER: 3500, DECAY_RATE: 150 };
   const DOM = {
@@ -1124,12 +1116,6 @@ function updateTimer(percent) {
     DOM.finalHigh.textContent = highScore;
     DOM.endScreen.style.display = 'flex';
   }
-
-document.getElementById('start-btn').addEventListener('click', () => {
-  document.getElementById('home-screen').style.display = 'none';
-  document.getElementById('game-screen').style.display = 'block';
-  loadQuestion();
-});
 
   const muteBtn = document.getElementById('mute-btn');
   let isMuted = false;
