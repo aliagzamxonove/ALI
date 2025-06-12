@@ -5,13 +5,25 @@
   <title>Lucid Games - Ultra PRO Home</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --accent: #00ffc8;
+      --gold: #ffe46f;
+      --bg-main: #181d2b;
+      --bg-gradient: linear-gradient(125deg, #0a172c 0%, #1a2f50 45%, #0f2847 100%);
+      --modal-bg: rgba(24,32,54,0.97);
+      --modal-border: #00ffc860;
+      --modal-glow: 0 4px 40px #00ffc8cc;
+      --border-radius: 20px;
+      --shadow: 0 2px 16px #000b, 0 1px 40px #00ffc840 inset;
+    }
     html, body {
       margin: 0;
       padding: 0;
       width: 100vw;
       min-height: 100vh;
-      background: #181d2b;
+      background: var(--bg-main);
       box-sizing: border-box;
       overflow-x: hidden;
       height: 100%;
@@ -24,8 +36,9 @@
       height: 100%;
       display: flex;
       flex-direction: column;
+      position: relative;
     }
-    #bg-animated { position: fixed; inset: 0; z-index: 0; width: 100vw; min-height: 100vh; background: linear-gradient(125deg, #0a172c 0%, #1a2f50 45%, #0f2847 100%); overflow: hidden; }
+    #bg-animated { position: fixed; inset: 0; z-index: 0; width: 100vw; min-height: 100vh; background: var(--bg-gradient); overflow: hidden; }
     #bg-canvas1, #bg-canvas2 { position: absolute; width:100vw; min-height:100vh; inset:0; pointer-events:none; z-index:1; display: block; max-width: 100vw; }
     .header-bar {
       position: fixed; top: 0; left: 50%; transform: translateX(-50%);
@@ -33,8 +46,8 @@
       z-index: 20;
       display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
       padding: 1.2rem 2.5rem; background: rgba(24,32,54,0.82);
-      color: #fff; box-shadow: 0 2px 16px #000b, 0 1px 40px #00ffc840 inset;
-      font-size: 1.2rem; border-radius: 20px; margin-top: 1.2vw;
+      color: #fff; box-shadow: var(--shadow);
+      font-size: 1.2rem; border-radius: var(--border-radius); margin-top: 1.2vw;
       backdrop-filter: blur(13px);
       border: 1.5px solid #00ffc825;
       user-select: none;
@@ -65,8 +78,10 @@
       margin-bottom: 0;
     }
     .carousel-container {
-      width: flex-end;
-      justify-content: center;
+      width: 100vw;
+      max-width: 100vw;
+      overflow-x: auto;
+      overflow-y: visible;
       position: relative;
       min-height: 340px;
       box-sizing: border-box;
@@ -76,18 +91,47 @@
       z-index: 6;
       scroll-behavior: smooth;
       margin-bottom: 24px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      scroll-snap-type: x mandatory;
     }
     .carousel-container::-webkit-scrollbar { display: none; }
     .carousel-track {
       display: flex;
       align-items: flex-end;
       gap: 2vw;
+      min-width: 100vw;
+      width: max-content;
       padding-bottom: 0;
       user-select: none;
       box-sizing: border-box;
-      width: max-content;
-      min-width: 100vw;
+      transition: transform .26s cubic-bezier(.68,-0.6,.32,1.6);
     }
+    .carousel-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 9;
+      background: linear-gradient(120deg, #232b47 60%, #101a2c 100%);
+      color: var(--accent);
+      border: 2.5px solid var(--modal-border);
+      border-radius: 50%;
+      box-shadow: 0 4px 20px #00ffc860;
+      width: 54px; height: 54px;
+      font-size: 2.1em;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: background .18s, box-shadow .18s;
+      opacity: 0.94;
+      outline: none;
+      user-select: none;
+    }
+    .carousel-arrow.left { left: 2vw;}
+    .carousel-arrow.right { right: 2vw;}
+    .carousel-arrow:active,
+    .carousel-arrow:focus { background: #00ffc840; box-shadow: 0 0 24px #00ffc8a0; }
+    .carousel-arrow[disabled] { opacity: 0.33; pointer-events: none; }
     .game-house {
       position: relative;
       width: 60vw; max-width: 520px; min-width: 220px;
@@ -136,6 +180,7 @@
       margin-left: auto; margin-right: auto;
       pointer-events: none;
       user-select: none;
+      transition: box-shadow .18s;
     }
     .house-shadow {
       position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%);
@@ -164,7 +209,7 @@
       animation: fadeIn 0.4s;
     }
     .lock-icon { font-size: 2.8rem; margin-bottom: 1rem; color: #ffeb3b; text-shadow: 0 6px 18px #000a; filter: drop-shadow(0 0 8px #fff4);}
-    .unlock-btn { margin-top: 1rem; padding: .65em 2.1em; font-size: 1.13rem; font-weight: 700; border-radius: 2em; border: none; background: linear-gradient(95deg, #00ffc8, #1a237e 90%); color: #1a237e; box-shadow: 0 3px 12px #00ffc8b3; cursor: pointer; transition: background .2s, color .2s; letter-spacing: 1px;}
+    .unlock-btn { margin-top: 1rem; padding: .65em 2.1em; font-size: 1.13rem; font-weight: 700; border-radius: 2em; border: none; background: linear-gradient(95deg, #00ffc8, #1a237e 90%); color: #1a237e; box-shadow: 0 3px 12px #00ffc8b3; cursor: pointer; letter-spacing: 1px; transition: background .2s, color .2s, opacity .2s;}
     .unlock-btn:disabled { background: #aaa; color: #fff; cursor: not-allowed;}
     #ground-3d {
       position: fixed;
@@ -174,7 +219,7 @@
       height: 270px;
       z-index: 3;
       pointer-events: none;
-      background: url('ground.png') center bottom / cover no-repeat;
+      background: url('/static/ground.png') center bottom / cover no-repeat;
       box-shadow: 0 -12px 40px 0 #000e;
       transition: box-shadow .22s;
     }
@@ -210,14 +255,14 @@
       min-width:320px; max-width:98vw;
       background:linear-gradient(120deg,#232b47 60%,#101a2c 100%);
       border-radius:26px;
-      box-shadow:0 2px 32px #00ffc860, 0 1px 40px #fff2 inset;
+      box-shadow:var(--modal-glow), 0 1px 40px #fff2 inset;
       padding:2.3em 2.4em 1.7em 2.4em; z-index:101; animation:popIn .33s;
       display:flex; flex-direction:column; align-items:center;
-      border: 2.5px solid #00ffc860;
+      border: 2.5px solid var(--modal-border);
       filter: drop-shadow(0 0 24px #00ffc8c8);
     }
     #proModalTitle {
-      font-size:1.55em; font-weight:700; color:#00ffc8; margin-bottom:0.7em; letter-spacing:1.3px;
+      font-size:1.55em; font-weight:700; color:var(--accent); margin-bottom:0.7em; letter-spacing:1.3px;
       text-shadow: 0 2px 14px #001b, 0 0 8px #00ffc8;
       width:100%;
       text-align:center;
@@ -281,7 +326,7 @@
     }
     .hs-row .hs-game {
       font-weight: 700;
-      color: #ffe46f;
+      color: var(--gold);
       font-size: 1.11em;
       flex: 1;
       text-shadow: 0 2px 8px #fff2;
@@ -292,10 +337,97 @@
       font-size: 1.21em;
       margin-left: 1em;
       text-shadow: 0 2px 8px #00ffc8b0;
-      background: linear-gradient(90deg, #ffe46f 30%, #fff 100%);
+      background: linear-gradient(90deg, var(--gold) 30%, #fff 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
+    /* Lucid Piece Styles */
+    .lucid-piece-falling {
+      position: fixed;
+      z-index: 100;
+      width: 72px;
+      height: 72px;
+      pointer-events: auto;
+      cursor: pointer;
+      animation: piece-glow 2s infinite alternate, piece-float 1.3s infinite cubic-bezier(.45,1.6,.51,-0.2);
+      filter: drop-shadow(0 0 12px #fff8) drop-shadow(0 0 22px #00ffc8cc) brightness(1.12);
+      transition: transform .18s;
+    }
+    .lucid-piece-falling:active { transform: scale(1.09); }
+    @keyframes piece-glow {
+      0% { filter: drop-shadow(0 0 22px #00ffd9c8) brightness(1.18);}
+      100% { filter: drop-shadow(0 0 38px #ffe46f) brightness(1.26);}
+    }
+    @keyframes piece-float {
+      0% { transform: translateY(0px);}
+      100% { transform: translateY(18px);}
+    }
+    .lucid-piece-collected {
+      filter: drop-shadow(0 0 20px #ffe46f) brightness(1.25);
+      animation: collected-pulse .5s;
+    }
+    @keyframes collected-pulse {
+      0% { transform: scale(1.1);}
+      100% { transform: scale(1);}
+    }
+    .lucid-piece-uncollected { opacity: 0.33; filter: grayscale(1) brightness(.7);}
+    .lucid-coin-anim-gain {
+      animation: coin-gain-bounce .9s cubic-bezier(.37,1.6,.58,1.0);
+      filter: drop-shadow(0 0 32px #ffe46f) brightness(1.5);
+    }
+    @keyframes coin-gain-bounce {
+      0% { transform: scale(1.45) translateY(-22px);}
+      60% { transform: scale(1.2) translateY(-10px);}
+      100% { transform: scale(1) translateY(0);}
+    }
+    .lucid-piece-merge-anim {
+      animation: piece-merge .8s cubic-bezier(.35,.97,.65,1.1);
+    }
+    @keyframes piece-merge {
+      0% { transform: scale(1) rotate(0deg);}
+      60% { transform: scale(1.25) rotate(14deg);}
+      100% { transform: scale(0) rotate(40deg);}
+    }
+    .lucid-piece-stack {
+      display: flex; flex-direction: row; gap: 0.1em; align-items: center;
+      margin-right: .45em;
+    }
+    .lucid-piece-img {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      border: 1.5px solid #00ffc8;
+      box-shadow: 0 0 6px #00ffc870;
+      margin-right: 2.5px;
+      margin-top: 1px;
+      background: #141c1f;
+      transition: filter .22s, opacity .22s;
+      object-fit: contain;
+    }
+    .lucid-coin-img {
+      width: 33px; height: 33px;
+      border-radius: 50%;
+      margin-left: 0.5em;
+      margin-right: 0.2em;
+      filter: drop-shadow(0 0 18px #ffe46f88);
+      vertical-align: middle;
+      background: #181d2b;
+      border: 1.5px solid #ffe46f;
+      box-shadow: 0 0 7px #ffe46f60;
+      object-fit: contain;
+    }
+    .lucid-coin-count {
+      color: var(--gold);
+      font-weight: 800;
+      margin-left: .2em;
+      font-size: 1.13em;
+      text-shadow: 0 2px 12px #00ffc890, 0 0 6px #ffe46f;
+    }
+    .lucid-coin-info-btn {
+      background: none; border: none; color: var(--accent); font-size: 1.15em; cursor: pointer; margin-left: 0.45em;
+      transition: color .18s; outline: none;
+    }
+    .lucid-coin-info-btn:active,
+    .lucid-coin-info-btn:focus { color: #ffe46f; }
     @keyframes fadeIn {0%{opacity:0}100%{opacity:1}}
     @keyframes popIn {0%{transform:scale(0.93);opacity:0}100%{transform:scale(1);opacity:1}}
     @media (max-width: 950px) {
@@ -314,6 +446,7 @@
       .house-shadow { width: 40px; height: 9px;}
       #ground-3d { height: 60px;}
       #proModalContent { min-width: unset; padding: 1.2em 0.5em 0.8em 0.5em;}
+      .carousel-arrow { width: 38px; height: 38px; font-size: 1.5em;}
     }
   </style>
 </head>
@@ -332,11 +465,11 @@
     <div class="coin-count"><i class="fas fa-coins"></i> <span id="coinCount">0</span></div>
     <div class="lucid-coin-ui">
       <div class="lucid-piece-stack">
-        <img class="lucid-piece-img" id="lucidPieceImg1" src="lucid_piece1.png" alt="Lucid Piece 1">
-        <img class="lucid-piece-img" id="lucidPieceImg2" src="lucid_piece2.png" alt="Lucid Piece 2">
-        <img class="lucid-piece-img" id="lucidPieceImg3" src="lucid_piece3.png" alt="Lucid Piece 3">
+        <img class="lucid-piece-img" id="lucidPieceImg1" src="/static/lucid_piece1.png" alt="Lucid Piece 1">
+        <img class="lucid-piece-img" id="lucidPieceImg2" src="/static/lucid_piece2.png" alt="Lucid Piece 2">
+        <img class="lucid-piece-img" id="lucidPieceImg3" src="/static/lucid_piece3.png" alt="Lucid Piece 3">
       </div>
-      <img class="lucid-coin-img" id="lucidCoinTotalImg" src="lucid_coin_total.png" alt="Total Lucid Coin">
+      <img class="lucid-coin-img" id="lucidCoinTotalImg" src="/static/lucid_coin_total.png" alt="Total Lucid Coin">
       <span id="lucidCoinCount" class="lucid-coin-count">0</span>
       <button id="lucidCoinInfoBtn" class="lucid-coin-info-btn" title="What are Lucid Coins?"><i class="fas fa-circle-info"></i></button>
     </div>
@@ -345,7 +478,9 @@
   <div class="main-content">
     <div class="carousel-bottom-area">
       <div class="carousel-container" id="carouselContainer">
+        <button class="carousel-arrow left" aria-label="Scroll Left" id="carouselArrowLeft"><i class="fas fa-chevron-left"></i></button>
         <div class="carousel-track" id="carouselTrack"></div>
+        <button class="carousel-arrow right" aria-label="Scroll Right" id="carouselArrowRight"><i class="fas fa-chevron-right"></i></button>
       </div>
     </div>
   </div>
@@ -360,13 +495,16 @@
       <div id="proModalActions"></div>
     </div>
   </div>
+  <!-- Lucid Piece FALLING Area (dynamic) -->
+  <div id="lucidPieceFallingArea"></div>
   <script>
     // ---- HARDCODED PRELOAD ALL MEDIA ----
+    // Add all Lucid Pieces and Coin images as assets
     const mediaAssets = [
-      'ground.png',
-      'house1.png', 'house2.png', 'house3.png', 'house4.png', 'house5.png',
-      'lucid_piece1.png', 'lucid_piece2.png', 'lucid_piece3.png',
-      'lucid_coin_total.png'
+      '/static/ground.png',
+      '/static/house1.png', '/static/house2.png', '/static/house3.png', '/static/house4.png', '/static/house5.png',
+      '/static/lucid_piece1.png', '/static/lucid_piece2.png', '/static/lucid_piece3.png',
+      '/static/lucid_coin_total.png'
     ];
     let loadedCount = 0;
     function updatePreloadProgress() {
@@ -399,7 +537,7 @@
     // ---- END PRELOAD ----
 
     window.startApp = function() {
-      // --- Animated background: rays & particles (unchanged) ---
+      // --- Animated background: rays & particles ---
       const c1 = document.getElementById('bg-canvas1');
       c1.width = window.innerWidth; c1.height = window.innerHeight;
       const ctx1 = c1.getContext('2d');
@@ -461,6 +599,7 @@
       } drawParticles();
       window.addEventListener('resize',()=>{ c2.width=window.innerWidth; c2.height=window.innerHeight; });
 
+      // ---- Professional Modal Logic ----
       function showProModal({title, message, actions}) {
         const modal = document.getElementById('proModal');
         modal.classList.add('show');
@@ -486,13 +625,13 @@
         window.onkeydown = e => { if(e.key==="Escape") { modal.classList.remove('show'); window.onkeydown = null; } };
       }
 
-      // Game data and logic
+      // ---- Game Data ----
       const housePNGs = [
-        'house1.png',  // lucidmatch.html (default unlocked)
-        'house2.png',
-        'house3.png',
-        'house4.png',
-        'house5.png'
+        '/static/house1.png',
+        '/static/house2.png',
+        '/static/house3.png',
+        '/static/house4.png',
+        '/static/house5.png'
       ];
       const flyingObjects = [
         `<svg width="84" height="84"><g id="starOrbit"></g></svg>`,
@@ -516,6 +655,7 @@
         '<i class="fas fa-brain"></i>'
       ];
 
+      // ---- Local Storage State ----
       let unlockedGames = JSON.parse(localStorage.getItem('lucid_unlocked_games')||'[true,false,false,false,false]');
       unlockedGames[0]=true;
       let coins = Number(localStorage.getItem('lucid_coins')||'500');
@@ -523,6 +663,8 @@
       let lucidCoin = Number(localStorage.getItem('lucid_lucidcoin')||'0');
       let lucidPieces = JSON.parse(localStorage.getItem('lucid_pieces')||'[false,false,false]');
       let selectedIdx = 0;
+
+      // ---- DOM Caching ----
       const $track = document.getElementById('carouselTrack');
       const $coinCount = document.getElementById('coinCount');
       const $highScore = document.getElementById('highScore');
@@ -537,7 +679,11 @@
       const $highScoreBoardBtn = document.getElementById('highScoreBoardBtn');
       const $lucidCoinInfoBtn = document.getElementById('lucidCoinInfoBtn');
       const $carouselContainer = document.getElementById('carouselContainer');
+      const $carouselArrowLeft = document.getElementById('carouselArrowLeft');
+      const $carouselArrowRight = document.getElementById('carouselArrowRight');
+      const $lucidPieceFallingArea = document.getElementById('lucidPieceFallingArea');
 
+      // ---- UI Update Functions ----
       function updateHeader() {
         $coinCount.textContent = coins;
         $highScore.textContent = highScore;
@@ -553,6 +699,7 @@
         }
       }
 
+      // ---- Carousel Rendering ----
       function renderHouses() {
         $track.innerHTML = '';
         for(let i=0;i<5;i++) {
@@ -584,18 +731,11 @@
               <button class="unlock-btn" data-idx="${i}" ${coins<unlockPrices[i]?'disabled':''}>Unlock</button>`;
             house.appendChild(lock);
           }
-          house.onclick = () => {
+          house.onclick = (e) => {
             if (unlockedGames[i]) {
               if (gameLinks[i]) window.location = gameLinks[i];
             } else {
-              showProModal({
-                title: "Unlock Game?",
-                message: `Do you want to unlock this game for <b>${unlockPrices[i]} coins</b>?`,
-                actions: [
-                  {label:"Cancel", className:"cancel"},
-                  {label:"Unlock", callback:()=>{ unlockGame(i); }}
-                ]
-              });
+              tryUnlockGame(i);
             }
           };
           house.addEventListener('click', (e) => {
@@ -608,7 +748,27 @@
         }
         updateHeader();
         attachUnlockEvents();
-        centerSelectedHouse();
+        setTimeout(centerSelectedHouse, 50);
+      }
+
+      function tryUnlockGame(i) {
+        if (coins < unlockPrices[i]) {
+          showProModal({
+            title: "Not Enough Coins",
+            message: `<span style="color:#ffe46f; font-size:1.3em;"><i class="fas fa-coins"></i> ${coins}</span><br>
+            You need <b>${unlockPrices[i]}</b> coins to unlock this game.`,
+            actions: [{label:"OK", className:"cancel"}]
+          });
+          return;
+        }
+        showProModal({
+          title: "Unlock Game?",
+          message: `Do you want to unlock this game for <b>${unlockPrices[i]} coins</b>?`,
+          actions: [
+            {label:"Cancel", className:"cancel"},
+            {label:"Unlock", callback:()=>{ unlockGame(i); }}
+          ]
+        });
       }
 
       function unlockGame(i) {
@@ -618,27 +778,65 @@
           localStorage.setItem('lucid_unlocked_games',JSON.stringify(unlockedGames));
           localStorage.setItem('lucid_coins',coins);
           renderHouses();
+          showProModal({
+            title: "Game Unlocked!",
+            message: `<span style="font-size:2em; color:#00ffc8;"><i class="fas fa-unlock"></i></span><br>
+            Enjoy your new game!`,
+            actions: [{label:"OK", className:"cancel"}]
+          });
+        } else {
+          showProModal({
+            title: "Not Enough Coins",
+            message: `<span style="color:#ffe46f; font-size:1.3em;"><i class="fas fa-coins"></i> ${coins}</span><br>
+            You need <b>${unlockPrices[i]}</b> coins to unlock this game.`,
+            actions: [{label:"OK", className:"cancel"}]
+          });
         }
       }
 
-      function centerSelectedHouse() {
-        // Center the selected house in the scroll container
+      // ---- Carousel Scroll & Centering ----
+      function centerSelectedHouse(smooth=true) {
         const houses = Array.from($track.children);
         if (!houses.length) return;
         const selected = houses[selectedIdx];
         if (!selected) return;
-        // scroll-margin-inline ensures snap is perfect, but we scrollTo manually for keyboard navigation
         const containerRect = $carouselContainer.getBoundingClientRect();
         const selectedRect = selected.getBoundingClientRect();
-        const scrollLeft = selected.offsetLeft + selected.offsetWidth/2 - containerRect.width/2;
+        const scrollOffset = selected.offsetLeft + (selected.offsetWidth / 2) - (containerRect.width / 2);
         $carouselContainer.scrollTo({
-          left: scrollLeft,
-          behavior: "smooth"
+          left: scrollOffset,
+          behavior: smooth ? "smooth" : "auto"
         });
+        // Arrow buttons disabled state:
+        $carouselArrowLeft.disabled = (selectedIdx <= 0);
+        $carouselArrowRight.disabled = (selectedIdx >= houses.length - 1);
       }
+      window.addEventListener('resize', () => centerSelectedHouse(false));
 
-      window.addEventListener('resize', () => {
-        centerSelectedHouse();
+      // Carousel Mousewheel: up/down scrolls left/right
+      $carouselContainer.addEventListener('wheel', function(e){
+        if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+          $carouselContainer.scrollLeft += e.deltaY * 0.75;
+          e.preventDefault();
+        }
+      }, {passive:false});
+      // Carousel Arrow Buttons
+      $carouselArrowLeft.onclick = function() {
+        if (selectedIdx > 0) { selectedIdx--; renderHouses(); }
+      };
+      $carouselArrowRight.onclick = function() {
+        if (selectedIdx < 4) { selectedIdx++; renderHouses(); }
+      };
+
+      // Keyboard Navigation
+      document.body.addEventListener('keydown',e=>{
+        if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
+        if (e.key==='ArrowRight') {
+          if (selectedIdx < 4) { selectedIdx++; renderHouses(); }
+        }
+        if (e.key==='ArrowLeft') {
+          if (selectedIdx > 0) { selectedIdx--; renderHouses(); }
+        }
       });
 
       function attachUnlockEvents() {
@@ -646,34 +844,12 @@
           btn.onclick = e=>{
             e.stopPropagation();
             const i = Number(btn.dataset.idx);
-            showProModal({
-              title: "Unlock Game?",
-              message: `Do you want to unlock this game for <b>${unlockPrices[i]} coins</b>?`,
-              actions: [
-                {label:"Cancel", className:"cancel"},
-                {label:"Unlock", callback:()=>{ unlockGame(i); }}
-              ]
-            });
+            tryUnlockGame(i);
           };
         });
       }
 
-      document.body.addEventListener('keydown',e=>{
-        if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
-        if (e.key==='ArrowRight') {
-          if (selectedIdx < 4) {
-            selectedIdx++;
-            renderHouses();
-          }
-        }
-        if (e.key==='ArrowLeft') {
-          if (selectedIdx > 0) {
-            selectedIdx--;
-            renderHouses();
-          }
-        }
-      });
-
+      // ---- Orbiting Stars for House 1 ----
       function drawOrbitingStars(parent, count, radius, speed) {
         parent.innerHTML = '';
         for (let i = 0; i < count; ++i) {
@@ -695,12 +871,154 @@
         } animate();
       }
 
+      // ---- Lucid Piece Falling/Collecting System ----
+      const PIECE_PNGS = [
+        "/static/lucid_piece1.png",
+        "/static/lucid_piece2.png",
+        "/static/lucid_piece3.png"
+      ];
+      let lucidPiecesTimer = null;
+      let currentlyFallingPiece = null;
+      function startLucidPieceRain() {
+        function maybeSpawnPiece() {
+          // If already all collected or one is falling, skip
+          if (lucidPieces.every(Boolean) || currentlyFallingPiece) {
+            scheduleNextPiece();
+            return;
+          }
+          // Only spawn missing pieces
+          const available = [0,1,2].filter(i=>!lucidPieces[i]);
+          if (available.length === 0) return;
+          const idx = available[Math.floor(Math.random()*available.length)];
+          spawnFallingPiece(idx);
+          scheduleNextPiece();
+        }
+        function scheduleNextPiece() {
+          // Between 12s and 32s
+          const delay = 12000 + Math.random()*20000;
+          lucidPiecesTimer = setTimeout(maybeSpawnPiece, delay);
+        }
+        scheduleNextPiece();
+      }
+      function spawnFallingPiece(pieceIdx) {
+        if (currentlyFallingPiece) return;
+        const $img = document.createElement("img");
+        $img.src = PIECE_PNGS[pieceIdx];
+        $img.className = "lucid-piece-falling";
+        // Random x between 7vw and (93vw - 72px)
+        const vw = Math.max(window.innerWidth, 400);
+        const maxX = vw - 82;
+        const left = 50 + Math.random() * (maxX - 100);
+        $img.style.left = left+"px";
+        $img.style.top = "-70px";
+        $img.setAttribute('data-piece-idx', pieceIdx);
+        $img.title = "Collect Lucid Piece!";
+        currentlyFallingPiece = $img;
+        $lucidPieceFallingArea.appendChild($img);
+        // Animate falling
+        let top = -70, stop = false;
+        function animateFall() {
+          if (stop) return;
+          top += 2.2 + (Math.random() * 0.3);
+          $img.style.top = top+"px";
+          // If hits ground, remove after a while
+          if (top > window.innerHeight - 120) {
+            $img.style.top = (window.innerHeight - 120)+"px";
+            setTimeout(()=> {
+              if ($img.parentNode) $img.parentNode.removeChild($img);
+              currentlyFallingPiece = null;
+            }, 1800);
+            stop = true;
+            return;
+          }
+          requestAnimationFrame(animateFall);
+        }
+        animateFall();
+        // Click to collect
+        $img.onclick = function(e) {
+          e.stopPropagation();
+          collectLucidPiece(pieceIdx, $img);
+        };
+      }
+      function collectLucidPiece(idx, $img) {
+        if (lucidPieces[idx]) return;
+        lucidPieces[idx]=true;
+        localStorage.setItem('lucid_pieces', JSON.stringify(lucidPieces));
+        $img.classList.add('lucid-piece-merge-anim');
+        setTimeout(()=> {
+          if ($img.parentNode) $img.parentNode.removeChild($img);
+          currentlyFallingPiece = null;
+          updateHeader();
+          // Animate to header
+          animatePieceToStack(idx, ()=>{
+            // If all collected, merge to Lucid Coin!
+            if (lucidPieces.every(Boolean)) {
+              setTimeout(animateMergePiecesToCoin, 400);
+            }
+          });
+        }, 700);
+      }
+      function animatePieceToStack(idx, cb) {
+        // Find header stack location
+        const pieceStackImg = $lucidPieceImgs[idx];
+        const rect = pieceStackImg.getBoundingClientRect();
+        // Create flying image
+        const flying = document.createElement("img");
+        flying.src = PIECE_PNGS[idx];
+        flying.className = "lucid-piece-falling";
+        flying.style.left = (window.innerWidth/2-36)+"px";
+        flying.style.top = (window.innerHeight-108)+"px";
+        flying.style.pointerEvents = "none";
+        flying.style.transition = "left .65s cubic-bezier(.42,2,.6,1), top .65s cubic-bezier(.42,2,.6,1), opacity .22s";
+        document.body.appendChild(flying);
+        setTimeout(()=>{
+          flying.style.left = (rect.left + rect.width/2 - 36)+"px";
+          flying.style.top = (rect.top + rect.height/2 - 36)+"px";
+          flying.style.opacity = 0.15;
+        }, 10);
+        setTimeout(()=>{
+          flying.remove();
+          pieceStackImg.classList.add('lucid-piece-collected');
+          setTimeout(()=>pieceStackImg.classList.remove('lucid-piece-collected'), 520);
+          cb && cb();
+        }, 700);
+      }
+      function animateMergePiecesToCoin() {
+        // Animate all stack pieces to coin, then reset them
+        const stackRects = $lucidPieceImgs.map(img=>img.getBoundingClientRect());
+        const coinRect = $lucidCoinTotalImg.getBoundingClientRect();
+        $lucidPieceImgs.forEach((img,i)=>{
+          img.classList.add('lucid-piece-merge-anim');
+          setTimeout(()=>{
+            img.style.visibility = "hidden";
+          }, 600);
+        });
+        setTimeout(()=>{
+          // Animate coin bounce
+          $lucidCoinTotalImg.classList.add('lucid-coin-anim-gain');
+          lucidCoin++;
+          localStorage.setItem('lucid_lucidcoin', lucidCoin);
+          lucidPieces = [false,false,false];
+          localStorage.setItem('lucid_pieces', JSON.stringify(lucidPieces));
+          updateHeader();
+          setTimeout(()=>{
+            $lucidPieceImgs.forEach(img=>{img.style.visibility=""; img.classList.remove('lucid-piece-merge-anim');});
+            $lucidCoinTotalImg.classList.remove('lucid-coin-anim-gain');
+          }, 900);
+        }, 700);
+      }
+      // Start the piece rain system
+      startLucidPieceRain();
+
+      // ---- Lucid Coin Info ----
       $lucidCoinInfoBtn.onclick = function() {
         showProModal({
           title: "Lucid Coin 🪙 Usage",
           message: `<div style="font-size:1.09em;text-align:left;max-width:320px;margin:auto;">
               <b>What are Lucid Coins?</b><br><br>
               <span style="color:#00ffc8">Lucid Coins🪙</span> are rare coins you can collect as jackpot drops.<br>
+              <br>
+              <b>Collect 3 unique Lucid Pieces (shown below) to get 1 Lucid Coin!</b><br>
               <br>
               <b>Use Lucid Coins to continue your game after a Game Over!</b><br>
               <ul style="margin-left:1.5em;">
@@ -716,6 +1034,7 @@
         });
       };
 
+      // ---- High Score Board ----
       $highScoreBoardBtn.onclick = function() {
         let hsList = [];
         let bestOverall = 0;
@@ -746,6 +1065,7 @@
         });
       };
 
+      // ---- Initialization ----
       renderHouses();
       updateHeader();
       setTimeout(centerSelectedHouse, 400);
