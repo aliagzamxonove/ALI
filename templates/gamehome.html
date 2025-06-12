@@ -18,217 +18,243 @@
       --border-radius: 20px;
       --shadow: 0 2px 16px #000b, 0 1px 40px #00ffc840 inset;
     }
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100vw;
-      min-height: 100vh;
-      background: var(--bg-main);
-      box-sizing: border-box;
-      overflow-x: hidden;
-      height: 100%;
-    }
-    body {
-      font-family: 'Orbitron', 'Space Grotesk', sans-serif;
-      min-height: 100vh;
-      width: 100vw;
-      box-sizing: border-box;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-    }
-    #bg-animated { position: fixed; inset: 0; z-index: 0; width: 100vw; min-height: 100vh; background: var(--bg-gradient); overflow: hidden; }
-    #bg-canvas1, #bg-canvas2 { position: absolute; width:100vw; min-height:100vh; inset:0; pointer-events:none; z-index:1; display: block; max-width: 100vw; }
-    .header-bar {
-      position: fixed; top: 0; left: 50%; transform: translateX(-50%);
-      width: 98vw; max-width: 1100px;
-      z-index: 20;
-      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
-      padding: 1.2rem 2.5rem; background: rgba(24,32,54,0.82);
-      color: #fff; box-shadow: var(--shadow);
-      font-size: 1.2rem; border-radius: var(--border-radius); margin-top: 1.2vw;
-      backdrop-filter: blur(13px);
-      border: 1.5px solid #00ffc825;
-      user-select: none;
-      gap: 0.8em;
-      box-sizing: border-box;
-    }
-    .main-content {
-      flex: 1 1 auto;
-      width: 100vw;
-      box-sizing: border-box;
-      padding-top: 120px;
-      padding-bottom: 0;
-      min-height: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-end;
-      position: relative;
-      z-index: 2;
-    }
-    .carousel-bottom-area {
-      width: 100vw;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-end;
-      position: relative;
-      margin-bottom: 0;
-    }
-    .carousel-container {
-      width: 100vw;
-      max-width: 100vw;
-      overflow-x: auto;
-      overflow-y: visible;
-      position: relative;
-      min-height: 340px;
-      box-sizing: border-box;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-      touch-action: pan-x;
-      z-index: 6;
-      scroll-behavior: smooth;
-      margin-bottom: 24px;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      scroll-snap-type: x mandatory;
-    }
-    .carousel-container::-webkit-scrollbar { display: none; }
-    .carousel-track {
-      display: flex;
-      align-items: flex-end;
-      gap: 2vw;
-      min-width: 100vw;
-      width: max-content;
-      padding-bottom: 0;
-      user-select: none;
-      box-sizing: border-box;
-      transition: transform .26s cubic-bezier(.68,-0.6,.32,1.6);
-    }
-    .carousel-arrow {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: 9;
-      background: linear-gradient(120deg, #232b47 60%, #101a2c 100%);
-      color: var(--accent);
-      border: 2.5px solid var(--modal-border);
-      border-radius: 50%;
-      box-shadow: 0 4px 20px #00ffc860;
-      width: 54px; height: 54px;
-      font-size: 2.1em;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer;
-      transition: background .18s, box-shadow .18s;
-      opacity: 0.94;
-      outline: none;
-      user-select: none;
-    }
-    .carousel-arrow.left { left: 2vw;}
-    .carousel-arrow.right { right: 2vw;}
-    .carousel-arrow:active,
-    .carousel-arrow:focus { background: #00ffc840; box-shadow: 0 0 24px #00ffc8a0; }
-    .carousel-arrow[disabled] { opacity: 0.33; pointer-events: none; }
-    .game-house {
-      position: relative;
-      width: 60vw; max-width: 520px; min-width: 220px;
-      height: 340px;
-      background: rgba(48,53,65,0.10);
-      border-radius: 34px;
-      box-shadow: 0 30px 70px #0008, 0 1px 40px #00ffc840 inset;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      margin-bottom: 0;
-      transition: transform 0.5s, filter 0.4s, box-shadow 0.4s;
-      cursor: pointer;
-      z-index: 2;
-      pointer-events: auto;
-      border: 2.5px solid rgba(0,255,200,0.03);
-      outline: none;
-      scroll-snap-align: center;
-      scroll-margin-inline: 50vw;
-      box-sizing: border-box;
-    }
-    .game-house.selected {
-      transform: scale(1.16) translateY(-33px) rotateY(-4deg);
-      box-shadow: 0 30px 110px #00ffc8b0, 0 1px 60px #fff2 inset;
-      filter: brightness(1.18) drop-shadow(0 0 24px #00ffc8cc);
-      z-index: 11;
-      border: 2.5px solid #00ffc8d9;
-    }
-    .game-house.locked {
-      filter: grayscale(0.9) blur(1.5px) brightness(0.7) contrast(1.2);
-      cursor: not-allowed;
-      box-shadow: 0 3px 60px #000b;
-      border: 2.5px solid #ffeb3b60;
-    }
-    .game-house img {
-      width: 90%;
-      max-width: 440px;
-      height: 60%;
-      object-fit: contain;
-      margin-bottom: -14px;
-      box-shadow: 0 20px 70px #0004;
-      border-radius: 24px 24px 32px 32px;
-      background: rgba(19,29,32,0.8);
-      border: 2px solid #fff2;
-      display: block;
-      margin-left: auto; margin-right: auto;
-      pointer-events: none;
-      user-select: none;
-      transition: box-shadow .18s;
-    }
-    .house-shadow {
-      position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%);
-      width: 130px; height: 36px;
-      background: radial-gradient(ellipse at center, #0008 65%, transparent 100%);
-      filter: blur(6px);
-      opacity: 0.48;
-      z-index: 1;
-      pointer-events: none;
-      user-select: none;
-    }
-    .flying-obj {
-      position: absolute; left: 50%; top: -70px; transform: translateX(-50%);
-      width: 84px; height: 84px; z-index: 3;
-      pointer-events: none;
-    }
-    .lock-overlay {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background: linear-gradient(120deg,rgba(22,22,22,0.43) 40%,rgba(0,0,0,0.71) 100%);
-      border-radius: 34px;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      z-index: 9; color: #fff;
-      backdrop-filter: blur(4px);
-      border: 1.5px solid #ffeb3b80;
-      box-shadow: 0 0 22px #ffeb3b40;
-      animation: fadeIn 0.4s;
-    }
-    .lock-icon { font-size: 2.8rem; margin-bottom: 1rem; color: #ffeb3b; text-shadow: 0 6px 18px #000a; filter: drop-shadow(0 0 8px #fff4);}
-    .unlock-btn { margin-top: 1rem; padding: .65em 2.1em; font-size: 1.13rem; font-weight: 700; border-radius: 2em; border: none; background: linear-gradient(95deg, #00ffc8, #1a237e 90%); color: #1a237e; box-shadow: 0 3px 12px #00ffc8b3; cursor: pointer; letter-spacing: 1px; transition: background .2s, color .2s, opacity .2s;}
-    .unlock-btn:disabled { background: #aaa; color: #fff; cursor: not-allowed;}
-    #ground-3d {
-      position: fixed;
-      left: 0;
-      bottom: 0;
-      width: 100vw;
-      height: 270px;
-      z-index: 3;
-      pointer-events: none;
-      background: url('/static/ground.png') center bottom / cover no-repeat;
-      box-shadow: 0 -12px 40px 0 #000e;
-      transition: box-shadow .22s;
-    }
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  min-height: 100vh;
+  background: var(--bg-main);
+  box-sizing: border-box;
+  overflow-x: hidden;
+  height: 100%;
+}
+
+body {
+  font-family: 'Orbitron', 'Space Grotesk', sans-serif;
+  min-height: 100vh;
+  width: 100vw;
+  box-sizing: border-box;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+#bg-animated {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100vw;
+  min-height: 100vh;
+  background: var(--bg-gradient);
+  overflow: hidden;
+}
+
+#bg-canvas1, #bg-canvas2 {
+  position: absolute;
+  width: 100vw;
+  min-height: 100vh;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  display: block;
+  max-width: 100vw;
+}
+
+.header-bar {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 98vw;
+  max-width: 1100px;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.2rem 2.5rem;
+  background: rgba(24,32,54,0.82);
+  color: #fff;
+  box-shadow: var(--shadow);
+  font-size: 1.2rem;
+  border-radius: var(--border-radius);
+  margin-top: 1.2vw;
+  backdrop-filter: blur(13px);
+  border: 1.5px solid #00ffc825;
+  user-select: none;
+  gap: 0.8em;
+  box-sizing: border-box;
+}
+
+.main-content {
+  flex: 1 1 auto;
+  width: 100vw;
+  box-sizing: border-box;
+  padding-top: 120px;
+  padding-bottom: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+}
+
+.carousel-bottom-area {
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 0;
+  flex: 1;
+}
+
+.carousel-container {
+  width: 96vw; /* Slightly smaller to prevent overflow */
+  max-width: 96vw;
+  overflow-x: auto;
+  overflow-y: visible;
+  position: relative;
+  min-height: 340px;
+  height: 100vh;
+  box-sizing: border-box;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  touch-action: pan-x;
+  z-index: 10;
+  scroll-behavior: smooth;
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  scroll-snap-type: x mandatory;
+}
+.carousel-container::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel-track {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5vw;                /* Slightly reduced gap */
+  padding: 0 2vw;            /* Add padding for left/right balance */
+  width: 100%;
+  box-sizing: border-box;
+  transition: transform 0.26s cubic-bezier(.68,-0.6,.32,1.6);
+}
+
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 9;
+  background: linear-gradient(120deg, #232b47 60%, #101a2c 100%);
+  color: var(--accent);
+  border: 2.5px solid var(--modal-border);
+  border-radius: 50%;
+  box-shadow: 0 4px 20px #00ffc860;
+  width: 54px;
+  height: 54px;
+  font-size: 2.1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.18s, box-shadow 0.18s;
+  opacity: 0.94;
+  outline: none;
+  user-select: none;
+}
+.carousel-arrow.left { left: 2vw; }
+.carousel-arrow.right { right: 2vw; }
+.carousel-arrow:active,
+.carousel-arrow:focus {
+  background: #00ffc840;
+  box-shadow: 0 0 24px #00ffc8a0;
+}
+.carousel-arrow[disabled] {
+  opacity: 0.33;
+  pointer-events: none;
+}
+
+.game-house {
+  position: relative;
+  flex: 0 0 calc(18vw - 1vw);  /* Make each house ~18vw max, minus half the gap */
+  max-width: 300px;            /* Prevent overflow on big screens */
+  min-width: 180px;
+  height: 340px;
+  background: rgba(48,53,65,0.10);
+  border-radius: 34px;
+  box-shadow: 0 30px 70px #0008, 0 1px 40px #00ffc840 inset;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.5s, filter 0.4s, box-shadow 0.4s;
+  cursor: pointer;
+  z-index: 15;
+  pointer-events: auto;
+  border: 2.5px solid rgba(0,255,200,0.03);
+  outline: none;
+  scroll-snap-align: center;
+  box-sizing: border-box;
+}
+
+.game-house.selected {
+  transform: scale(1.16) translateY(-33px) rotateY(-4deg);
+  box-shadow: 0 30px 110px #00ffc8b0, 0 1px 60px #fff2 inset;
+  filter: brightness(1.18) drop-shadow(0 0 24px #00ffc8cc);
+  z-index: 18;
+  border: 2.5px solid #00ffc8d9;
+}
+
+.game-house.locked {
+  filter: grayscale(0.9) blur(1.5px) brightness(0.7) contrast(1.2);
+  cursor: not-allowed;
+  box-shadow: 0 3px 60px #000b;
+  border: 2.5px solid #ffeb3b60;
+}
+
+.game-house img {
+  width: 100%;                /* Use full card width */
+  max-width: 360px;           /* Bigger house image */
+  height: auto;               /* Maintain aspect ratio */
+  object-fit: contain;
+  box-shadow: 0 20px 70px #0004;
+  border-radius: 24px 24px 32px 32px;
+  background: rgba(19, 29, 32, 0.8);
+  border: 2px solid #fff2;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+  transition: box-shadow 0.18s;
+}
+
+/* ✅ Ground stays at the bottom */
+#ground-3d {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 270px;
+  z-index: 1;
+  pointer-events: none;
+  background: url('/static/ground.png') center bottom / cover no-repeat;
+  box-shadow: 0 -12px 40px 0 #000e;
+  transition: box-shadow .22s;
+}
+
     #ground-3d-fade {
       position: absolute;
       left: 0; top: 0; width: 100vw; height: 70px;
       background: linear-gradient(to bottom, rgba(24,29,43,1) 0%, rgba(24,29,43,0) 100%);
       pointer-events: none;
-      z-index: 4;
+      z-index: 3;
     }
     #preload-overlay {
       position: fixed; inset: 0; z-index: 9999;
@@ -448,6 +474,51 @@
       #proModalContent { min-width: unset; padding: 1.2em 0.5em 0.8em 0.5em;}
       .carousel-arrow { width: 38px; height: 38px; font-size: 1.5em;}
     }
+.floating-rune {
+  position: absolute;
+  font-size: 14px;
+  color: #7ef9ff;
+  opacity: 0.9;
+  transition: transform 5s ease, opacity 5s ease;
+  pointer-events: none;
+}
+.glowing-petal {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #f8ffb0, transparent);
+  transition: transform 5s ease-out, opacity 5s ease-out;
+  opacity: 0.8;
+}
+.ember-spark {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: #ff9848;
+  border-radius: 50%;
+  opacity: 0.7;
+  animation: ember-glow 2.4s infinite ease-in-out;
+}
+
+@keyframes ember-glow {
+  0% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.8); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.7; }
+}
+.floating-crystal {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(135deg, #b9f2ff, #fff, #b9f2ff);
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  box-shadow: 0 0 8px #b9f2ffaa;
+  opacity: 0.9;
+  transition: transform 6s ease-out, opacity 6s ease-out;
+  pointer-events: none;
+}
+
+
   </style>
 </head>
 <body>
@@ -675,13 +746,14 @@
         document.getElementById('lucidPieceImg2'),
         document.getElementById('lucidPieceImg3')
       ];
-      const $ground3d = document.getElementById('ground-3d');
       const $highScoreBoardBtn = document.getElementById('highScoreBoardBtn');
       const $lucidCoinInfoBtn = document.getElementById('lucidCoinInfoBtn');
       const $carouselContainer = document.getElementById('carouselContainer');
       const $carouselArrowLeft = document.getElementById('carouselArrowLeft');
       const $carouselArrowRight = document.getElementById('carouselArrowRight');
+      const $ground3d = document.getElementById('ground-3d');
       const $lucidPieceFallingArea = document.getElementById('lucidPieceFallingArea');
+      
 
       // ---- UI Update Functions ----
       function updateHeader() {
@@ -870,145 +942,238 @@
           requestAnimationFrame(animate);
         } animate();
       }
+   // --- House 2 — Floating Runes
+function drawFloatingRunes(parent, count = 5, range = 40, duration = 6000) {
+  for (let i = 0; i < count; i++) {
+    const span = document.createElement('span');
+    span.className = 'floating-rune';
+    span.textContent = 'ᚠᛇᚨᚹ'[Math.floor(Math.random() * 4)];
+    span.style.left = 42 + (Math.random() * range - range / 2) + 'px';
+    span.style.top = 42 + (Math.random() * range - range / 2) + 'px';
+    parent.appendChild(span);
 
-      // ---- Lucid Piece Falling/Collecting System ----
-      const PIECE_PNGS = [
-        "/static/lucid_piece1.png",
-        "/static/lucid_piece2.png",
-        "/static/lucid_piece3.png"
-      ];
-      let lucidPiecesTimer = null;
-      let currentlyFallingPiece = null;
-      function startLucidPieceRain() {
-        function maybeSpawnPiece() {
-          // If already all collected or one is falling, skip
-          if (lucidPieces.every(Boolean) || currentlyFallingPiece) {
-            scheduleNextPiece();
-            return;
-          }
-          // Only spawn missing pieces
-          const available = [0,1,2].filter(i=>!lucidPieces[i]);
-          if (available.length === 0) return;
-          const idx = available[Math.floor(Math.random()*available.length)];
-          spawnFallingPiece(idx);
-          scheduleNextPiece();
-        }
-        function scheduleNextPiece() {
-          // Between 12s and 32s
-          const delay = 12000 + Math.random()*20000;
-          lucidPiecesTimer = setTimeout(maybeSpawnPiece, delay);
-        }
-        scheduleNextPiece();
+    requestAnimationFrame(() => {
+      span.style.transform = `translateY(-${20 + Math.random() * 10}px) rotate(${Math.random() * 30 - 15}deg)`;
+      span.style.opacity = '0';
+    });
+
+    setTimeout(() => span.remove(), duration);
+  }
+
+  setInterval(() => drawFloatingRunes(parent, count, range, duration), duration);
+}
+
+  // -- House 3 
+function spawnGlowingPetals(parent, count = 6) {
+  for (let i = 0; i < count; i++) {
+    const petal = document.createElement('div');
+    petal.className = 'glowing-petal';
+    petal.style.left = `${20 + Math.random() * 40}px`;
+    petal.style.top = `${20 + Math.random() * 40}px`;
+    parent.appendChild(petal);
+
+    requestAnimationFrame(() => {
+      petal.style.transform = `translate(${Math.random() * 50 - 25}px, ${Math.random() * 50 - 25}px) rotate(${Math.random() * 360}deg)`;
+      petal.style.opacity = '0';
+    });
+
+    setTimeout(() => petal.remove(), 6000);
+  }
+
+  setInterval(() => spawnGlowingPetals(parent, count), 6000);
+}
+
+
+  // -- house 4
+function drawEmberSparks(parent, count = 8) {
+  for (let i = 0; i < count; i++) {
+    const ember = document.createElement('div');
+    ember.className = 'ember-spark';
+    ember.style.left = 42 + (Math.random() * 30 - 15) + 'px';
+    ember.style.top = 42 + (Math.random() * 30 - 15) + 'px';
+    ember.style.animationDelay = `${Math.random() * 2}s`;
+    parent.appendChild(ember);
+
+    setTimeout(() => ember.remove(), 4000);
+  }
+
+  setInterval(() => drawEmberSparks(parent, count), 4000);
+}
+
+  /// -- house 5 
+function spawnFloatingCrystals(parent, count = 4) {
+  for (let i = 0; i < count; i++) {
+    const crystal = document.createElement('div');
+    crystal.className = 'floating-crystal';
+    crystal.style.left = `${42 + Math.random() * 20 - 10}px`;
+    crystal.style.top = `${42 + Math.random() * 20 - 10}px`;
+    parent.appendChild(crystal);
+
+    requestAnimationFrame(() => {
+      crystal.style.transform = `translateY(-${10 + Math.random() * 10}px) rotate(${Math.random() * 20 - 10}deg)`;
+      crystal.style.opacity = '0';
+    });
+
+    setTimeout(() => crystal.remove(), 6500);
+  }
+
+  setInterval(() => spawnFloatingCrystals(parent, count), 6000);
+}
+
+
+// ---- Lucid Piece Falling/Collecting System ----
+const PIECE_PNGS = [
+  "/static/lucid_piece1.png",
+  "/static/lucid_piece2.png",
+  "/static/lucid_piece3.png"
+];
+
+let lucidPiecesTimer = null;
+let currentlyFallingPiece = null;
+
+function startLucidPieceRain() {
+  function maybeSpawnPiece() {
+    if (lucidPieces.every(Boolean) || currentlyFallingPiece) {
+      scheduleNextPiece();
+      return;
+    }
+    const available = [0,1,2].filter(i => !lucidPieces[i]);
+    if (available.length === 0) return;
+
+    const idx = available[Math.floor(Math.random() * available.length)];
+    spawnFallingPiece(idx);
+    scheduleNextPiece();
+  }
+
+  function scheduleNextPiece() {
+    // Delay between 45 and 95 seconds
+    const delay = 45000 + Math.random() * 50000;
+    lucidPiecesTimer = setTimeout(maybeSpawnPiece, delay);
+  }
+
+  scheduleNextPiece();
+}
+
+function spawnFallingPiece(pieceIdx) {
+  if (currentlyFallingPiece) return;
+
+  const $img = document.createElement("img");
+  $img.src = PIECE_PNGS[pieceIdx];
+  $img.className = "lucid-piece-falling";
+
+  const vw = Math.max(window.innerWidth, 400);
+  const maxX = vw - 82;
+  const left = 50 + Math.random() * (maxX - 100);
+  $img.style.left = left + "px";
+  $img.style.top = "-70px";
+  $img.setAttribute('data-piece-idx', pieceIdx);
+  $img.title = "Collect Lucid Piece!";
+
+  currentlyFallingPiece = $img;
+  $lucidPieceFallingArea.appendChild($img);
+
+  let top = -70, stop = false;
+  function animateFall() {
+    if (stop) return;
+    top += 1.5 + (Math.random() * 0.4);
+    $img.style.top = top + "px";
+
+    if (top > window.innerHeight - 120) {
+      $img.style.top = (window.innerHeight - 120) + "px";
+      setTimeout(() => {
+        if ($img.parentNode) $img.parentNode.removeChild($img);
+        currentlyFallingPiece = null;
+      }, 5000); // remains for 5 seconds
+      stop = true;
+      return;
+    }
+    requestAnimationFrame(animateFall);
+  }
+
+  animateFall();
+
+  $img.onclick = function(e) {
+    e.stopPropagation();
+    collectLucidPiece(pieceIdx, $img);
+  };
+}
+
+function collectLucidPiece(idx, $img) {
+  if (lucidPieces[idx]) return;
+  lucidPieces[idx] = true;
+  localStorage.setItem('lucid_pieces', JSON.stringify(lucidPieces));
+
+  $img.classList.add('lucid-piece-merge-anim');
+  setTimeout(() => {
+    if ($img.parentNode) $img.parentNode.removeChild($img);
+    currentlyFallingPiece = null;
+    updateHeader();
+    animatePieceToStack(idx, () => {
+      if (lucidPieces.every(Boolean)) {
+        setTimeout(animateMergePiecesToCoin, 400);
       }
-      function spawnFallingPiece(pieceIdx) {
-        if (currentlyFallingPiece) return;
-        const $img = document.createElement("img");
-        $img.src = PIECE_PNGS[pieceIdx];
-        $img.className = "lucid-piece-falling";
-        // Random x between 7vw and (93vw - 72px)
-        const vw = Math.max(window.innerWidth, 400);
-        const maxX = vw - 82;
-        const left = 50 + Math.random() * (maxX - 100);
-        $img.style.left = left+"px";
-        $img.style.top = "-70px";
-        $img.setAttribute('data-piece-idx', pieceIdx);
-        $img.title = "Collect Lucid Piece!";
-        currentlyFallingPiece = $img;
-        $lucidPieceFallingArea.appendChild($img);
-        // Animate falling
-        let top = -70, stop = false;
-        function animateFall() {
-          if (stop) return;
-          top += 2.2 + (Math.random() * 0.3);
-          $img.style.top = top+"px";
-          // If hits ground, remove after a while
-          if (top > window.innerHeight - 120) {
-            $img.style.top = (window.innerHeight - 120)+"px";
-            setTimeout(()=> {
-              if ($img.parentNode) $img.parentNode.removeChild($img);
-              currentlyFallingPiece = null;
-            }, 1800);
-            stop = true;
-            return;
-          }
-          requestAnimationFrame(animateFall);
-        }
-        animateFall();
-        // Click to collect
-        $img.onclick = function(e) {
-          e.stopPropagation();
-          collectLucidPiece(pieceIdx, $img);
-        };
-      }
-      function collectLucidPiece(idx, $img) {
-        if (lucidPieces[idx]) return;
-        lucidPieces[idx]=true;
-        localStorage.setItem('lucid_pieces', JSON.stringify(lucidPieces));
-        $img.classList.add('lucid-piece-merge-anim');
-        setTimeout(()=> {
-          if ($img.parentNode) $img.parentNode.removeChild($img);
-          currentlyFallingPiece = null;
-          updateHeader();
-          // Animate to header
-          animatePieceToStack(idx, ()=>{
-            // If all collected, merge to Lucid Coin!
-            if (lucidPieces.every(Boolean)) {
-              setTimeout(animateMergePiecesToCoin, 400);
-            }
-          });
-        }, 700);
-      }
-      function animatePieceToStack(idx, cb) {
-        // Find header stack location
-        const pieceStackImg = $lucidPieceImgs[idx];
-        const rect = pieceStackImg.getBoundingClientRect();
-        // Create flying image
-        const flying = document.createElement("img");
-        flying.src = PIECE_PNGS[idx];
-        flying.className = "lucid-piece-falling";
-        flying.style.left = (window.innerWidth/2-36)+"px";
-        flying.style.top = (window.innerHeight-108)+"px";
-        flying.style.pointerEvents = "none";
-        flying.style.transition = "left .65s cubic-bezier(.42,2,.6,1), top .65s cubic-bezier(.42,2,.6,1), opacity .22s";
-        document.body.appendChild(flying);
-        setTimeout(()=>{
-          flying.style.left = (rect.left + rect.width/2 - 36)+"px";
-          flying.style.top = (rect.top + rect.height/2 - 36)+"px";
-          flying.style.opacity = 0.15;
-        }, 10);
-        setTimeout(()=>{
-          flying.remove();
-          pieceStackImg.classList.add('lucid-piece-collected');
-          setTimeout(()=>pieceStackImg.classList.remove('lucid-piece-collected'), 520);
-          cb && cb();
-        }, 700);
-      }
-      function animateMergePiecesToCoin() {
-        // Animate all stack pieces to coin, then reset them
-        const stackRects = $lucidPieceImgs.map(img=>img.getBoundingClientRect());
-        const coinRect = $lucidCoinTotalImg.getBoundingClientRect();
-        $lucidPieceImgs.forEach((img,i)=>{
-          img.classList.add('lucid-piece-merge-anim');
-          setTimeout(()=>{
-            img.style.visibility = "hidden";
-          }, 600);
-        });
-        setTimeout(()=>{
-          // Animate coin bounce
-          $lucidCoinTotalImg.classList.add('lucid-coin-anim-gain');
-          lucidCoin++;
-          localStorage.setItem('lucid_lucidcoin', lucidCoin);
-          lucidPieces = [false,false,false];
-          localStorage.setItem('lucid_pieces', JSON.stringify(lucidPieces));
-          updateHeader();
-          setTimeout(()=>{
-            $lucidPieceImgs.forEach(img=>{img.style.visibility=""; img.classList.remove('lucid-piece-merge-anim');});
-            $lucidCoinTotalImg.classList.remove('lucid-coin-anim-gain');
-          }, 900);
-        }, 700);
-      }
-      // Start the piece rain system
-      startLucidPieceRain();
+    });
+  }, 700);
+}
+
+function animatePieceToStack(idx, cb) {
+  const pieceStackImg = $lucidPieceImgs[idx];
+  const rect = pieceStackImg.getBoundingClientRect();
+
+  const flying = document.createElement("img");
+  flying.src = PIECE_PNGS[idx];
+  flying.className = "lucid-piece-falling";
+  flying.style.left = (window.innerWidth / 2 - 36) + "px";
+  flying.style.top = (window.innerHeight - 108) + "px";
+  flying.style.pointerEvents = "none";
+  flying.style.transition = "left .65s cubic-bezier(.42,2,.6,1), top .65s cubic-bezier(.42,2,.6,1), opacity .22s";
+  document.body.appendChild(flying);
+
+  setTimeout(() => {
+    flying.style.left = (rect.left + rect.width / 2 - 36) + "px";
+    flying.style.top = (rect.top + rect.height / 2 - 36) + "px";
+    flying.style.opacity = 0.15;
+  }, 10);
+
+  setTimeout(() => {
+    flying.remove();
+    pieceStackImg.classList.add('lucid-piece-collected');
+    setTimeout(() => pieceStackImg.classList.remove('lucid-piece-collected'), 520);
+    cb && cb();
+  }, 700);
+}
+
+function animateMergePiecesToCoin() {
+  const stackRects = $lucidPieceImgs.map(img => img.getBoundingClientRect());
+  const coinRect = $lucidCoinTotalImg.getBoundingClientRect();
+
+  $lucidPieceImgs.forEach((img, i) => {
+    img.classList.add('lucid-piece-merge-anim');
+    setTimeout(() => {
+      img.style.visibility = "hidden";
+    }, 600);
+  });
+
+  setTimeout(() => {
+    $lucidCoinTotalImg.classList.add('lucid-coin-anim-gain');
+    lucidCoin++;
+    localStorage.setItem('lucid_lucidcoin', lucidCoin);
+    lucidPieces = [false, false, false];
+    localStorage.setItem('lucid_pieces', JSON.stringify(lucidPieces));
+    updateHeader();
+    setTimeout(() => {
+      $lucidPieceImgs.forEach(img => {
+        img.style.visibility = "";
+        img.classList.remove('lucid-piece-merge-anim');
+      });
+      $lucidCoinTotalImg.classList.remove('lucid-coin-anim-gain');
+    }, 900);
+  }, 700);
+}
+
+startLucidPieceRain();
+
+
 
       // ---- Lucid Coin Info ----
       $lucidCoinInfoBtn.onclick = function() {
