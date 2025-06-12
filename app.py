@@ -511,6 +511,14 @@ def lucidgame():
         # Optional: Log error here with logging library
         return abort(500, description="Internal Server Error: Could not load the Lucid Game page.")
 
+@app.route('/gamehome')
+def gamehome():
+    try:
+        return render_template('gamehome.html')
+    except Exception as e:
+        # Optional: Log error here with logging library
+        return abort(500, description="Internal Server Error: Could not load the Lucid Game page.")
+
 @app.route('/logout')
 def logout():
     session.pop('username', None)
