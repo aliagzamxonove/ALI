@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GameLucid Pro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Preload Audio -->
+  <link rel="preload" href="/static/audio/coin.wav" as="audio" type="audio/wav">
+  <link rel="preload" href="/static/audio/wrong.wav" as="audio" type="audio/wav">
+  <link rel="preload" href="/static/audio/menu-loop.mp3" as="audio" type="audio/mp3">
+  <link rel="preload" as="image" href="/static/backgrounds/bg1.png">
+  <link rel="preload" as="image" href="/static/backgrounds/bg2.png">
+  <link rel="preload" as="image" href="/static/backgrounds/bg3.png">
+  <link rel="preload" as="image" href="/static/backgrounds/bg4.png">
+  <link rel="preload" as="image" href="/static/backgrounds/bg5.png">
+
+  <style>
+/* --- Reset & Base --- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Space Grotesk', 'Orbitron', sans-serif;
+  background: linear-gradient(160deg, #000428, #004e92);
+  color: #e0f7fa;
+  overflow: hidden;
+  height: 100vh;
+  letter-spacing: 0.6px;
+  line-height: 1.6;
+}
+/* --- BGs and Effects --- */
+#firefly-bg, #hero-particles, #bg-overlay, #dynamic-bg {
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  pointer-events: none;
+}
+#firefly-bg, #hero-particles, #dynamic-bg { z-index: -1; }
+#bg-overlay { z-index: -2; opacity: 1; background: url('/static/backgrounds/bg1.png') center/cover no-repeat; }
+#stars-canvas, #blue-stars-canvas {
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none;
+}
+#stars-canvas { z-index: 2001; opacity: 0.3; }
+#blue-stars-canvas { z-index: 1; }
+
+#score-panel {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 1rem; z-index: 9999;
+  padding: 0.8rem 1.2rem; background: rgba(255,255,255,0.05);
+  border-radius: 16px; backdrop-filter: blur(10px);
+  box-shadow: inset 1px 1px 10px rgba(255,255,255,0.08), 0 4px 14px rgba(0,0,0,0.3);
+}
+#score-panel div {
+  display: flex; align-items: center; gap: 0.6rem;
+  font-size: 1.15rem; color: #fff; background: rgba(255,255,255,0.06);
+  padding: 0.5rem 1rem; border-radius: 10px;
+}
+#score-panel i { color: #00ffff; }
+#mute-btn {
+  position: fixed; top: 20px; right: 24px; width: 48px; height: 48px;
+  background: rgba(255,255,255,0.08); backdrop-filter: blur(8px);
+  border: none; border-radius: 50%; box-shadow: 0 0 8px rgba(0,255,255,0.3);
+  color: #0ff; font-size: 1.4rem; cursor: pointer; z-index: 9999;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s ease;
+}
+#mute-btn:hover { box-shadow: 0 0 12px rgba(0,255,255,0.6); transform: scale(1.05); }
+#mute-btn i { transition: all 0.3s ease; }
+
+#game-container {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -40%);
+  opacity: 1; width: 92vw; max-width: 740px; padding: 3rem 2.4rem;
+  z-index: 100; border-radius: 24px;
+  background: rgba(20,24,28,0.65); backdrop-filter: blur(20px) saturate(200%);
+  -webkit-backdrop-filter: blur(20px) saturate(200%);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05), inset 0 0 0 1px rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  transition: all 0.4s cubic-bezier(.4,2,.6,1);
+}
+#equation-box h1 {
+  font-size: clamp(2.8rem, 6vw, 4rem); font-weight: 800; text-align: center; margin: 2rem 0;
+  background: linear-gradient(90deg, #e0f7fa, #fff, #d1f2eb); background-size: 300%;
+  background-position: center; background-clip: text; -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: 0 2px 3px rgba(0,0,0,0.3), 0 0 12px rgba(0,255,255,0.2), 0 0 22px rgba(0,200,180,0.25);
+  animation: gradientFlow 12s linear infinite;
+}
+@keyframes gradientFlow {
+  0% { background-position: 0% center;}
+  100% { background-position: 200% center;}
+}
+#answers { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; }
+#answers button, .answer-btn {
+  flex: 1 1 45%; padding: 1.1rem 1.5rem; font-size: 1.4rem; font-weight: 600; color: #fefefe;
+  background: linear-gradient(135deg, #00796b, #00cba9); border: none; border-radius: 16px; cursor: pointer;
+  position: relative; overflow: hidden;
+  box-shadow: 0 6px 16px rgba(0,255,170,0.2), inset 0 1px 1px rgba(255,255,255,0.1);
+  transition: all 0.25s ease; text-transform: uppercase; letter-spacing: 0.4px;
+}
+#answers button:hover, .answer-btn:hover {
+  transform: translateY(-2px) scale(1.05);
+  background: linear-gradient(135deg, #00bfa5, #1de9b6);
+  box-shadow: 0 12px 24px rgba(0,255,170,0.4);
+}
+#answers button::after, .answer-btn::after {
+  content: ''; position: absolute; width: 160%; height: 100%; top: 0; left: -80%;
+  background: linear-gradient(120deg,transparent,rgba(255,255,255,0.12),transparent);
+  transform: skewX(-25deg); transition: all 0.4s ease; opacity: 0;
+}
+#answers button:hover::after, .answer-btn:hover::after { left: 100%; opacity: 1; }
+.answer-btn.correct { background: linear-gradient(135deg, #25df8c, #6dffb0); color: #163c2c; }
+.answer-btn.wrong   { background: linear-gradient(135deg, #e94e3c, #f8c1c1); color: #fff; }
+#timer-bar {
+  height: 24px; margin-top: 2.5rem;
+  background: linear-gradient(to right, #1e1e1e, #2a2a2a); border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.08); overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(255,255,255,0.05), inset 0 -1px 4px rgba(0,0,0,0.2), 0 2px 6px rgba(0,0,0,0.3);
+  backdrop-filter: blur(6px);
+}
+#timer-fill {
+  height: 100%; width: 100%;
+  background: linear-gradient(90deg, #8e0000, #c43e00, #dcdcdc); background-size: 200% auto;
+  animation: timerPulse 4s ease-in-out infinite; transition: width 0.16s cubic-bezier(.4,2,.6,1);
+  border-radius: 14px; box-shadow: inset 0 0 12px rgba(255,255,255,0.05);
+}
+@keyframes timerPulse {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 100% 0%; }
+  100% { background-position: 0% 0%; }
+}
+#level-up-banner {
+  position: absolute; top: 12%; left: 50%; transform: translateX(-50%);
+  display: none; padding: 1.2rem 2.5rem;
+  font-size: 2rem; font-weight: 600; color: #e6fdfc;
+  background: linear-gradient(135deg, rgba(0,64,64,0.5), rgba(0,128,128,0.2));
+  border: 1px solid rgba(255,255,255,0.08); border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,255,255,0.1), inset 0 0 0 1px rgba(255,255,255,0.02);
+  backdrop-filter: blur(12px); text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap;
+  animation: levelUpReveal 1.6s ease forwards; z-index: 10000; will-change: opacity, transform;
+}
+@keyframes levelUpReveal {
+  0% { opacity: 0; transform: translateX(-50%) translateY(-10px) scale(0.9);}
+  40% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1.05);}
+  70% { transform: translateX(-50%) scale(1.02);}
+  100% { opacity: 0; transform: translateX(-50%) translateY(10px) scale(1);}
+}
+/* ULTRA Coin Animation -- multiple coins, explosion, sparkle */
+.coin-animation {
+  width: 28px; height: 28px; border-radius: 50%; position: fixed; z-index: 9999; pointer-events: none;
+  left: 50%; top: 58%; background: none;
+  animation: coinFlyToScore 0.85s cubic-bezier(.3,1.8,.5,1) forwards;
+  will-change: transform, opacity;
+}
+.coin-animation-inner {
+  width: 100%; height: 100%; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffe98b 0%, #d4a232 60%, #7a5d1c 100%);
+  box-shadow: 0 0 5px #ffe98b, 0 0 14px #f8e58c;
+}
+@keyframes coinFlyToScore {
+  0%   { transform: scale(0.2) translate(-50%,0) rotate(-6deg); opacity: .9;}
+  60%  { transform: scale(1.08) translate(-50%,-60px) rotate(20deg);}
+  80%  { transform: scale(0.9) translate(-50%,-85px) rotate(-20deg);}
+  100% { transform: scale(0.72) translate( calc(-50vw + 110px), calc(-58vh + 38px)) rotate(0deg); opacity: 0; }
+}
+.coin-sparkle {
+  position: absolute;
+  width: 16px; height: 16px; left: 50%; top: 50%;
+  transform: translate(-50%,-50%);
+  pointer-events: none;
+  background: radial-gradient(circle,#fff 0%,#ffe98b 70%,transparent 100%);
+  opacity: 0.6;
+  border-radius: 50%;
+  animation: sparkleFade 0.8s linear forwards;
+}
+@keyframes sparkleFade {
+  0% { opacity: 1; transform: scale(1);}
+  80% { opacity: 0.8; }
+  100% { opacity: 0; transform: scale(2);}
+}
+#end-screen {
+  position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+  background: rgba(18,18,18,0.85); backdrop-filter: blur(18px) saturate(160%); -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);
+  color: #e0f7fa; font-size: 1.9rem; z-index: 1000; opacity: 0; pointer-events: none;
+  transition: opacity 0.4s cubic-bezier(.4,2,.6,1);
+}
+#end-screen.show { opacity: 1; pointer-events: all; }
+#end-screen button {
+  background: linear-gradient(135deg,#00ffc8,#0ff); color: #000; padding: 1.1rem 2.8rem; font-size: 1.4rem;
+  border: none; border-radius: 18px; margin-top: 2.5rem; cursor: pointer;
+  box-shadow: 0 6px 16px rgba(0,255,255,0.3), 0 0 12px rgba(0,255,204,0.4);
+  transition: all 0.3s ease; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
+}
+#end-screen button:hover { transform: scale(1.08); box-shadow: 0 10px 26px rgba(0,255,255,0.4), 0 0 18px rgba(0,255,204,0.6); }
+.flash-wrong { animation: flashRed 0.4s ease; }
+@keyframes flashRed { 0%{background-color:#ff4a4a;} 100%{background-color:transparent;} }
+.score-increment {
+  position: absolute; font-size: 1.4rem; color: #0ff;
+  animation: riseFade 1s ease-out forwards; pointer-events: none;
+  text-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
+}
+@keyframes riseFade { 0%{opacity:1;transform:translateY(0) scale(1);} 100%{opacity:0;transform:translateY(-40px) scale(1.4);} }
+.shake { animation: shakeAnim 0.3s ease-in-out; }
+@keyframes shakeAnim { 0%{transform:translateX(0);} 25%{transform:translateX(-6px);} 50%{transform:translateX(6px);} 75%{transform:translateX(-6px);} 100%{transform:translateX(0);} }
+audio { display: none; }
+@media (max-width: 768px) {
+  #equation-box h1 { font-size: 2.3rem; }
+  #answers button { font-size: 1.2rem; padding: 1rem; max-width: 100%; }
+  #score-panel { flex-direction: column; gap: 0.6rem; top: 1rem; left: 50%; transform: translateX(-50%);}
+}
+#end-screen .home-btn {
+  margin-top: 1.1rem;
+  background: linear-gradient(135deg, #0066ff, #00ffea);
+  color: #fff;
+  padding: 1.1rem 2.8rem;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 18px;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(0,140,255,0.12), 0 0 12px rgba(0,255,255,0.18);
+  transition: all 0.28s cubic-bezier(.4,2,.6,1);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+#end-screen .home-btn:hover {
+  background: linear-gradient(135deg, #00c3ff, #00ffea 80%);
+  color: #001f2f;
+  transform: scale(1.07);
+  box-shadow: 0 10px 36px rgba(0,180,255,0.18), 0 0 20px rgba(0,255,255,0.22);
+}
+  </style>
+</head>
+<body>
+<canvas id="firefly-bg"></canvas>
+<canvas id="hero-particles"></canvas>
+<div id="bg-overlay"></div>
+<canvas id="stars-canvas"></canvas>
+<canvas id="blue-stars-canvas"></canvas>
+<div id="game-screen">
+  <div id="score-panel">
+    <div><i class="fas fa-star"></i> <span id="score">0</span></div>
+    <div><i class="fas fa-coins"></i> <span id="coins">0</span></div>
+  </div>
+  <button id="mute-btn" title="Toggle Sound" aria-label="Toggle sound">
+    <i class="fas fa-volume-up"></i>
+  </button>
+  <div id="game-container">
+    <div id="equation-box"><h1 id="equation"></h1></div>
+    <div id="answers"></div>
+    <div id="timer-bar"><div id="timer-fill"></div></div>
+  </div>
+  <div id="dynamic-bg" aria-hidden="true"></div>
+  <div id="level-up-banner" role="alert">Level Up!</div>
+  <section id="end-screen" role="dialog" aria-modal="true" aria-labelledby="end-screen-heading">
+    <h2 id="end-screen-heading" style="display:none;">End of Game</h2>
+    <p><i class="bi bi-hourglass-bottom"></i> Time's up!</p>
+    <p>Your Score: <span id="final-score">0</span></p>
+    <p>High Score: <span id="final-high-score">0</span></p>
+    <p>Coins Earned: <span id="final-coins">0</span></p>
+    <button id="restart-btn">
+      <i class="bi bi-arrow-repeat"></i> Play Again
+    </button>
+    <button id="home-btn" class="home-btn">
+  <i class="fas fa-home"></i> Home
+</button>
+  </section>
+  <audio id="coin-sound" src="/static/audio/coin.wav" preload="auto"></audio>
+  <audio id="wrong-sound" src="/static/audio/wrong.wav" preload="auto"></audio>
+  <audio id="bg-music" src="/static/audio/menu-loop.mp3" loop preload="auto"></audio>
+</div>
+<script>
+// --- Stars Canvas Background ---
+const canvas = document.getElementById('stars-canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+const stars = [];
+const starCount = 160;
+for (let i = 0; i < starCount; i++) {
+  stars.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    size: Math.random() * 1.5 + 0.5,
+    alpha: Math.random() * 0.6 + 0.4,
+    alphaChange: (Math.random() * 0.02) + 0.008,
+    angle: Math.random() * Math.PI * 2,
+    rotationSpeed: (Math.random() - 0.5) * 0.01,
+    dx: (Math.random() - 0.5) * 0.15,
+    dy: (Math.random() - 0.5) * 0.15
+  });
+}
+function drawStar(star) {
+  ctx.save();
+  ctx.translate(star.x, star.y);
+  ctx.rotate(star.angle);
+  const baseAlpha = star.alpha;
+  ctx.globalAlpha = baseAlpha;
+  ctx.fillStyle = `rgba(255, 255, 80, ${baseAlpha})`;
+  ctx.beginPath();
+  ctx.arc(0, 0, star.size, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = `rgba(255, 255, 150, ${baseAlpha})`; ctx.lineWidth = 0.6;
+  ctx.beginPath(); ctx.moveTo(-star.size * 2.5, 0); ctx.lineTo(star.size * 2.5, 0); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0, -star.size * 2.5); ctx.lineTo(0, star.size * 2.5); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(-star.size * 1.8, -star.size * 1.8); ctx.lineTo(star.size * 1.8, star.size * 1.8); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(star.size * 1.8, -star.size * 1.8); ctx.lineTo(-star.size * 1.8, star.size * 1.8); ctx.stroke();
+  ctx.restore();
+}
+function animateStars() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (const star of stars) {
+    star.alpha += star.alphaChange;
+    if (star.alpha <= 0.3 || star.alpha >= 1) star.alphaChange = -star.alphaChange;
+    star.angle += star.rotationSpeed;
+    star.x += star.dx;
+    star.y += star.dy;
+    if (star.x < 0) star.x = canvas.width;
+    if (star.x > canvas.width) star.x = 0;
+    if (star.y < 0) star.y = canvas.height;
+    if (star.y > canvas.height) star.y = 0;
+    drawStar(star);
+  }
+  requestAnimationFrame(animateStars);
+}
+animateStars();
+window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+
+// --- Firefly background animation ---
+const fireflyCanvas = document.getElementById('firefly-bg');
+const fireflyCtx = fireflyCanvas.getContext('2d');
+fireflyCanvas.width = window.innerWidth;
+fireflyCanvas.height = window.innerHeight;
+const bugs = [...Array(100)].map(() => ({
+  x: Math.random() * fireflyCanvas.width,
+  y: Math.random() * fireflyCanvas.height,
+  r: Math.random() * 2 + 0.5,
+  dx: (Math.random() - 0.5) * 0.6,
+  dy: (Math.random() - 0.5) * 0.6,
+  alpha: Math.random() * 0.5 + 0.5
+}));
+function animateFireflies() {
+  fireflyCtx.clearRect(0, 0, fireflyCanvas.width, fireflyCanvas.height);
+  bugs.forEach(b => {
+    fireflyCtx.beginPath();
+    fireflyCtx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+    fireflyCtx.fillStyle = `rgba(255,255,255,${b.alpha})`;
+    fireflyCtx.fill();
+    b.x += b.dx;
+    b.y += b.dy;
+    if (b.x < 0 || b.x > fireflyCanvas.width) b.dx *= -1;
+    if (b.y < 0 || b.y > fireflyCanvas.height) b.dy *= -1;
+  });
+  requestAnimationFrame(animateFireflies);
+}
+animateFireflies();
+window.addEventListener('resize', () => {
+  fireflyCanvas.width = window.innerWidth;
+  fireflyCanvas.height = window.innerHeight;
+});
+
+// ======= GAME LOGIC: SUPER MASTER ULTRA PRO =======
+const CONFIG = {
+  BASE_TIMER: 3200,
+  MIN_TIMER: 1200,
+  TIMER_DECAY: 170,
+  EASY_LIMIT: 8,
+  NORMAL_LIMIT: 14,
+  COINS_RANGE: [2, 5],
+  LEVEL_INTERVAL: 5,
+};
+
+let state = {
+  score: 0,
+  coins: 0,
+  level: 1,
+  highScore: Number(localStorage.getItem('lucid_highscore')) || 0,
+  timer: CONFIG.BASE_TIMER,
+  timerId: null,
+  timerActive: false,
+  gameActive: true,
+  ended: false,
+  currentAnswer: null,
+  difficulty: 'easy',
+};
+
+const $ = id => document.getElementById(id);
+const $score = $("score"), $coins = $("coins"), $equation = $("equation"),
+      $answers = $("answers"), $timerFill = $("timer-fill"), $levelUpBanner = $("level-up-banner"),
+      $dynamicBg = $("dynamic-bg"), $endScreen = $("end-screen"), $finalScore = $("final-score"),
+      $finalHighScore = $("final-high-score"), $finalCoins = $("final-coins"),
+      $restartBtn = $("restart-btn"), $muteBtn = $("mute-btn"),
+      $coinSound = $("coin-sound"), $wrongSound = $("wrong-sound"), $bgMusic = $("bg-music"),
+      $gameContainer = $("game-container");
+
+const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+function getDifficulty(score) {
+  if (score < CONFIG.EASY_LIMIT) return 'easy';
+  if (score < CONFIG.EASY_LIMIT + CONFIG.NORMAL_LIMIT) return 'normal';
+  return 'hard';
+}
+function getEquation(difficulty) {
+  let a, b, op, ans;
+  if (difficulty === 'easy') {
+    a = getRandomInt(3, 12); b = getRandomInt(3, 12);
+    op = getRandomInt(0, 1) ? '+' : '-';
+    ans = op === '+' ? a + b : a - b;
+  } else if (difficulty === 'normal') {
+    op = ['+', '-', '×'][getRandomInt(0, 2)];
+    if (op === '×') {
+      a = getRandomInt(4, 13); b = getRandomInt(4, 13);
+      ans = a * b;
+    } else {
+      a = getRandomInt(13, 37); b = getRandomInt(4, 21);
+      ans = op === '+' ? a + b : a - b;
+    }
+  } else {
+    op = ['+', '-', '×', '÷'][getRandomInt(0, 3)];
+    if (op === '÷') {
+      b = getRandomInt(2, 14);
+      ans = getRandomInt(2, 15);
+      a = ans * b;
+      op = '÷';
+    } else if (op === '×') {
+      a = getRandomInt(13, 28); b = getRandomInt(8, 21);
+      ans = a * b;
+    } else {
+      a = getRandomInt(40, 180); b = getRandomInt(17, 60);
+      ans = op === '+' ? a + b : a - b;
+    }
+  }
+  return { eq: `${a} ${op} ${b}`, ans, op };
+}
+
+function getAnswerChoices(correct, op, difficulty) {
+  let deltas = [-11,-8,-5,-3,-2,-1,1,2,3,4,5,7,9,13];
+  let choices = new Set([correct]);
+  while (choices.size < 4) {
+    let delta = deltas[getRandomInt(0, deltas.length-1)];
+    let fake;
+    if (op === '÷') fake = correct + delta;
+    else if (op === '×') fake = correct + delta * getRandomInt(1, difficulty === 'hard' ? 2 : 1);
+    else fake = correct + delta;
+    if (fake !== correct && fake > -100 && fake < 9999 && !choices.has(fake)) choices.add(fake);
+  }
+  return Array.from(choices).sort(() => Math.random() - 0.5);
+}
+
+function setBgImage() {
+  let idx = Math.min(Math.floor(state.score / 8) + 1, 5);
+  $dynamicBg.style.backgroundImage = `url('/static/backgrounds/bg${idx}.png')`;
+}
+
+function playSound(audio) {
+  if ($bgMusic.muted) return;
+  audio.currentTime = 0;
+  audio.play();
+}
+
+function updateScorePanel() { $score.textContent = state.score; $coins.textContent = state.coins; }
+
+function showLevelUp() {
+  $levelUpBanner.style.display = "block";
+  setTimeout(() => { $levelUpBanner.style.display = "none"; }, 1000);
+}
+
+function animateCoin() {
+  // ULTRA: burst several coins and sparkles, with one flying to the coin panel!
+  const coinCount = getRandomInt(2, 3);
+  for(let i=0; i<coinCount; i++) {
+    const coin = document.createElement("div");
+    coin.className = "coin-animation";
+    coin.style.left = `calc(50% + ${getRandomInt(-40,40)}px)`;
+    coin.style.top = `calc(58% + ${getRandomInt(-16,16)}px)`;
+    let coinInner = document.createElement('div');
+    coinInner.className = 'coin-animation-inner';
+    coin.appendChild(coinInner);
+    // Sparkles
+    for(let s=0; s<2; s++) {
+      let sparkle = document.createElement('div');
+      sparkle.className = 'coin-sparkle';
+      sparkle.style.left = `${50+getRandomInt(-18,18)}%`;
+      sparkle.style.top = `${50+getRandomInt(-18,18)}%`;
+      sparkle.style.opacity = (0.4+Math.random()*0.5).toFixed(2);
+      coin.appendChild(sparkle);
+    }
+    document.body.appendChild(coin);
+    setTimeout(() => { coin.remove(); }, 1200);
+  }
+}
+
+function riseScore(val) {
+  let el = document.createElement("span");
+  el.className = "score-increment";
+  el.innerText = `+${val}`;
+  el.style.left = "50%";
+  el.style.top = "36%";
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 800);
+}
+
+function flashWrong() {
+  $gameContainer.classList.add("flash-wrong");
+  setTimeout(() => $gameContainer.classList.remove("flash-wrong"), 330);
+}
+
+function disableAnswerButtons() {
+  Array.from($answers.children).forEach(btn => btn.disabled = true);
+}
+function enableAnswerButtons() {
+  Array.from($answers.children).forEach(btn => btn.disabled = false);
+}
+
+function startTimer() {
+  cancelAnimationFrame(state.timerId);
+  $timerFill.style.width = "100%";
+  state.timerActive = true;
+  let duration = state.timer, start = performance.now();
+
+  function tick(now) {
+    if (!state.timerActive) return;
+    let elapsed = now - start;
+    let progress = Math.max(0, 1 - elapsed / duration);
+    $timerFill.style.width = `${progress * 100}%`;
+    if (progress > 0) {
+      state.timerId = requestAnimationFrame(tick);
+    } else {
+      $timerFill.style.width = "0%";
+      state.timerActive = false;
+      setTimeout(() => { endGame('timeout'); }, 120);
+    }
+  }
+  state.timerId = requestAnimationFrame(tick);
+}
+
+function nextQuestion() {
+  setBgImage();
+  state.difficulty = getDifficulty(state.score);
+  let { eq, ans, op } = getEquation(state.difficulty);
+  state.currentAnswer = ans;
+  $equation.textContent = eq;
+  let choices = getAnswerChoices(ans, op, state.difficulty);
+  $answers.innerHTML = "";
+  choices.forEach(val => {
+    let btn = document.createElement("button");
+    btn.textContent = val;
+    btn.className = "answer-btn";
+    btn.onclick = () => handleAnswer(val, ans, btn);
+    btn.setAttribute('tabindex', "0");
+    $answers.appendChild(btn);
+  });
+  enableAnswerButtons();
+  state.timer = Math.max(CONFIG.MIN_TIMER, CONFIG.BASE_TIMER - (state.score * CONFIG.TIMER_DECAY));
+  state.gameActive = true; // Key: allow answering for this question!
+  state.ended = false;
+  startTimer();
+}
+
+function handleAnswer(val, ans, btn) {
+  if (!state.gameActive || !state.timerActive) return;
+  disableAnswerButtons();
+  state.timerActive = false;
+  cancelAnimationFrame(state.timerId);
+
+  if (val === ans) {
+    state.score++;
+    let coinsWon = getRandomInt(CONFIG.COINS_RANGE[0], CONFIG.COINS_RANGE[1]);
+    state.coins += coinsWon;
+    playSound($coinSound);
+    animateCoin();
+    riseScore(1);
+    btn.classList.add("correct");
+    if (state.score % CONFIG.LEVEL_INTERVAL === 0) {
+      state.level++;
+      showLevelUp();
+    }
+    updateScorePanel();
+    setTimeout(nextQuestion, 330);
+  } else {
+    playSound($wrongSound);
+    btn.classList.add("wrong");
+    flashWrong();
+    setTimeout(() => endGame('wrong'), 400);
+  }
+}
+
+function endGame(reason) {
+  if (state.ended) return;
+  state.ended = true;
+  state.gameActive = false;
+  state.timerActive = false;
+  cancelAnimationFrame(state.timerId);
+  setTimeout(() => {
+    $endScreen.classList.add('show');
+    $finalScore.textContent = state.score;
+    state.highScore = Math.max(state.highScore, state.score);
+    localStorage.setItem('lucid_highscore', state.highScore);
+    $finalHighScore.textContent = state.highScore;
+    $finalCoins.textContent = state.coins;
+  }, reason === 'timeout' ? 110 : 0);
+}
+
+function resetGame() {
+  $endScreen.classList.remove('show');
+  state = {
+    ...state,
+    score: 0,
+    coins: 0,
+    level: 1,
+    timer: CONFIG.BASE_TIMER,
+    timerId: null,
+    timerActive: false,
+    gameActive: true,
+    currentAnswer: null,
+    difficulty: 'easy',
+    ended: false,
+  };
+  updateScorePanel();
+  setTimeout(nextQuestion, 310);
+}
+$muteBtn.onclick = () => {
+  $bgMusic.muted = !$bgMusic.muted;
+  $muteBtn.querySelector("i").className = $bgMusic.muted ? "fas fa-volume-mute" : "fas fa-volume-up";
+};
+$restartBtn.onclick = resetGame;
+
+$("home-btn").onclick = () => {
+  window.location.href = "lucidgamehome.html";
+};
+
+window.addEventListener('load', () => {
+  $dynamicBg.style.backgroundImage = "url('/static/backgrounds/bg1.png')";
+  $bgMusic.volume = 0.38;
+  $bgMusic.play().catch(()=>{});
+  updateScorePanel();
+  setTimeout(nextQuestion, 180);
+});
+</script>
+</body>
+</html>
