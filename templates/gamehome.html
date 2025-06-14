@@ -1,457 +1,257 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Lucid Games - Ultra PRO Home</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
-<style>
+  <style>
     :root {
-      --accent: #00ffc8;
+      --primary: #00ffc8;
       --gold: #ffe46f;
-      --bg-main: #181d2b;
-      --bg-gradient: linear-gradient(125deg, #0a172c 0%, #1a2f50 45%, #0f2847 100%);
-      --modal-bg: rgba(24,32,54,0.97);
-      --modal-border: #00ffc860;
-      --modal-glow: 0 4px 40px #00ffc8cc;
-      --border-radius: 20px;
-      --shadow: 0 2px 16px #000b, 0 1px 40px #00ffc840 inset;
+      --deep: #181d2b;
+      --surface: #232b47;
+      --radius: 18px;
+      --shadow: 0 2px 20px #00ffc85a, 0 0 10px #0002 inset;
     }
-html, body {
-  margin: 0;
-  padding: 0;
-  width: 100vw;
-  min-height: 100vh;
-  background: var(--bg-main);
-  box-sizing: border-box;
-  overflow-x: hidden;
-  height: 100%;
-}
-
-body {
-  font-family: 'Orbitron', 'Space Grotesk', sans-serif;
-  min-height: 100vh;
-  width: 100vw;
-  box-sizing: border-box;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-}
-
-#bg-animated {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  width: 100vw;
-  min-height: 100vh;
-  background: var(--bg-gradient);
-  overflow: hidden;
-}
-
-#bg-canvas1, #bg-canvas2 {
-  position: absolute;
-  width: 100vw;
-  min-height: 100vh;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1;
-  display: block;
-  max-width: 100vw;
-}
-
-.header-bar {
-  position: fixed;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 98vw;
-  max-width: 1100px;
-  z-index: 20;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.2rem 2.5rem;
-  background: rgba(24,32,54,0.82);
-  color: #fff;
-  box-shadow: var(--shadow);
-  font-size: 1.2rem;
-  border-radius: var(--border-radius);
-  margin-top: 1.2vw;
-  backdrop-filter: blur(13px);
-  border: 1.5px solid #00ffc825;
-  user-select: none;
-  gap: 0.8em;
-  box-sizing: border-box;
-}
-
-.main-content {
-  flex: 1 1 auto;
-  width: 100vw;
-  box-sizing: border-box;
-  padding-top: 120px;
-  padding-bottom: 0;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  z-index: 2;
-}
-
-.carousel-bottom-area {
-  width: 100vw;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  margin-bottom: 0;
-  flex: 1;
-}
-
-.carousel-container {
-  width: 96vw; /* Slightly smaller to prevent overflow */
-  max-width: 96vw;
-  overflow-x: auto;
-  overflow-y: visible;
-  position: relative;
-  min-height: 340px;
-  height: 100vh;
-  box-sizing: border-box;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  touch-action: pan-x;
-  z-index: 10;
-  scroll-behavior: smooth;
-  margin-bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  scroll-snap-type: x mandatory;
-}
-.carousel-container::-webkit-scrollbar {
-  display: none;
-}
-
-.carousel-track {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1.5vw;                /* Slightly reduced gap */
-  padding: 0 2vw;            /* Add padding for left/right balance */
-  width: 100%;
-  box-sizing: border-box;
-  transition: transform 0.26s cubic-bezier(.68,-0.6,.32,1.6);
-}
-
-.carousel-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 9;
-  background: linear-gradient(120deg, #232b47 60%, #101a2c 100%);
-  color: var(--accent);
-  border: 2.5px solid var(--modal-border);
-  border-radius: 50%;
-  box-shadow: 0 4px 20px #00ffc860;
-  width: 54px;
-  height: 54px;
-  font-size: 2.1em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background 0.18s, box-shadow 0.18s;
-  opacity: 0.94;
-  outline: none;
-  user-select: none;
-}
-.carousel-arrow.left { left: 2vw; }
-.carousel-arrow.right { right: 2vw; }
-.carousel-arrow:active,
-.carousel-arrow:focus {
-  background: #00ffc840;
-  box-shadow: 0 0 24px #00ffc8a0;
-}
-.carousel-arrow[disabled] {
-  opacity: 0.33;
-  pointer-events: none;
-}
-
-.game-house {
-  position: relative;
-  flex: 0 0 calc(18vw - 1vw);  /* Make each house ~18vw max, minus half the gap */
-  max-width: 300px;            /* Prevent overflow on big screens */
-  min-width: 180px;
-  height: 340px;
-  background: rgba(48,53,65,0.10);
-  border-radius: 34px;
-  box-shadow: 0 30px 70px #0008, 0 1px 40px #00ffc840 inset;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.5s, filter 0.4s, box-shadow 0.4s;
-  cursor: pointer;
-  z-index: 15;
-  pointer-events: auto;
-  border: 2.5px solid rgba(0,255,200,0.03);
-  outline: none;
-  scroll-snap-align: center;
-  box-sizing: border-box;
-}
-
-.game-house.selected {
-  transform: scale(1.16) translateY(-33px) rotateY(-4deg);
-  box-shadow: 0 30px 110px #00ffc8b0, 0 1px 60px #fff2 inset;
-  filter: brightness(1.18) drop-shadow(0 0 24px #00ffc8cc);
-  z-index: 18;
-  border: 2.5px solid #00ffc8d9;
-}
-
-.game-house.locked {
-  filter: grayscale(0.9) blur(1.5px) brightness(0.7) contrast(1.2);
-  cursor: not-allowed;
-  box-shadow: 0 3px 60px #000b;
-  border: 2.5px solid #ffeb3b60;
-}
-
-.game-house img {
-  width: 100%;                /* Use full card width */
-  max-width: 360px;           /* Bigger house image */
-  height: auto;               /* Maintain aspect ratio */
-  object-fit: contain;
-  box-shadow: 0 20px 70px #0004;
-  border-radius: 24px 24px 32px 32px;
-  background: rgba(19, 29, 32, 0.8);
-  border: 2px solid #fff2;
-  display: block;
-  pointer-events: none;
-  user-select: none;
-  transition: box-shadow 0.18s;
-}
-
-  #ground-3d {
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    height: 270px;
-    background: url('/static/ground.png') center bottom / cover no-repeat;
-    box-shadow: 0 -12px 40px #000e;
-    z-index: 1;
-    pointer-events: none;
-  }
-
-  #ground-3d-fade {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 70px;
-    background: linear-gradient(to bottom, rgba(24,29,43,1), rgba(24,29,43,0));
-    pointer-events: none;
-    z-index: 3;
-  }
-
-  #preload-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    background: #181d2b;
-    color: var(--accent);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.1em;
-    font-family: 'Orbitron', 'Space Grotesk', sans-serif;
-    letter-spacing: 2px;
-    transition: opacity 0.3s;
-  }
-
-  #preload-progress {
-    font-size: 1.1em;
-    margin-top: 1.3em;
-    color: #fff;
-  }
-
-  #preload-overlay.hide {
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.8s;
-  }
-
-  #proModal {
-    position: fixed;
-    inset: 0;
-    z-index: 1002;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    background: rgba(18,22,36,0.63);
-    backdrop-filter: blur(6px);
-    transition: background .22s;
-  }
-  #proModal.show { display: flex; }
-  #proModalBackdrop { display: none; }
-
-  #proModalContent {
-    position: relative;
-    min-width: 320px;
-    max-width: 98vw;
-    padding: 2.3em 2.4em 1.7em;
-    background: linear-gradient(120deg, #232b47 60%, #101a2c 100%);
-    border-radius: 26px;
-    box-shadow: var(--modal-glow), 0 1px 40px #fff2 inset;
-    border: 2.5px solid var(--modal-border);
-    filter: drop-shadow(0 0 24px #00ffc8c8);
-    animation: popIn .33s;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  #proModalTitle {
-    font-size: 1.55em;
-    font-weight: 700;
-    color: var(--accent);
-    margin-bottom: 0.7em;
-    letter-spacing: 1.3px;
-    text-align: center;
-    text-shadow: 0 2px 14px #001b, 0 0 8px #00ffc8;
-  }
-
-  #proModalMsg {
-    font-size: 1.14em;
-    color: #fff;
-    margin-bottom: 1.6em;
-    text-align: center;
-    max-width: 400px;
-    line-height: 1.55em;
-    text-shadow: 0 1px 2px #000b;
-  }
-
-  #proModalActions {
-    display: flex;
-    gap: 1.2em;
-    justify-content: center;
-    width: 100%;
-  }
-
-  .pro-btn {
-    padding: 0.65em 2.1em;
-    border: none;
-    border-radius: 2em;
-    font-weight: 700;
-    font-size: 1.11em;
-    cursor: pointer;
-    transition: background .2s, color .2s, box-shadow .2s;
-    box-shadow: 0 4px 14px #00ffc8a8;
-    background: linear-gradient(90deg, #00ffc8, #1a237e 90%);
-    color: #1a237e;
-    text-shadow: 0 2px 8px #fff2;
-  }
-
-  .pro-btn.cancel {
-    background: rgba(255,255,255,0.08);
-    color: #fff;
-    box-shadow: none;
-    border: 1.5px solid #00ffc850;
-  }
-
-  #highScoresBoard {
-    display: flex;
-    flex-direction: column;
-    gap: 1em;
-    padding: 0.6em 0.8em 0.2em;
-    min-width: 290px;
-    background: linear-gradient(110deg, #222c44 40%, #10151f 100%);
-    border-radius: 15px;
-    box-shadow: inset 0 2px 24px #00ffc850;
-    margin-bottom: 0.9em;
-  }
-
-  .hs-row {
-    display: flex;
-    align-items: center;
-    gap: 1.2em;
-    background: linear-gradient(90deg, #191f33 80%, #293a5a 100%);
-    border-radius: 14px;
-    padding: 0.8em 1.2em;
-    font-size: 1.18em;
-    box-shadow: 0 2px 8px #00ffc830;
-    margin-bottom: 0.5em;
-    border: 2px solid #00ffc850;
-  }
-
-  .hs-row .hs-icon {
-    font-size: 2.1em;
-    width: 42px;
-    height: 42px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(120deg, #00ffc8 40%, #ffe46f 100%);
-    border-radius: 50%;
-    box-shadow: 0 1px 10px #fff6;
-    color: #1a237e;
-    border: 1.5px solid #fff7;
-    filter: drop-shadow(0 0 8px #00ffc8c0);
-  }
-
-  .hs-row .hs-game {
-    font-weight: 700;
-    color: var(--gold);
-    flex: 1;
-    font-size: 1.11em;
-    text-shadow: 0 2px 8px #fff2;
-  }
-
-  .hs-row .hs-score {
-    font-weight: 800;
-    font-size: 1.21em;
-    margin-left: 1em;
-    background: linear-gradient(90deg, var(--gold) 30%, #fff 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: 0 2px 8px #00ffc8b0;
-  }
-
-    /* Lucid Piece Styles */
-    .lucid-piece-falling {
+    html, body {
+      min-height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Orbitron', Arial, sans-serif;
+      background: linear-gradient(125deg, #0a172c 0%, #1a2f50 45%, #0f2847 100%);
+      color: #fff;
+      box-sizing: border-box;
+      width: 100vw;
+      overflow-x: hidden;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    #bg-animated,
+    #ground-3d,
+    #ground-3d-fade {
+      z-index: 0 !important;
       position: fixed;
-      z-index: 100;
+    }
+    header {
+      position: fixed;
+      top: 0; left: 50%; transform: translateX(-50%);
+      width: 96vw; max-width: 1100px;
+      background: rgba(24,32,54,0.85);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.1rem 2rem;
+      z-index: 5;
+      gap: 1.2em;
+      border: none;
+    }
+    .header-group {
+      display: flex; align-items: center; gap: 1.1em;
+    }
+    .coin, .lucid-coin, .highscore {
+      font-size: 1.19em;
+      font-weight: 700;
+      background: rgba(0,0,0,0.1);
+      padding: .42em 1.1em;
+      border-radius: 1em;
+      display: flex; align-items: center;
+      gap: .45em;
+    }
+    .lucid-pieces {
+      display: flex; gap: .4em; align-items: center;
+    }
+    .lucid-piece {
+      width: 26px; height: 26px;
+      border-radius: 50%; border: 1.5px solid var(--primary);
+      background: #141c1f;
+      box-shadow: 0 0 6px #00ffc870;
+      opacity: 0.33;
+      filter: grayscale(1) brightness(.7);
+      transition: filter .2s, opacity .2s;
+      object-fit: contain;
+    }
+    .lucid-piece.collected {
+      opacity: 1;
+      filter: drop-shadow(0 0 14px #00ffc8cc) brightness(1.18);
+    }
+    .lucid-coin-img {
+      width: 33px; height: 33px;
+      border-radius: 50%; margin-left: .4em;
+      background: #181d2b; border: 1.5px solid #ffe46f;
+      box-shadow: 0 0 7px #ffe46f60;
+      object-fit: contain;
+    }
+    .lucid-coin-info-btn {
+      background: none; border: none; color: var(--primary); font-size: 1.15em; cursor: pointer;
+      margin-left: .5em; transition: color .18s;
+    }
+    .main-content {
+      margin-top: 110px;
+      flex: 1;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      width: 100vw;
+      min-height: 0;
+    }
+    .carousel-wrapper {
+      width: 98vw; max-width: 1200px; margin: 0 auto;
+      display: flex; align-items: center; position: relative;
+      min-height: 550px;
+      height: 600px
+      z-index: 20;
+    }
+    .carousel-arrow {
+      background: var(--surface);
+      color: var(--primary);
+      border: none;
+      border-radius: 50%;
+      width: 48px; height: 48px; font-size: 2em;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background .18s;
+      position: absolute; top: 50%; transform: translateY(-50%);
+      z-index: 21;
+      opacity: .95;
+    }
+    .carousel-arrow.left { left: -5vw; }
+    .carousel-arrow.right { right: -5vw; }
+    .carousel-arrow:disabled { opacity: .33; pointer-events: none; }
+    .carousel-track {
+      display: flex; gap: 2vw;
+      width: 100%; overflow-x: auto;
+      scrollbar-width: none; -ms-overflow-style: none;
+      scroll-behavior: smooth;
+      padding: 0 5vw;
+      align-items: center;
+      scroll-snap-type: x mandatory;
+      border: none !important;
+      box-shadow: none !important;
+      background: none;
+      z-index: 20;
+    }
+    .carousel-track::-webkit-scrollbar { display: none; }
+    .game-card, .game-card.selected, .game-card.locked {
+      flex: 0 0 225px; max-width: 260px; min-width: 160px;
+      height: 320px;
+      background: rgba(48,53,65,0.14);
+      border-radius: 24px;
+      border: none !important;
+      box-shadow: none !important;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      position: relative; cursor: pointer; transition: transform .3s;
+      scroll-snap-align: center;
+      z-index: 20;
+    }
+    .game-card.selected {
+      transform: scale(1.1) translateY(-20px);
+      box-shadow: none !important;
+      border: none !important;
+      z-index: 23;
+    }
+    .game-card.locked {
+      filter: grayscale(1) brightness(0.8) contrast(1.05);
+      cursor: not-allowed;
+      border: none !important;
+      box-shadow: none !important;
+    }
+    .game-card img {
+      width: 95%; max-width: 220px; height: 124px; object-fit: contain;
+      margin-bottom: .7em; border-radius: 16px;
+      background: rgba(19, 29, 32, 0.8);
+      border: none;
+      box-shadow: none;
+    }
+    .game-card .game-title {
+      text-align: center; font-size: 1.2em; font-weight: 800; color: var(--gold);
+      margin-bottom: .3em;
+      letter-spacing: 0.03em;
+      text-shadow: 0 2px 8px #fff2;
+      width: 100%;
+    }
+    .game-card .game-icon {
+      font-size: 2em; margin-bottom: .2em;
+      color: var(--primary);
+    }
+    .game-card .unlock-block {
+      position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%);
+      background: rgba(20,30,38,0.97); border-radius: 12px;
+      box-shadow: none;
+      padding: 1em 1.5em;
+      text-align: center;
+      display: flex; flex-direction: column; gap: .6em; align-items: center;
+      z-index: 30;
+      border: none;
+    }
+    .unlock-block .unlock-price {
+      color: var(--gold); font-weight: 700; font-size: 1.12em;
+      display: flex; align-items: center; gap: .3em;
+    }
+    .unlock-block button {
+      background: linear-gradient(90deg, #00ffc8 60%, #1a237e 100%);
+      color: #1a237e; border: none; border-radius: 1em;
+      font-weight: 700; font-size: 1em; padding: .5em 1.6em;
+      cursor: pointer; box-shadow: 0 2px 10px #00ffc890;
+      transition: background .18s;
+    }
+    .unlock-block button:disabled {
+      background: #aaa; color: #fff; cursor: not-allowed; opacity: .7;
+    }
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(18,22,36,0.63);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000 !important;
+      backdrop-filter: blur(6px);
+      animation: fadeIn .25s;
+    }
+    .modal-content {
+      background: var(--surface);
+      border-radius: 18px; box-shadow: var(--shadow);
+      border: 2px solid #00ffc860;
+      min-width: 290px; max-width: 98vw;
+      padding: 2em 2.2em 1.3em;
+      display: flex; flex-direction: column; align-items: center;
+      animation: popIn .28s;
+      z-index: 1001;
+    }
+    .modal-title {
+      font-size: 1.2em; font-weight: 800; color: var(--primary); margin-bottom: .7em;
+      letter-spacing: .04em; text-align: center;
+    }
+    .modal-message { font-size: 1.05em; margin-bottom: 1.2em; text-align: center; }
+    .modal-actions { display: flex; gap: 1.2em; width: 100%; justify-content: center; }
+    .modal-actions button {
+      padding: .6em 1.7em; border-radius: 2em;
+      font-weight: 700; font-size: 1.07em;
+      background: linear-gradient(90deg, #00ffc8, #1a237e 90%);
+      color: #1a237e; border: none; cursor: pointer; box-shadow: 0 3px 9px #00ffc8a8;
+      transition: background .15s;
+    }
+    .modal-actions .cancel {
+      background: rgba(255,255,255,0.09); color: #fff; box-shadow: none;
+      border: 1.5px solid #00ffc850;
+    }
+    .preload-overlay {
+      position: fixed; inset: 0; z-index: 4000;
+      background: #181d2b; color: var(--primary);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2em; font-family: 'Orbitron', Arial, sans-serif;
+      transition: opacity .3s;
+    }
+    .preload-overlay.hide { opacity: 0; pointer-events: none; transition: opacity .8s; }
+    .lucid-piece-falling, .lucid-coin-anim-gain {
+      position: fixed;
+      z-index: 1002 !important;
       width: 72px;
       height: 72px;
       pointer-events: auto;
       cursor: pointer;
-      animation: piece-glow 2s infinite alternate, piece-float 1.3s infinite cubic-bezier(.45,1.6,.51,-0.2);
       filter: drop-shadow(0 0 12px #fff8) drop-shadow(0 0 22px #00ffc8cc) brightness(1.12);
       transition: transform .18s;
     }
-    .lucid-piece-falling:active { transform: scale(1.09); }
-    @keyframes piece-glow {
-      0% { filter: drop-shadow(0 0 22px #00ffd9c8) brightness(1.18);}
-      100% { filter: drop-shadow(0 0 38px #ffe46f) brightness(1.26);}
-    }
-    @keyframes piece-float {
-      0% { transform: translateY(0px);}
-      100% { transform: translateY(18px);}
-    }
-    .lucid-piece-collected {
-      filter: drop-shadow(0 0 20px #ffe46f) brightness(1.25);
-      animation: collected-pulse .5s;
-    }
-    @keyframes collected-pulse {
-      0% { transform: scale(1.1);}
-      100% { transform: scale(1);}
-    }
-    .lucid-piece-uncollected { opacity: 0.33; filter: grayscale(1) brightness(.7);}
     .lucid-coin-anim-gain {
       animation: coin-gain-bounce .9s cubic-bezier(.37,1.6,.58,1.0);
       filter: drop-shadow(0 0 32px #ffe46f) brightness(1.5);
@@ -461,891 +261,336 @@ body {
       60% { transform: scale(1.2) translateY(-10px);}
       100% { transform: scale(1) translateY(0);}
     }
-    .lucid-piece-merge-anim {
-      animation: piece-merge .8s cubic-bezier(.35,.97,.65,1.1);
-    }
-    @keyframes piece-merge {
-      0% { transform: scale(1) rotate(0deg);}
-      60% { transform: scale(1.25) rotate(14deg);}
-      100% { transform: scale(0) rotate(40deg);}
-    }
-    .lucid-piece-stack {
-      display: flex; flex-direction: row; gap: 0.1em; align-items: center;
-      margin-right: .45em;
-    }
-    .lucid-piece-img {
-      width: 26px; height: 26px;
-      border-radius: 50%;
-      border: 1.5px solid #00ffc8;
-      box-shadow: 0 0 6px #00ffc870;
-      margin-right: 2.5px;
-      margin-top: 1px;
-      background: #141c1f;
-      transition: filter .22s, opacity .22s;
-      object-fit: contain;
-    }
-    .lucid-coin-img {
-      width: 33px; height: 33px;
-      border-radius: 50%;
-      margin-left: 0.5em;
-      margin-right: 0.2em;
-      filter: drop-shadow(0 0 18px #ffe46f88);
-      vertical-align: middle;
-      background: #181d2b;
-      border: 1.5px solid #ffe46f;
-      box-shadow: 0 0 7px #ffe46f60;
-      object-fit: contain;
-    }
-    .lucid-coin-count {
-      color: var(--gold);
+    .play-game-btn {
+      position: fixed;
+      left: 50%;
+      bottom: 40px;
+      transform: translateX(-50%);
+      z-index: 50;
+      padding: 1.1em 3.4em;
+      font-size: 2.2em;
+      font-family: 'Orbitron', Arial, sans-serif;
       font-weight: 800;
-      margin-left: .2em;
-      font-size: 1.13em;
-      text-shadow: 0 2px 12px #00ffc890, 0 0 6px #ffe46f;
+      border-radius: 2.5em;
+      background: linear-gradient(92deg, #00ffc8 10%, #1a237e 100%);
+      color: #181d2b;
+      box-shadow: 0 8px 48px #00ffc890, 0 2px 18px #181d2b90;
+      border: none;
+      outline: none;
+      display: flex;
+      align-items: center;
+      gap: 1em;
+      cursor: pointer;
+      transition: background .18s, box-shadow .18s, filter .18s, opacity .18s;
+      opacity: 0.98;
+      text-shadow: 0 2px 9px #fff7;
+      letter-spacing: 1.5px;
+      backdrop-filter: blur(7px);
+      animation: popIn .33s;
     }
-    .lucid-coin-info-btn {
-      background: none; border: none; color: var(--accent); font-size: 1.15em; cursor: pointer; margin-left: 0.45em;
-      transition: color .18s; outline: none;
+    .play-game-btn-icon {
+      font-size: 1.25em;
+      filter: drop-shadow(0 0 10px #00ffc8a0);
+      display: flex; align-items: center;
     }
-    .lucid-coin-info-btn:active,
-    .lucid-coin-info-btn:focus { color: #ffe46f; }
-    @keyframes fadeIn {0%{opacity:0}100%{opacity:1}}
-    @keyframes popIn {0%{transform:scale(0.93);opacity:0}100%{transform:scale(1);opacity:1}}
+    .play-game-btn:active, .play-game-btn:focus {
+      background: linear-gradient(92deg, #00ffc8 20%, #ffe46f 90%);
+      filter: brightness(1.08);
+      box-shadow: 0 4px 32px #ffe46f88, 0 1px 14px #00ffc850;
+    }
+    .play-game-btn[disabled], .play-game-btn.disabled {
+      opacity: 0.38;
+      cursor: not-allowed;
+      filter: grayscale(0.7) brightness(0.8);
+      pointer-events: none;
+    }
     @media (max-width: 950px) {
-      .main-content { padding-top: 95px;}
-      .carousel-container { min-height: 140px; }
-      .game-house { width: 170px; height: 140px;}
-      .game-house img { width: 100px; height: 60px;}
-      .house-shadow { width: 60px; height: 14px;}
-      #ground-3d { height: 90px;}
+      header { font-size: .85em; }
+      .main-content { margin-top: 90px; }
+      .carousel-wrapper { min-height: 140px; }
+      .game-card { min-width: 110px; height: 140px; }
+      .game-card img { height: 60px; }
     }
     @media (max-width: 600px) {
-      .main-content { padding-top: 72px;}
-      .carousel-container { min-height: 100px;}
-      .game-house { width: 120px; height: 110px;}
-      .game-house img { width: 68px; height: 48px;}
-      .house-shadow { width: 40px; height: 9px;}
-      #ground-3d { height: 60px;}
-      #proModalContent { min-width: unset; padding: 1.2em 0.5em 0.8em 0.5em;}
-      .carousel-arrow { width: 38px; height: 38px; font-size: 1.5em;}
+      header { font-size: .7em; padding: .7rem .4rem;}
+      .main-content { margin-top: 65px;}
+      .carousel-arrow { width: 34px; height: 34px; font-size: 1.3em;}
+      .game-card { min-width: 80px; height: 100px; }
+      .game-card img { height: 34px; }
+      .modal-content { min-width: unset; padding: 1.1em .5em .8em; }
+      .play-game-btn { font-size: 1.2em; padding: .7em 1.7em;}
     }
-  .pro-sigil {
-    position: absolute;
-    width: 24px;
-    height: 24px;
-    background: url('https://upload.wikimedia.org/wikipedia/commons/3/35/Glowing_rune_example.svg') no-repeat center;
-    background-size: contain;
-    filter: drop-shadow(0 0 4px #0ff) brightness(1.2);
-    transform-origin: center;
-    opacity: 0.8;
-    animation: floatSigil 6s ease-in-out forwards;
-  }
-
-  @keyframes floatSigil {
-    0% { transform: translateY(0px) rotate(0deg); opacity: 0.9; }
-    50% { transform: translateY(-30px) rotate(180deg); opacity: 0.4; }
-    100% { transform: translateY(-60px) rotate(360deg); opacity: 0; }
-  }
-
-  .feather-particle {
-    position: absolute;
-    width: 14px;
-    height: 14px;
-    background: radial-gradient(circle at 40% 30%, #fff8cc, #ffe08c, transparent);
-    border-radius: 50%;
-    filter: blur(0.5px) brightness(1.3);
-    opacity: 0.85;
-    animation: featherFloat 7s ease-in forwards;
-  }
-
-  @keyframes featherFloat {
-    0% { transform: translate(0px, 0px) rotate(0deg); opacity: 0.8; }
-    50% { transform: translate(-10px, -30px) rotate(45deg); opacity: 0.5; }
-    100% { transform: translate(-20px, -70px) rotate(90deg); opacity: 0; }
-  }
-
-  .flame-spark {
-    position: absolute;
-    width: 4px;
-    height: 10px;
-    background: linear-gradient(to top, #ff7200, #fff0a0);
-    border-radius: 2px;
-    opacity: 0.9;
-    filter: blur(0.4px);
-    transform-origin: center;
-    animation: flameRise 3.2s infinite ease-in;
-  }
-
-  @keyframes flameRise {
-    0% { transform: translateY(0px) scaleY(1); opacity: 0.8; }
-    50% { transform: translateY(-15px) scaleY(1.5); opacity: 1; }
-    100% { transform: translateY(-30px) scaleY(0.8); opacity: 0; }
-  }
-
-  .glass-crystal {
-    position: absolute;
-    width: 16px;
-    height: 16px;
-    background: linear-gradient(135deg, rgba(185,242,255,0.6), rgba(255,255,255,0.9), rgba(185,242,255,0.6));
-    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-    box-shadow: 0 0 10px #b9f2ff80, inset 0 0 5px #ffffff50;
-    filter: blur(0.3px) contrast(1.2);
-    transform-origin: center;
-    opacity: 0.85;
-    animation: crystalDrift 7s ease-out forwards;
-  }
-
+    @keyframes fadeIn {0%{opacity:0}100%{opacity:1}}
+    @keyframes popIn {0%{transform:scale(.93);opacity:0}100%{transform:scale(1);opacity:1}}
   </style>
 </head>
 <body>
-  <div id="preload-overlay">
-    <div>
-      Loading assets...<br>
-      <span id="preload-progress">0%</span>
-    </div>
+  <div class="preload-overlay" id="preloadOverlay">
+    <div>Loading assets... <span id="preloadProgress">0%</span></div>
   </div>
-  <div id="bg-animated">
-    <canvas id="bg-canvas1"></canvas>
-    <canvas id="bg-canvas2"></canvas>
-  </div>
-  <div class="header-bar">
-    <div class="coin-count"><i class="fas fa-coins"></i> <span id="coinCount">0</span></div>
-    <div class="lucid-coin-ui">
-      <div class="lucid-piece-stack">
-        <img class="lucid-piece-img" id="lucidPieceImg1" src="/static/lucid_piece1.png" alt="Lucid Piece 1">
-        <img class="lucid-piece-img" id="lucidPieceImg2" src="/static/lucid_piece2.png" alt="Lucid Piece 2">
-        <img class="lucid-piece-img" id="lucidPieceImg3" src="/static/lucid_piece3.png" alt="Lucid Piece 3">
+  <header>
+    <div class="header-group coin"><i class="fas fa-coins"></i><span id="coinCount">0</span></div>
+    <div class="header-group lucid-coin">
+      <div class="lucid-pieces">
+        <img src="/static/lucid_piece1.png" class="lucid-piece" id="piece1" alt="Piece 1">
+        <img src="/static/lucid_piece2.png" class="lucid-piece" id="piece2" alt="Piece 2">
+        <img src="/static/lucid_piece3.png" class="lucid-piece" id="piece3" alt="Piece 3">
       </div>
-      <img class="lucid-coin-img" id="lucidCoinTotalImg" src="/static/lucid_coin_total.png" alt="Total Lucid Coin">
-      <span id="lucidCoinCount" class="lucid-coin-count">0</span>
-      <button id="lucidCoinInfoBtn" class="lucid-coin-info-btn" title="What are Lucid Coins?"><i class="fas fa-circle-info"></i></button>
+      <img src="/static/lucid_coin_total.png" class="lucid-coin-img" id="lucidCoinImg" alt="Lucid Coin">
+      <span id="lucidCoinCount">0</span>
+      <button class="lucid-coin-info-btn" id="lucidCoinInfoBtn" aria-label="What are Lucid Coins?"><i class="fas fa-circle-info"></i></button>
     </div>
-    <div class="high-score" id="highScoreBoardBtn"><i class="fas fa-trophy"></i> <span id="highScore">0</span></div>
-  </div>
-  <div class="main-content">
-    <div class="carousel-bottom-area">
-      <div class="carousel-container" id="carouselContainer">
-        <button class="carousel-arrow left" aria-label="Scroll Left" id="carouselArrowLeft"><i class="fas fa-chevron-left"></i></button>
-        <div class="carousel-track" id="carouselTrack"></div>
-        <button class="carousel-arrow right" aria-label="Scroll Right" id="carouselArrowRight"><i class="fas fa-chevron-right"></i></button>
-      </div>
+    <div class="header-group highscore" id="highScoreBtn"><i class="fas fa-trophy"></i><span id="highScore">0</span></div>
+  </header>
+  <main class="main-content">
+    <div class="carousel-wrapper">
+      <button class="carousel-arrow left" id="arrowLeft" aria-label="Previous Game"><i class="fas fa-chevron-left"></i></button>
+      <div class="carousel-track" id="carouselTrack"></div>
+      <button class="carousel-arrow right" id="arrowRight" aria-label="Next Game"><i class="fas fa-chevron-right"></i></button>
     </div>
-  </div>
-  <div id="ground-3d">
-    <div id="ground-3d-fade"></div>
-  </div>
-  <div id="proModal">
-    <div id="proModalBackdrop"></div>
-    <div id="proModalContent" role="dialog" aria-modal="true">
-      <div id="proModalTitle"></div>
-      <div id="proModalMsg"></div>
-      <div id="proModalActions"></div>
-    </div>
-  </div>
-  <!-- Lucid Piece FALLING Area (dynamic) -->
-  <div id="lucidPieceFallingArea"></div>
+  </main>
+  <button id="playGameBtn" class="play-game-btn" disabled>
+    <span class="play-game-btn-icon"><i class="fas fa-play"></i></span>
+    <span class="play-game-btn-label">Play Game</span>
+  </button>
+  <div id="modal" style="display:none"></div>
   <script>
-    // ---- HARDCODED PRELOAD ALL MEDIA ----
-    // Add all Lucid Pieces and Coin images as assets
-    const mediaAssets = [
+    // ----------- Asset Preload -----------
+    const ASSETS = [
       '/static/ground.png',
-      '/static/house1.png', '/static/house2.png', '/static/house3.png', '/static/house4.png', '/static/house5.png',
       '/static/lucid_piece1.png', '/static/lucid_piece2.png', '/static/lucid_piece3.png',
-      '/static/lucid_coin_total.png'
+      '/static/lucid_coin_total.png',
+      '/static/house1.png', '/static/house2.png', '/static/house3.png', '/static/house4.png', '/static/house5.png'
     ];
-    let loadedCount = 0;
-    function updatePreloadProgress() {
-      const percent = Math.round((loadedCount / mediaAssets.length) * 100);
-      document.getElementById('preload-progress').textContent = percent + '%';
+    let loadedAssets = 0;
+    function updatePreload() {
+      const pct = Math.round((loadedAssets / ASSETS.length) * 100);
+      document.getElementById('preloadProgress').textContent = pct + '%';
     }
-    function preloadAllMedia(callback) {
-      let loaded = 0;
-      function singleLoaded() {
-        loadedCount++;
-        updatePreloadProgress();
-        if (loadedCount >= mediaAssets.length) {
-          setTimeout(callback, 300); // slight delay for smoothness
-        }
-      }
-      for (const src of mediaAssets) {
-        const img = new window.Image();
-        img.onload = singleLoaded;
-        img.onerror = singleLoaded;
-        img.src = src;
-      }
-    }
-    preloadAllMedia(() => {
-      document.getElementById('preload-overlay').classList.add('hide');
-      setTimeout(() => {
-        document.getElementById('preload-overlay').style.display = 'none';
-      }, 1000);
-      window.startApp && window.startApp();
-    });
-    // ---- END PRELOAD ----
-
-    window.startApp = function() {
-      // --- Animated background: rays & particles ---
-      const c1 = document.getElementById('bg-canvas1');
-      c1.width = window.innerWidth; c1.height = window.innerHeight;
-      const ctx1 = c1.getContext('2d');
-      let rays = Array.from({length:7},()=>({
-        x:Math.random()*c1.width, y:Math.random()*c1.height*0.6,
-        len:Math.random()*180+150, w:Math.random()*22+7, a:Math.random()*6.28,
-        hue:Math.floor(Math.random()*40+170), speed:(Math.random()*0.33)+0.07, alpha:Math.random()*0.19+0.14
-      }));
-      function drawRays(){
-        ctx1.clearRect(0,0,c1.width,c1.height);
-        for(const r of rays){
-          ctx1.save();
-          ctx1.translate(r.x, r.y);
-          ctx1.rotate(r.a);
-          let grad = ctx1.createLinearGradient(0,0,r.len,0);
-          grad.addColorStop(0,`hsla(${r.hue},90%,70%,${r.alpha*0.66})`);
-          grad.addColorStop(1,`hsla(${r.hue},90%,40%,0)`);
-          ctx1.fillStyle = grad;
-          ctx1.globalAlpha = r.alpha;
-          ctx1.beginPath();
-          ctx1.ellipse(r.len/2,0,r.len/2,r.w,0,0,Math.PI*2);
-          ctx1.fill();
-          ctx1.restore();
-          r.a += 0.0007+r.speed/700;
-          r.x += Math.sin(r.a)*r.speed;
-          r.y += Math.cos(r.a)*r.speed*0.5;
-          if(r.x<0||r.x>c1.width||r.y<0||r.y>c1.height*0.65){ r.x=Math.random()*c1.width; r.y=Math.random()*c1.height*0.7;}
-        }
-        requestAnimationFrame(drawRays);
-      } drawRays();
-      window.addEventListener('resize',()=>{ c1.width=window.innerWidth; c1.height=window.innerHeight; });
-
-      const c2 = document.getElementById('bg-canvas2');
-      c2.width = window.innerWidth; c2.height = window.innerHeight;
-      const ctx2 = c2.getContext('2d');
-      const particles = Array.from({length:33},()=>({
-        x: Math.random()*c2.width,
-        y: Math.random()*c2.height,
-        r: Math.random()*2.8+1.2,
-        dx: (Math.random()-0.5)*0.10,
-        dy: (Math.random()-0.5)*0.13,
-        alpha: Math.random()*0.23+0.1
-      }));
-      function drawParticles(){
-        ctx2.clearRect(0,0,c2.width,c2.height);
-        for(const p of particles){
-          ctx2.globalAlpha = p.alpha;
-          ctx2.beginPath();
-          ctx2.arc(p.x,p.y,p.r,0,Math.PI*2);
-          ctx2.fillStyle="#fff";
-          ctx2.shadowColor="#00ffc8"; ctx2.shadowBlur=7;
-          ctx2.fill();
-          ctx2.shadowBlur=0;
-          p.x+=p.dx; p.y+=p.dy;
-          if(p.x<0) p.x=c2.width; if(p.x>c2.width) p.x=0;
-          if(p.y<0) p.y=c2.height; if(p.y>c2.height) p.y=0;
-        }
-        requestAnimationFrame(drawParticles);
-      } drawParticles();
-      window.addEventListener('resize',()=>{ c2.width=window.innerWidth; c2.height=window.innerHeight; });
-
-      // ---- Professional Modal Logic ----
-      function showProModal({title, message, actions}) {
-        const modal = document.getElementById('proModal');
-        modal.classList.add('show');
-        document.getElementById('proModalTitle').textContent = title;
-        document.getElementById('proModalMsg').innerHTML = message;
-        const $actions = document.getElementById('proModalActions');
-        $actions.innerHTML = '';
-        actions.forEach(({label, callback, className})=>{
-          const btn = document.createElement('button');
-          btn.className = 'pro-btn'+(className?' '+className:'');
-          btn.textContent = label;
-          btn.onclick = ()=>{
-            modal.classList.remove('show');
-            window.onkeydown = null;
-            callback && callback();
-          };
-          $actions.appendChild(btn);
-        });
-        document.getElementById('proModalBackdrop').onclick = ()=>{
-          modal.classList.remove('show');
-          window.onkeydown = null;
+    function preloadAssets(done) {
+      let finished = 0;
+      ASSETS.forEach(src => {
+        const img = new Image();
+        img.onload = img.onerror = function() {
+          loadedAssets++; updatePreload();
+          if (++finished === ASSETS.length) setTimeout(done, 300);
         };
-        window.onkeydown = e => { if(e.key==="Escape") { modal.classList.remove('show'); window.onkeydown = null; } };
-      }
-
-      // ---- Game Data ----
-      const housePNGs = [
-        '/static/house1.png',
-        '/static/house2.png',
-        '/static/house3.png',
-        '/static/house4.png',
-        '/static/house5.png'
-      ];
-      const flyingObjects = [
-        `<svg width="84" height="84"><g id="starOrbit"></g></svg>`,
-        `<svg width="84" height="84"><ellipse cx="42" cy="34" rx="20" ry="10" fill="#a6eaff" opacity="0.7"/><ellipse cx="42" cy="37" rx="12" ry="5" fill="#00ffc8" opacity="0.8"/></svg>`,
-        `<svg width="84" height="84"><circle cx="42" cy="38" r="13" fill="#ffe500" opacity="0.75"/><circle cx="42" cy="28" r="7" fill="#fff" opacity="0.8"/></svg>`,
-        `<svg width="84" height="84"><ellipse cx="42" cy="34" rx="16" ry="7" fill="#fff" opacity="0.22"/><rect x="28" y="30" width="28" height="18" rx="9" fill="#b3e5fc" /></svg>`,
-        `<svg width="84" height="84"><ellipse cx="42" cy="36" rx="13" ry="13" fill="#ffc107" opacity="0.85"/><ellipse cx="42" cy="32" rx="7" ry="3" fill="#fffde7"/></svg>`
-      ];
-      const gameLinks = [
-        'lucidgame.html', '', '', '', ''
-      ];
-      const unlockPrices = [0, 300, 900, 2000, 3500];
-      const gameNames = [
-        "LucidMath", "NeuroSharp", "GemRunner", "SkyStack", "MindTwist"
-      ];
-      const gameIcons = [
-        '<i class="fas fa-dice-d20"></i>',
-        '<i class="fas fa-cube"></i>',
-        '<i class="fas fa-gem"></i>',
-        '<i class="fas fa-layer-group"></i>',
-        '<i class="fas fa-brain"></i>'
-      ];
-
-      // ---- Local Storage State ----
-      let unlockedGames = JSON.parse(localStorage.getItem('lucid_unlocked_games')||'[true,false,false,false,false]');
-      unlockedGames[0]=true;
-      let coins = Number(localStorage.getItem('lucid_coins')||'500');
-      let highScore = Number(localStorage.getItem('lucid_highscore')||'0');
-      let lucidCoin = Number(localStorage.getItem('lucid_lucidcoin')||'0');
-      let lucidPieces = JSON.parse(localStorage.getItem('lucid_pieces')||'[false,false,false]');
-      let selectedIdx = 0;
-
-      // ---- DOM Caching ----
-      const $track = document.getElementById('carouselTrack');
-      const $coinCount = document.getElementById('coinCount');
-      const $highScore = document.getElementById('highScore');
-      const $lucidCoinTotalImg = document.getElementById('lucidCoinTotalImg');
-      const $lucidCoinCount = document.getElementById('lucidCoinCount');
-      const $lucidPieceImgs = [
-        document.getElementById('lucidPieceImg1'),
-        document.getElementById('lucidPieceImg2'),
-        document.getElementById('lucidPieceImg3')
-      ];
-      const $highScoreBoardBtn = document.getElementById('highScoreBoardBtn');
-      const $lucidCoinInfoBtn = document.getElementById('lucidCoinInfoBtn');
-      const $carouselContainer = document.getElementById('carouselContainer');
-      const $carouselArrowLeft = document.getElementById('carouselArrowLeft');
-      const $carouselArrowRight = document.getElementById('carouselArrowRight');
-      const $ground3d = document.getElementById('ground-3d');
-      const $lucidPieceFallingArea = document.getElementById('lucidPieceFallingArea');
-      
-
-      // ---- UI Update Functions ----
-      function updateHeader() {
-        $coinCount.textContent = coins;
-        $highScore.textContent = highScore;
-        $lucidCoinCount.textContent = lucidCoin;
-        for (let i = 0; i < 3; ++i) {
-          if (lucidPieces[i]) {
-            $lucidPieceImgs[i].classList.add('lucid-piece-collected');
-            $lucidPieceImgs[i].classList.remove('lucid-piece-uncollected');
-          } else {
-            $lucidPieceImgs[i].classList.remove('lucid-piece-collected');
-            $lucidPieceImgs[i].classList.add('lucid-piece-uncollected');
-          }
-        }
-      }
-
-      // ---- Carousel Rendering ----
-      function renderHouses() {
-        $track.innerHTML = '';
-        for(let i=0;i<5;i++) {
-          const house = document.createElement('div');
-          house.className = 'game-house' + (i===selectedIdx?' selected':'') + (unlockedGames[i]?'':' locked');
-          house.tabIndex = 0;
-          house.setAttribute('data-idx', i);
-          const img = document.createElement('img');
-          img.src = housePNGs[i]; img.alt = 'Game House '+(i+1);
-          house.appendChild(img);
-          house.appendChild(Object.assign(document.createElement('div'), {className:'house-shadow'}));
-          const flying = document.createElement('div');
-          flying.className = 'flying-obj';
-          if(i === 0) {
-            flying.innerHTML = `<svg width="84" height="84"><g id="starOrbit"></g></svg>`;
-            setTimeout(()=>{
-              const starSVG = flying.querySelector('#starOrbit');
-              if(starSVG) drawOrbitingStars(starSVG, 9, 26, 1.0);
-            }, 20);
-          } else {
-            flying.innerHTML = flyingObjects[i];
-          }
-          house.appendChild(flying);
-          if (!unlockedGames[i]) {
-            const lock = document.createElement('div');
-            lock.className = 'lock-overlay';
-            lock.innerHTML = `<span class="lock-icon"><i class="fas fa-lock"></i></span>
-              <span style="font-size:1.2em;font-weight:600;">${unlockPrices[i]} <i class="fas fa-coins"></i></span>
-              <button class="unlock-btn" data-idx="${i}" ${coins<unlockPrices[i]?'disabled':''}>Unlock</button>`;
-            house.appendChild(lock);
-          }
-          house.onclick = (e) => {
-            if (unlockedGames[i]) {
-              if (gameLinks[i]) window.location = gameLinks[i];
-            } else {
-              tryUnlockGame(i);
-            }
-          };
-          house.addEventListener('click', (e) => {
-            if (selectedIdx !== i && unlockedGames[i]) {
-              selectedIdx = i;
-              renderHouses();
-            }
-          });
-          $track.appendChild(house);
-        }
-        updateHeader();
-        attachUnlockEvents();
-        setTimeout(centerSelectedHouse, 50);
-      }
-
-      function tryUnlockGame(i) {
-        if (coins < unlockPrices[i]) {
-          showProModal({
-            title: "Not Enough Coins",
-            message: `<span style="color:#ffe46f; font-size:1.3em;"><i class="fas fa-coins"></i> ${coins}</span><br>
-            You need <b>${unlockPrices[i]}</b> coins to unlock this game.`,
-            actions: [{label:"OK", className:"cancel"}]
-          });
-          return;
-        }
-        showProModal({
-          title: "Unlock Game?",
-          message: `Do you want to unlock this game for <b>${unlockPrices[i]} coins</b>?`,
-          actions: [
-            {label:"Cancel", className:"cancel"},
-            {label:"Unlock", callback:()=>{ unlockGame(i); }}
-          ]
-        });
-      }
-
-      function unlockGame(i) {
-        if (coins>=unlockPrices[i]) {
-          coins -= unlockPrices[i];
-          unlockedGames[i]=true;
-          localStorage.setItem('lucid_unlocked_games',JSON.stringify(unlockedGames));
-          localStorage.setItem('lucid_coins',coins);
-          renderHouses();
-          showProModal({
-            title: "Game Unlocked!",
-            message: `<span style="font-size:2em; color:#00ffc8;"><i class="fas fa-unlock"></i></span><br>
-            Enjoy your new game!`,
-            actions: [{label:"OK", className:"cancel"}]
-          });
-        } else {
-          showProModal({
-            title: "Not Enough Coins",
-            message: `<span style="color:#ffe46f; font-size:1.3em;"><i class="fas fa-coins"></i> ${coins}</span><br>
-            You need <b>${unlockPrices[i]}</b> coins to unlock this game.`,
-            actions: [{label:"OK", className:"cancel"}]
-          });
-        }
-      }
-
-      // ---- Carousel Scroll & Centering ----
-      function centerSelectedHouse(smooth=true) {
-        const houses = Array.from($track.children);
-        if (!houses.length) return;
-        const selected = houses[selectedIdx];
-        if (!selected) return;
-        const containerRect = $carouselContainer.getBoundingClientRect();
-        const selectedRect = selected.getBoundingClientRect();
-        const scrollOffset = selected.offsetLeft + (selected.offsetWidth / 2) - (containerRect.width / 2);
-        $carouselContainer.scrollTo({
-          left: scrollOffset,
-          behavior: smooth ? "smooth" : "auto"
-        });
-        // Arrow buttons disabled state:
-        $carouselArrowLeft.disabled = (selectedIdx <= 0);
-        $carouselArrowRight.disabled = (selectedIdx >= houses.length - 1);
-      }
-      window.addEventListener('resize', () => centerSelectedHouse(false));
-
-      // Carousel Mousewheel: up/down scrolls left/right
-      $carouselContainer.addEventListener('wheel', function(e){
-        if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-          $carouselContainer.scrollLeft += e.deltaY * 0.75;
-          e.preventDefault();
-        }
-      }, {passive:false});
-      // Carousel Arrow Buttons
-      $carouselArrowLeft.onclick = function() {
-        if (selectedIdx > 0) { selectedIdx--; renderHouses(); }
-      };
-      $carouselArrowRight.onclick = function() {
-        if (selectedIdx < 4) { selectedIdx++; renderHouses(); }
-      };
-
-      // Keyboard Navigation
-      document.body.addEventListener('keydown',e=>{
-        if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
-        if (e.key==='ArrowRight') {
-          if (selectedIdx < 4) { selectedIdx++; renderHouses(); }
-        }
-        if (e.key==='ArrowLeft') {
-          if (selectedIdx > 0) { selectedIdx--; renderHouses(); }
-        }
+        img.src = src;
       });
-
-      function attachUnlockEvents() {
-        document.querySelectorAll('.unlock-btn').forEach(btn=>{
-          btn.onclick = e=>{
-            e.stopPropagation();
-            const i = Number(btn.dataset.idx);
-            tryUnlockGame(i);
-          };
-        });
-      }
-
-      // ---- Orbiting Stars for House 1 ----
-      function drawOrbitingStars(parent, count, radius, speed) {
-        parent.innerHTML = '';
-        for (let i = 0; i < count; ++i) {
-          const star = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-          star.setAttribute('r', 2.3+Math.random()*1.2);
-          star.setAttribute('fill', '#fff');
-          parent.appendChild(star);
-        }
-        function animate() {
-          const now = Date.now()/1000;
-          for (let i = 0; i < count; ++i) {
-            const angle = (2 * Math.PI * i / count) + now * speed * (i%2===0?1:-1);
-            const r = radius + Math.sin(now*0.6+i)*3;
-            parent.children[i].setAttribute('cx', 42 + Math.cos(angle)*r);
-            parent.children[i].setAttribute('cy', 42 + Math.sin(angle)*r*0.55);
-            parent.children[i].setAttribute('opacity', 0.68 + Math.sin(now*2+i)*0.2);
-          }
-          requestAnimationFrame(animate);
-        } animate();
-      }
-      
-// --- House 2 — Orbiting Runes (SVG glyphs, glowing and rotating)
-function drawOrbitingRunes(parent, count, radius, speed) {
-  parent.innerHTML = '';
-  const runes = ['ᚠ', 'ᛇ', 'ᚨ', 'ᚹ'];
-  for (let i = 0; i < count; ++i) {
-    const rune = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    rune.textContent = runes[i % runes.length];
-    rune.setAttribute('font-size', '12');
-    rune.setAttribute('fill', '#7ef9ff');
-    rune.setAttribute('opacity', '0.8');
-    rune.setAttribute('text-anchor', 'middle');
-    rune.setAttribute('alignment-baseline', 'middle');
-    parent.appendChild(rune);
-  }
-  function animate() {
-    const now = Date.now() / 1000;
-    for (let i = 0; i < count; ++i) {
-      const angle = (2 * Math.PI * i / count) + now * speed * 1.3;
-      const r = radius + Math.sin(now * 0.5 + i) * 2.2;
-      const x = 42 + Math.cos(angle) * r;
-      const y = 42 + Math.sin(angle) * r * 0.7;
-      parent.children[i].setAttribute('x', x);
-      parent.children[i].setAttribute('y', y);
-      parent.children[i].setAttribute('transform', `rotate(${angle * 57.3}, ${x}, ${y})`);
     }
-    requestAnimationFrame(animate);
-  }
-  animate();
-}
-
-// --- House 3 — Orbiting Feathers (soft glowing particles)
-function drawOrbitingFeathers(parent, count, radius, speed) {
-  parent.innerHTML = '';
-  for (let i = 0; i < count; ++i) {
-    const feather = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
-    feather.setAttribute('rx', 2 + Math.random() * 1.5);
-    feather.setAttribute('ry', 5 + Math.random() * 2);
-    feather.setAttribute('fill', 'url(#featherGradient)');
-    parent.appendChild(feather);
-  }
-  function animate() {
-    const now = Date.now() / 1000;
-    for (let i = 0; i < count; ++i) {
-      const angle = (2 * Math.PI * i / count) + now * speed * 0.8;
-      const r = radius + Math.cos(now * 0.4 + i) * 2;
-      parent.children[i].setAttribute('cx', 42 + Math.cos(angle) * r);
-      parent.children[i].setAttribute('cy', 42 + Math.sin(angle) * r * 0.55);
-      parent.children[i].setAttribute('opacity', 0.6 + Math.sin(now * 1.8 + i) * 0.3);
-    }
-    requestAnimationFrame(animate);
-  }
-  animate();
-}
-
-// --- House 4 — Orbiting Flames (dynamic flickering shapes)
-function drawOrbitingFlames(parent, count, radius, speed) {
-  parent.innerHTML = '';
-  for (let i = 0; i < count; ++i) {
-    const flame = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    flame.setAttribute('d', 'M0,0 C2,-5 4,-5 6,0 C4,5 2,5 0,0');
-    flame.setAttribute('fill', 'orange');
-    flame.setAttribute('opacity', '0.7');
-    parent.appendChild(flame);
-  }
-  function animate() {
-    const now = Date.now() / 1000;
-    for (let i = 0; i < count; ++i) {
-      const angle = (2 * Math.PI * i / count) + now * speed * (i % 2 === 0 ? 1 : -1);
-      const r = radius + Math.sin(now * 0.5 + i) * 4;
-      const x = 42 + Math.cos(angle) * r;
-      const y = 42 + Math.sin(angle) * r * 0.6;
-      parent.children[i].setAttribute('transform', `translate(${x}, ${y}) rotate(${now * 60}) scale(${0.6 + Math.sin(now + i) * 0.2})`);
-    }
-    requestAnimationFrame(animate);
-  }
-  animate();
-}
-
-// --- House 5 — Orbiting Glass Crystals (diamond-like reflection effects)
-function drawOrbitingCrystals(parent, count, radius, speed) {
-  parent.innerHTML = '';
-  for (let i = 0; i < count; ++i) {
-    const crystal = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-    crystal.setAttribute('points', '5,0 10,10 5,20 0,10');
-    crystal.setAttribute('fill', 'url(#glassGradient)');
-    crystal.setAttribute('opacity', '0.9');
-    parent.appendChild(crystal);
-  }
-  function animate() {
-    const now = Date.now() / 1000;
-    for (let i = 0; i < count; ++i) {
-      const angle = (2 * Math.PI * i / count) + now * speed * 1.2;
-      const r = radius + Math.sin(now * 0.8 + i) * 3.5;
-      const x = 42 + Math.cos(angle) * r;
-      const y = 42 + Math.sin(angle) * r * 0.65;
-      parent.children[i].setAttribute('transform', `translate(${x}, ${y}) rotate(${now * 40})`);
-    }
-    requestAnimationFrame(animate);
-  }
-  animate();
-}
-// ---- Lucid Piece Falling/Collecting System ----
-const PIECE_PNGS = [
-  "/static/lucid_piece1.png",
-  "/static/lucid_piece2.png",
-  "/static/lucid_piece3.png"
-];
-
-let lucidPiecesTimer = null;
-let currentlyFallingPiece = null;
-
-function startLucidPieceRain() {
-  function maybeSpawnPiece() {
-    if (lucidPieces.every(Boolean) || currentlyFallingPiece) {
-      scheduleNextPiece();
-      return;
-    }
-    const available = [0,1,2].filter(i => !lucidPieces[i]);
-    if (available.length === 0) return;
-
-    const idx = available[Math.floor(Math.random() * available.length)];
-    spawnFallingPiece(idx);
-    scheduleNextPiece();
-  }
-
-  function scheduleNextPiece() {
-    // Delay between 45 and 95 seconds
-    const delay = 45000 + Math.random() * 50000;
-    lucidPiecesTimer = setTimeout(maybeSpawnPiece, delay);
-  }
-
-  scheduleNextPiece();
-}
-
-function spawnFallingPiece(pieceIdx) {
-  if (currentlyFallingPiece) return;
-
-  const $img = document.createElement("img");
-  $img.src = PIECE_PNGS[pieceIdx];
-  $img.className = "lucid-piece-falling";
-
-  const vw = Math.max(window.innerWidth, 400);
-  const maxX = vw - 82;
-  const left = 50 + Math.random() * (maxX - 100);
-  $img.style.left = left + "px";
-  $img.style.top = "-70px";
-  $img.setAttribute('data-piece-idx', pieceIdx);
-  $img.title = "Collect Lucid Piece!";
-
-  currentlyFallingPiece = $img;
-  $lucidPieceFallingArea.appendChild($img);
-
-  let top = -70, stop = false;
-  function animateFall() {
-    if (stop) return;
-    top += 1.5 + (Math.random() * 0.4);
-    $img.style.top = top + "px";
-
-    if (top > window.innerHeight - 120) {
-      $img.style.top = (window.innerHeight - 120) + "px";
-      setTimeout(() => {
-        if ($img.parentNode) $img.parentNode.removeChild($img);
-        currentlyFallingPiece = null;
-      }, 5000); // remains for 5 seconds
-      stop = true;
-      return;
-    }
-    requestAnimationFrame(animateFall);
-  }
-
-  animateFall();
-
-  $img.onclick = function(e) {
-    e.stopPropagation();
-    collectLucidPiece(pieceIdx, $img);
-  };
-}
-
-function collectLucidPiece(idx, $img) {
-  if (lucidPieces[idx]) return;
-  lucidPieces[idx] = true;
-  localStorage.setItem('lucid_pieces', JSON.stringify(lucidPieces));
-
-  $img.classList.add('lucid-piece-merge-anim');
-  setTimeout(() => {
-    if ($img.parentNode) $img.parentNode.removeChild($img);
-    currentlyFallingPiece = null;
-    updateHeader();
-    animatePieceToStack(idx, () => {
-      if (lucidPieces.every(Boolean)) {
-        setTimeout(animateMergePiecesToCoin, 400);
-      }
+    preloadAssets(() => {
+      document.getElementById('preloadOverlay').classList.add('hide');
+      setTimeout(() => document.getElementById('preloadOverlay').style.display = 'none', 1000);
+      window.startApp();
     });
-  }, 700);
-}
-
-function animatePieceToStack(idx, cb) {
-  const pieceStackImg = $lucidPieceImgs[idx];
-  const rect = pieceStackImg.getBoundingClientRect();
-
-  const flying = document.createElement("img");
-  flying.src = PIECE_PNGS[idx];
-  flying.className = "lucid-piece-falling";
-  flying.style.left = (window.innerWidth / 2 - 36) + "px";
-  flying.style.top = (window.innerHeight - 108) + "px";
-  flying.style.pointerEvents = "none";
-  flying.style.transition = "left .65s cubic-bezier(.42,2,.6,1), top .65s cubic-bezier(.42,2,.6,1), opacity .22s";
-  document.body.appendChild(flying);
-
-  setTimeout(() => {
-    flying.style.left = (rect.left + rect.width / 2 - 36) + "px";
-    flying.style.top = (rect.top + rect.height / 2 - 36) + "px";
-    flying.style.opacity = 0.15;
-  }, 10);
-
-  setTimeout(() => {
-    flying.remove();
-    pieceStackImg.classList.add('lucid-piece-collected');
-    setTimeout(() => pieceStackImg.classList.remove('lucid-piece-collected'), 520);
-    cb && cb();
-  }, 700);
-}
-
-function animateMergePiecesToCoin() {
-  const stackRects = $lucidPieceImgs.map(img => img.getBoundingClientRect());
-  const coinRect = $lucidCoinTotalImg.getBoundingClientRect();
-
-  $lucidPieceImgs.forEach((img, i) => {
-    img.classList.add('lucid-piece-merge-anim');
-    setTimeout(() => {
-      img.style.visibility = "hidden";
-    }, 600);
-  });
-
-  setTimeout(() => {
-    $lucidCoinTotalImg.classList.add('lucid-coin-anim-gain');
-    lucidCoin++;
-    localStorage.setItem('lucid_lucidcoin', lucidCoin);
-    lucidPieces = [false, false, false];
-    localStorage.setItem('lucid_pieces', JSON.stringify(lucidPieces));
-    updateHeader();
-    setTimeout(() => {
-      $lucidPieceImgs.forEach(img => {
-        img.style.visibility = "";
-        img.classList.remove('lucid-piece-merge-anim');
-      });
-      $lucidCoinTotalImg.classList.remove('lucid-coin-anim-gain');
-    }, 900);
-  }, 700);
-}
-
-startLucidPieceRain();
-
-
-
-      // ---- Lucid Coin Info ----
-      $lucidCoinInfoBtn.onclick = function() {
-        showProModal({
-          title: "Lucid Coin 🪙 Usage",
-          message: `<div style="font-size:1.09em;text-align:left;max-width:320px;margin:auto;">
-              <b>What are Lucid Coins?</b><br><br>
-              <span style="color:#00ffc8">Lucid Coins🪙</span> are rare coins you can collect as jackpot drops.<br>
-              <br>
-              <b>Collect 3 unique Lucid Pieces (shown below) to get 1 Lucid Coin!</b><br>
-              <br>
-              <b>Use Lucid Coins to continue your game after a Game Over!</b><br>
-              <ul style="margin-left:1.5em;">
-                <li>First continue: <b>1</b> Lucid Coin</li>
-                <li>Second continue: <b>2</b> Lucid Coins</li>
-                <li>Third continue: <b>3</b> Lucid Coins</li>
-                <li>Fourth time: <span style="color:#f33">No more continues</span></li>
-              </ul>
-              <br>
-              <span style="color:#ffe46f;">Collect more Lucid Coins to get more chances!</span>
-            </div>`,
-          actions: [{label:"Close", className:"cancel"}]
-        });
+    function showModal({title, message, actions}) {
+      const modal = document.getElementById('modal');
+      modal.innerHTML = `
+        <div class="modal-backdrop" tabindex="0">
+          <div class="modal-content" role="dialog" aria-modal="true">
+            <div class="modal-title">${title}</div>
+            <div class="modal-message">${message}</div>
+            <div class="modal-actions">
+              ${actions.map((a,i) =>
+                `<button class="${a.className||""}" data-modal-btn="${i}">${a.label}</button>`
+              ).join('')}
+            </div>
+          </div>
+        </div>`;
+      modal.style.display = "block";
+      modal.querySelector(".modal-backdrop").onclick = e => {
+        if (e.target === e.currentTarget) { modal.style.display="none"; }
       };
-
-      // ---- High Score Board ----
-      $highScoreBoardBtn.onclick = function() {
-        let hsList = [];
-        let bestOverall = 0;
-        for(let i=0;i<5;i++) {
-          let score = +(localStorage.getItem('lucid_highscore_'+i)||'0');
-          if(score > bestOverall) bestOverall = score;
-          hsList.push({
-            name: gameNames[i],
-            icon: gameIcons[i],
-            score: score
+      window.onkeydown = e => { if (e.key === "Escape") modal.style.display = "none"; }
+      actions.forEach((a,i) => {
+        modal.querySelector(`[data-modal-btn="${i}"]`).onclick = () => {
+          modal.style.display = "none";
+          if (a.callback) a.callback();
+        };
+      });
+    }
+    window.startApp = function() {
+      const games = [
+        { img: '/static/house1.png', title: "LucidMath", icon: '<i class="fas fa-dice-d20"></i>', link: 'lucidgame.html', price: 0 },
+        { img: '/static/house2.png', title: "NeuroSharp", icon: '<i class="fas fa-cube"></i>', link: '', price: 300 },
+        { img: '/static/house3.png', title: "GemRunner", icon: '<i class="fas fa-gem"></i>', link: '', price: 900 },
+        { img: '/static/house4.png', title: "SkyStack", icon: '<i class="fas fa-layer-group"></i>', link: '', price: 2000 },
+        { img: '/static/house5.png', title: "MindTwist", icon: '<i class="fas fa-brain"></i>', link: '', price: 3500 }
+      ];
+      let unlocked = JSON.parse(localStorage.getItem('lucid_unlocked_games') || '[true,false,false,false,false]');
+      unlocked[0] = true;
+      let coins = +localStorage.getItem('lucid_coins') || 500;
+      let highScore = +localStorage.getItem('lucid_highscore') || 0;
+      let lucidCoin = +localStorage.getItem('lucid_lucidcoin') || 0;
+      let pieces = JSON.parse(localStorage.getItem('lucid_pieces') || '[false,false,false]');
+      let selectedIdx = 0;
+      const $coin = document.getElementById('coinCount');
+      const $highScore = document.getElementById('highScore');
+      const $lucidCoin = document.getElementById('lucidCoinCount');
+      const $pieceImgs = [1,2,3].map(i=>document.getElementById('piece'+i));
+      const $carousel = document.getElementById('carouselTrack');
+      const $arrowL = document.getElementById('arrowLeft');
+      const $arrowR = document.getElementById('arrowRight');
+      const $playBtn = document.getElementById('playGameBtn');
+      function updateHeader() {
+        $coin.textContent = coins;
+        $highScore.textContent = highScore;
+        $lucidCoin.textContent = lucidCoin;
+        $pieceImgs.forEach((img,i)=>{
+          img.classList.toggle('collected', !!pieces[i]);
+        });
+      }
+      function renderCarousel() {
+        $carousel.innerHTML = '';
+        games.forEach((g,i) => {
+          const card = document.createElement('div');
+          card.className = 'game-card' + (i===selectedIdx?' selected':'') + (unlocked[i]?'':' locked');
+          card.tabIndex = 0;
+          card.setAttribute('data-idx',i);
+          card.innerHTML = `
+            <div class="game-icon">${g.icon}</div>
+            <img src="${g.img}" alt="${g.title}">
+            <div class="game-title">${g.title}</div>
+          `;
+          if (!unlocked[i]) {
+            card.innerHTML += `
+              <div class="unlock-block">
+                <div class="unlock-price"><i class="fas fa-coins"></i> ${g.price}</div>
+                <button ${coins<g.price?'disabled':''}>Unlock</button>
+              </div>`;
+            card.querySelector('button').onclick = e => {
+              e.stopPropagation();
+              unlockGame(i);
+            }
+          }
+          // Only selection, no game start by click
+          card.onclick = () => {
+            if (selectedIdx !== i) {
+              selectedIdx = i;
+              afterSelectOrRender();
+            }
+          };
+          $carousel.appendChild(card);
+        });
+        updateHeader();
+        updateArrows();
+        setTimeout(()=>centerSelected(),50);
+      }
+      function centerSelected(smooth=true) {
+        const cards = Array.from($carousel.children);
+        if (!cards[selectedIdx]) return;
+        const container = $carousel.getBoundingClientRect();
+        const card = cards[selectedIdx].getBoundingClientRect();
+        const scroll = cards[selectedIdx].offsetLeft + card.width/2 - container.width/2;
+        $carousel.scrollTo({left: scroll, behavior: smooth?"smooth":"auto"});
+      }
+      function updateArrows() {
+        $arrowL.disabled = (selectedIdx<=0);
+        $arrowR.disabled = (selectedIdx>=games.length-1);
+      }
+      $arrowL.onclick = ()=>{ if(selectedIdx>0){selectedIdx--;afterSelectOrRender();}};
+      $arrowR.onclick = ()=>{ if(selectedIdx<games.length-1){selectedIdx++;afterSelectOrRender();}};
+      window.addEventListener('resize',()=>centerSelected(false));
+      $carousel.addEventListener('wheel',e=>{
+        if(Math.abs(e.deltaY)>Math.abs(e.deltaX)){
+          $carousel.scrollLeft += e.deltaY * .85; e.preventDefault();
+        }
+      },{passive:false});
+      document.body.addEventListener('keydown',e=>{
+        if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA")return;
+        if(e.key==="ArrowRight" && selectedIdx<games.length-1){selectedIdx++;afterSelectOrRender();}
+        if(e.key==="ArrowLeft" && selectedIdx>0){selectedIdx--;afterSelectOrRender();}
+      });
+      function unlockGame(idx) {
+        if(coins<games[idx].price) {
+          return showModal({
+            title:"Not Enough Coins",
+            message:`You need <b>${games[idx].price}</b> coins to unlock this game.<br>Your coins: <b>${coins}</b>`,
+            actions:[{label:"OK",className:"cancel"}]
           });
         }
-        let board = `<div id="highScoresBoard">
-          ${hsList.map((g,i)=>`
-            <div class="hs-row">
-              <span class="hs-icon">${g.icon}</span>
-              <span class="hs-game">${g.name}</span>
-              <span class="hs-score">${g.score}</span>
-            </div>
-          `).join('')}
-        </div>`;
-        showProModal({
-          title: "Your Game Awards",
-          message: board,
-          actions: [
-            {label:"Close", className:"cancel"}
+        showModal({
+          title:"Unlock Game?",
+          message:`Do you want to unlock <b>${games[idx].title}</b> for <b>${games[idx].price} coins</b>?`,
+          actions:[
+            {label:"Cancel",className:"cancel"},
+            {label:"Unlock",callback:()=>{
+              coins -= games[idx].price;
+              unlocked[idx]=true;
+              localStorage.setItem('lucid_unlocked_games',JSON.stringify(unlocked));
+              localStorage.setItem('lucid_coins',coins);
+              afterSelectOrRender();
+              showModal({
+                title:"Game Unlocked!",
+                message:`Enjoy your new game!`,
+                actions:[{label:"OK",className:"cancel"}]
+              });
+            }}
           ]
         });
+      }
+      function updatePlayButton() {
+        const game = games[selectedIdx];
+        if (unlocked[selectedIdx] && game.link) {
+          $playBtn.disabled = false;
+          $playBtn.classList.remove('disabled');
+          $playBtn.title = "Play this game";
+        } else {
+          $playBtn.disabled = true;
+          $playBtn.classList.add('disabled');
+          $playBtn.title = unlocked[selectedIdx] ? "This game will be available soon" : "Unlock the game first";
+        }
+        $playBtn.querySelector('.play-game-btn-label').textContent = "Play Game";
+      }
+      $playBtn.onclick = () => {
+        const game = games[selectedIdx];
+        if (unlocked[selectedIdx] && game.link) {
+          window.location = game.link;
+        }
       };
-
-      // ---- Initialization ----
-      renderHouses();
+      function afterSelectOrRender() {
+        renderCarousel();
+        updatePlayButton();
+      }
+      document.getElementById('lucidCoinInfoBtn').onclick = ()=>{
+        showModal({
+          title:"What are Lucid Coins?",
+          message:`
+            <b>What are Lucid Coins?</b><br>
+            <span style="color:#00ffc8">Lucid Coins🪙</span> are rare coins you collect by finding 3 unique Lucid Pieces.<br>
+            <ul style="text-align:left;">
+              <li><b>Collect all 3 unique Lucid Pieces to earn 1 Lucid Coin!</b></li>
+              <li><b>Use Lucid Coins to continue your game after Game Over:</b><br>
+                1st continue: 1 coin, 2nd: 2 coins, 3rd: 3 coins, then no more continues.</li>
+            </ul>
+            <span style="color:#ffe46f;">Collect more Lucid Coins for more continues!</span>
+          `,
+          actions:[{label:"Close",className:"cancel"}]
+        });
+      };
+      document.getElementById('highScoreBtn').onclick = ()=>{
+        let board = '<div style="width:100%;max-width:340px;margin:auto">';
+        games.forEach((g,i)=>{
+          let score = +localStorage.getItem('lucid_highscore_'+i)||0;
+          board += `
+            <div style="display:flex;align-items:center;gap:.7em;background:#151d2b;padding:.7em 1em;margin-bottom:.4em;border-radius:12px;">
+              <span style="font-size:2em">${g.icon}</span>
+              <span style="flex:1;font-weight:700;color:var(--gold);">${g.title}</span>
+              <span style="font-size:1.2em;font-weight:800;background:linear-gradient(90deg,var(--gold) 30%,#fff 100%);
+                -webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 2px 8px #00ffc8b0;">${score}</span>
+            </div>`;
+        });
+        board += '</div>';
+        showModal({
+          title:"Your Game Awards",
+          message:board,
+          actions:[{label:"Close",className:"cancel"}]
+        });
+      };
+      afterSelectOrRender();
       updateHeader();
-      setTimeout(centerSelectedHouse, 400);
-    }
+      setTimeout(centerSelected,500);
+    };
   </script>
-  <svg width="100" height="100" style="display:none">
-  <defs>
-    <linearGradient id="glassGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#b9f2ff" stop-opacity="0.6"/>
-      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.8"/>
-      <stop offset="100%" stop-color="#b9f2ff" stop-opacity="0.6"/>
-    </linearGradient>
-    <radialGradient id="featherGradient" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#f8ffb0"/>
-      <stop offset="100%" stop-color="transparent"/>
-    </radialGradient>
-  </defs>
 </body>
 </html>
