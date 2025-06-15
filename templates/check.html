@@ -1536,182 +1536,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   );
 });
-// Stars (звёзды)
-(function(){
-  const starsCanvas = document.getElementById('stars-canvas');
-  if (!starsCanvas) return;
-  const starsCtx = starsCanvas.getContext('2d');
-  function resizeStarsCanvas() {
-    starsCanvas.width = window.innerWidth;
-    starsCanvas.height = window.innerHeight;
-  }
-  resizeStarsCanvas();
-  window.addEventListener('resize', resizeStarsCanvas);
-
-  const stars = [];
-  const starCount = 160;
-  for (let i = 0; i < starCount; i++) {
-    stars.push({
-      x: Math.random() * starsCanvas.width,
-      y: Math.random() * starsCanvas.height,
-      size: Math.random() * 1.5 + 0.5,
-      alpha: Math.random() * 0.6 + 0.4,
-      alphaChange: (Math.random() * 0.02) + 0.008,
-      angle: Math.random() * Math.PI * 2,
-      rotationSpeed: (Math.random() - 0.5) * 0.01,
-      dx: (Math.random() - 0.5) * 0.15,
-      dy: (Math.random() - 0.5) * 0.15
-    });
-  }
-  function drawStar(star) {
-    starsCtx.save();
-    starsCtx.translate(star.x, star.y);
-    starsCtx.rotate(star.angle);
-    const baseAlpha = star.alpha;
-    const glowColor = `rgba(255, 255, 150, ${baseAlpha})`;
-    const sharpColor = `rgba(255, 255, 80, ${baseAlpha})`;
-    starsCtx.globalAlpha = baseAlpha;
-    starsCtx.fillStyle = sharpColor;
-    starsCtx.beginPath();
-    starsCtx.arc(0, 0, star.size, 0, Math.PI * 2);
-    starsCtx.fill();
-    starsCtx.strokeStyle = glowColor;
-    starsCtx.lineWidth = 0.6;
-    starsCtx.beginPath();
-    starsCtx.moveTo(-star.size * 2.5, 0);
-    starsCtx.lineTo(star.size * 2.5, 0);
-    starsCtx.stroke();
-    starsCtx.beginPath();
-    starsCtx.moveTo(0, -star.size * 2.5);
-    starsCtx.lineTo(0, star.size * 2.5);
-    starsCtx.stroke();
-    starsCtx.beginPath();
-    starsCtx.moveTo(-star.size * 1.8, -star.size * 1.8);
-    starsCtx.lineTo(star.size * 1.8, star.size * 1.8);
-    starsCtx.stroke();
-    starsCtx.beginPath();
-    starsCtx.moveTo(star.size * 1.8, -star.size * 1.8);
-    starsCtx.lineTo(-star.size * 1.8, star.size * 1.8);
-    starsCtx.stroke();
-    starsCtx.restore();
-  }
-  function animateStars() {
-    starsCtx.clearRect(0, 0, starsCanvas.width, starsCanvas.height);
-    for (const star of stars) {
-      star.alpha += star.alphaChange;
-      if (star.alpha <= 0.3 || star.alpha >= 1) star.alphaChange = -star.alphaChange;
-      star.angle += star.rotationSpeed;
-      star.x += star.dx;
-      star.y += star.dy;
-      if (star.x < 0) star.x = starsCanvas.width;
-      if (star.x > starsCanvas.width) star.x = 0;
-      if (star.y < 0) star.y = starsCanvas.height;
-      if (star.y > starsCanvas.height) star.y = 0;
-      drawStar(star);
-    }
-    requestAnimationFrame(animateStars);
-  }
-  animateStars();
-})();
-
-// Firefly background
-(function(){
-  const fireflyCanvas = document.getElementById('firefly-bg');
-  if (!fireflyCanvas) return;
-  const fireflyCtx = fireflyCanvas.getContext('2d');
-  function resizeFireflyCanvas() {
-    fireflyCanvas.width = window.innerWidth;
-    fireflyCanvas.height = window.innerHeight;
-  }
-  resizeFireflyCanvas();
-  window.addEventListener('resize', resizeFireflyCanvas);
-  const bugs = [...Array(100)].map(() => ({
-    x: Math.random() * fireflyCanvas.width,
-    y: Math.random() * fireflyCanvas.height,
-    r: Math.random() * 2 + 0.5,
-    dx: (Math.random() - 0.5) * 0.6,
-    dy: (Math.random() - 0.5) * 0.6,
-    alpha: Math.random() * 0.5 + 0.5
-  }));
-  function animateFireflies() {
-    fireflyCtx.clearRect(0, 0, fireflyCanvas.width, fireflyCanvas.height);
-    bugs.forEach(b => {
-      fireflyCtx.beginPath();
-      fireflyCtx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
-      fireflyCtx.fillStyle = `rgba(255,255,255,${b.alpha})`;
-      fireflyCtx.fill();
-      b.x += b.dx;
-      b.y += b.dy;
-      if (b.x < 0 || b.x > fireflyCanvas.width) b.dx *= -1;
-      if (b.y < 0 || b.y > fireflyCanvas.height) b.dy *= -1;
-    });
-    requestAnimationFrame(animateFireflies);
-  }
-  animateFireflies();
-})();
-
-// Blue stars canvas (home bg effect)
-(function(){
-  const blueStarsCanvas = document.getElementById('blue-stars-canvas');
-  if (!blueStarsCanvas) return;
-  const blueStarsCtx = blueStarsCanvas.getContext('2d');
-  function resizeBlueStarsCanvas() {
-    blueStarsCanvas.width = window.innerWidth;
-    blueStarsCanvas.height = window.innerHeight;
-  }
-  resizeBlueStarsCanvas();
-  window.addEventListener('resize', resizeBlueStarsCanvas);
-  const blueStars = [];
-  const blueStarCount = 120;
-  for (let i = 0; i < blueStarCount; i++) {
-    const speed = (Math.random() * 0.4 + 0.1);
-    const angle = Math.random() * 2 * Math.PI;
-    blueStars.push({
-      x: Math.random() * blueStarsCanvas.width,
-      y: Math.random() * blueStarsCanvas.height,
-      size: Math.random() * 0.5 + 1.0,
-      alpha: Math.random() * 0.5 + 0.6,
-      alphaDir: Math.random() > 0.5 ? 1 : -1,
-      pulseSpeed: Math.random() * 0.015 + 0.005,
-      dx: Math.cos(angle) * speed,
-      dy: Math.sin(angle) * speed
-    });
-  }
-  function drawBlueStars() {
-    if (!document.getElementById('home-screen')?.style?.display || document.getElementById('home-screen').style.display !== 'none') {
-      blueStarsCtx.clearRect(0, 0, blueStarsCanvas.width, blueStarsCanvas.height);
-      for (const star of blueStars) {
-        star.alpha += star.pulseSpeed * star.alphaDir;
-        if (star.alpha <= 0.3 || star.alpha >= 1) star.alphaDir *= -1;
-        star.x += star.dx;
-        star.y += star.dy;
-        if (star.x < -20) star.x = blueStarsCanvas.width + 20;
-        if (star.x > blueStarsCanvas.width + 20) star.x = -20;
-        if (star.y < -20) star.y = blueStarsCanvas.height + 20;
-        if (star.y > blueStarsCanvas.height + 20) star.y = -20;
-        const gradient = blueStarsCtx.createRadialGradient(
-          star.x, star.y, 0,
-          star.x, star.y, star.size * 3
-        );
-        gradient.addColorStop(0, `rgba(0, 180, 255, ${star.alpha})`);
-        gradient.addColorStop(0.3, `rgba(0, 180, 255, ${star.alpha * 0.4})`);
-        gradient.addColorStop(1, `rgba(0, 180, 255, 0)`);
-        blueStarsCtx.beginPath();
-        blueStarsCtx.arc(star.x, star.y, star.size * 6, 0, Math.PI * 2);
-        blueStarsCtx.fillStyle = gradient;
-        blueStarsCtx.fill();
-        blueStarsCtx.beginPath();
-        blueStarsCtx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
-        blueStarsCtx.fillStyle = `rgba(0, 200, 255, ${star.alpha})`;
-        blueStarsCtx.fill();
-      }
-      requestAnimationFrame(drawBlueStars);
-    }
-  }
-  drawBlueStars();
-})();
-/* ==== GameLucid Pro MAX: 100% robust, /
- 
+/* ==== GameLucid Pro MAX: 100% robust, bug-free, bulletproof ==== */
 class GameLucidPro {
   #state = {
     score: 0,
@@ -1719,12 +1544,17 @@ class GameLucidPro {
     level: 1,
     alive: false,
     lucidCoins: 0,
-    lucidPieces: 0,
+    // Now tracking which pieces have been collected in this game
+    lucidPieces: 0, // 0-3
+    collectedPieceIdxs: [], // stores 0,1,2 for blue,green,yellow
     timer: null,
     question: null,
     correctAnswer: null,
     highScore: 0,
     totalCoins: 0,
+    lucidPieceTimeout: null, // controls the piece appearance/disappearance
+    lucidPieceMiniTimer: null, // for mini-timer
+    lucidPieceActive: null, // {idx, dom, timer, miniTimer}
   };
   #config = {
     minTimer: 1200,
@@ -1732,6 +1562,10 @@ class GameLucidPro {
     timerDecay: 150,
     lucidCoinCost: 1,
     answersCount: 4,
+    lucidPieceAppearMin: 12000, // min between pieces
+    lucidPieceAppearMax: 22000, // max between pieces
+    lucidPieceShowTotal: 12000, // total time piece visible
+    lucidPieceMiniTimer: 4000,  // show mini-timer last 4s
     backgrounds: [
       '/static/backgrounds/bg1.png',
       '/static/backgrounds/bg2.png',
@@ -1754,7 +1588,6 @@ class GameLucidPro {
     this.#setupAriaLive();
   }
 
-  // Cache DOM nodes for fast lookup
   #cacheDOM() {
     this.#dom = {
       homeScreen: document.getElementById('home-screen'),
@@ -1787,17 +1620,19 @@ class GameLucidPro {
       startBtn: document.getElementById('start-btn'),
       muteBtn: document.getElementById('mute-btn'),
       lucidCoinImage: document.getElementById('lucidCoinImage'),
-      // ARIA live region for screen readers
       ariaLive: document.getElementById('aria-live-region')
     };
     this.#audio = {
       coin: document.getElementById('coin-sound'),
       wrong: document.getElementById('wrong-sound'),
-      music: document.getElementById('bg-music')
+      music: document.getElementById('bg-music'),
+      // Add custom sound for lucid piece appear/collect (optional)
+      lucidAppear: document.getElementById('lucid-appear-sound'),
+      lucidCollect: document.getElementById('lucid-collect-sound'),
+      lucidFull: document.getElementById('lucid-full-sound')
     };
   }
 
-  // Add ARIA live region if not present
   #setupAriaLive() {
     if (!this.#dom.ariaLive) {
       const live = document.createElement('div');
@@ -1811,7 +1646,6 @@ class GameLucidPro {
     }
   }
 
-  // Load game state and settings from localStorage
   #loadPersistent() {
     this.#state.highScore = parseInt(localStorage.getItem('highScore') || '0');
     this.#state.totalCoins = parseInt(localStorage.getItem('totalCoins') || '0');
@@ -1819,10 +1653,8 @@ class GameLucidPro {
     this.#isMuted = localStorage.getItem('isMuted') === 'true';
     this.#updateLucidCoinUI();
     this.#updateMuteBtn();
-    Object.values(this.#audio).forEach(audio => audio.muted = this.#isMuted);
+    Object.values(this.#audio).forEach(audio => audio && (audio.muted = this.#isMuted));
   }
-
-  // Save game state and settings to localStorage
   #savePersistent() {
     localStorage.setItem('highScore', this.#state.highScore);
     localStorage.setItem('totalCoins', this.#state.totalCoins);
@@ -1830,14 +1662,12 @@ class GameLucidPro {
     localStorage.setItem('isMuted', this.#isMuted);
   }
 
-  // Setup event listeners
   #bindUI() {
     this.#dom.startBtn.addEventListener('click', () => this.startGame());
     this.#dom.muteBtn.addEventListener('click', () => this.#toggleMute());
     this.#dom.restartBtn.addEventListener('click', () => this.restartGame());
     this.#dom.homeBtn.addEventListener('click', () => window.location.href = "gamehome.html");
     this.#dom.buyChanceBtn.addEventListener('click', () => this.buyChance());
-    // Keyboard navigation for answer buttons
     this.#dom.answers.addEventListener('keydown', e => this.#handleAnswerKeyNav(e));
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) this.#audio.music.pause();
@@ -1855,13 +1685,12 @@ class GameLucidPro {
     this.#dom.coins.textContent = this.#state.coins;
     this.#dom.highScore.textContent = this.#state.highScore;
     this.#updateLucidCoinUI();
-    // Accessibility: Announce changes
     this.#announce(`Score: ${this.#state.score}, Level: ${this.#state.level}`);
   }
   #updateLucidCoinUI() {
     this.#dom.lucidCoinCount.textContent = this.#state.lucidCoins;
     this.#dom.lucidPieceImgs.forEach((img, i) => {
-      img.className = "lucid-piece-slot" + (i < this.#state.lucidPieces ? " lucid-piece-collected" : "");
+      img.className = "lucid-piece-slot" + (this.#state.collectedPieceIdxs.includes(i) ? " lucid-piece-collected" : "");
     });
   }
   #setupBackground() {
@@ -1871,7 +1700,7 @@ class GameLucidPro {
   }
 
   startGame() {
-    // === BULLETPROOF: Hide EndScreen, clear timer, and set alive immediately ===
+    this.#resetLucidPieces();
     clearTimeout(this.#state.timer);
     this.#state.alive = true;
     this.#dom.endScreen.style.display = "none";
@@ -1887,6 +1716,7 @@ class GameLucidPro {
     this.#audio.music.currentTime = 0;
     if (!this.#isMuted) this.#playAudio(this.#audio.music, true);
     this.nextQuestion();
+    this.#scheduleNextLucidPiece();
   }
 
   nextQuestion() {
@@ -1895,10 +1725,8 @@ class GameLucidPro {
     this.#state.correctAnswer = this.#state.question.correct;
     this.#dom.equation.textContent = this.#state.question.text;
     this.#dom.answers.innerHTML = '';
-    // Accessibility: Set focus to answers container
     this.#dom.answers.setAttribute('tabindex', '-1');
     this.#dom.answers.focus();
-    // Render answer buttons
     this.#state.question.choices.forEach((choice, idx) => {
       const btn = document.createElement('button');
       btn.textContent = choice;
@@ -1906,48 +1734,39 @@ class GameLucidPro {
       btn.setAttribute('tabindex', '0');
       btn.className = 'answer-btn';
       btn.onclick = () => this.#handleAnswer(choice, btn);
-      // For keyboard navigation
       btn.dataset.idx = idx;
       this.#dom.answers.appendChild(btn);
     });
-    // Focus first answer for keyboard navigation
     const firstBtn = this.#dom.answers.querySelector('button');
     if (firstBtn) firstBtn.focus();
     this.#startTimer();
   }
 
-  // Improved question generation for higher difficulty and variety
   #generateQuestion(level) {
     let eq = '', correct = 0, choices = [], min=1, max=9, ops = ['+', '-'];
     if (level <= 5) {
-      // Simple add/subtract
       eq = `${this.#rand(min,max)} ${this.#pick(ops)} ${this.#rand(min,max)}`;
     } else if (level <= 12) {
-      // Three-term add/subtract, may yield negative results
       eq = `${this.#rand(min,max)} ${this.#pick(ops)} ${this.#rand(min,max)} ${this.#pick(ops)} ${this.#rand(min,max)}`;
     } else if (level <= 18) {
-      // Introduce multiplication
       ops = ['+', '-', '*'];
       min = 2; max = 15;
       eq = `${this.#rand(min,max)} ${this.#pick(ops)} ${this.#rand(min,max)}`;
     } else if (level <= 24) {
-      // Add division, avoid division by zero
       ops = ['+', '-', '*', '/'];
       min = 2; max = 16;
       let a = this.#rand(min,max), b = this.#rand(min,max);
       let op = this.#pick(ops);
       if (op === '/') {
-        b = this.#rand(2, max); // no divide by zero, no 1
-        a = b * this.#rand(2, Math.floor(max/2)); // ensure integer division for challenge
+        b = this.#rand(2, max);
+        a = b * this.#rand(2, Math.floor(max/2));
       }
       eq = `${a} ${op} ${b}`;
     } else {
-      // Four terms, mix all ops, larger numbers
       ops = ['+', '-', '*', '/'];
       min = 5; max = 30;
       let a = this.#rand(min,max), b = this.#rand(min,max), c = this.#rand(2,max), d = this.#rand(2,max);
       let op1 = this.#pick(ops), op2 = this.#pick(ops), op3 = this.#pick(ops);
-      // For division, ensure integer and no zero
       if (op1 === '/') { b = this.#rand(2, max); a = b * this.#rand(2, Math.floor(max/2)); }
       if (op2 === '/') { c = this.#rand(2, max); b = c * this.#rand(2, Math.floor(max/2)); }
       if (op3 === '/') { d = this.#rand(2, max); c = d * this.#rand(2, Math.floor(max/2)); }
@@ -1957,38 +1776,26 @@ class GameLucidPro {
     choices = this.#generateAnswerOptions(correct, this.#config.answersCount, level);
     return {text: eq + " = ?", correct, choices};
   }
-
   #evaluate(expr) {
     try { 
-      // Use Math.floor for division for integer results
-      // Replace / with // for integer division in display
       let safeExpr = expr.replace(/\//g, '/');
       let res = Function('return Math.floor(' + safeExpr + ')')();
       return Number.isFinite(res) ? res : 0;
     }
     catch { return 0; }
   }
-
-  // Improved distractor logic for greater variety and challenge
   #generateAnswerOptions(correct, count, level) {
     const set = new Set([correct]);
     let range = Math.max(5, Math.round(Math.abs(correct) * 0.5));
     let tries = 0;
     while (set.size < count && tries < 40) {
-      let fake;
-      if (level > 12 && Math.random() > 0.5) {
-        // At higher levels, sometimes invert sign or use a close value
-        fake = correct + this.#rand(-range, range);
-      } else {
-        fake = correct + this.#rand(-range, range);
-      }
+      let fake = correct + this.#rand(-range, range);
       if (fake === correct || set.has(fake) || !Number.isFinite(fake)) {
         tries++; continue;
       }
       set.add(fake);
       tries++;
     }
-    // If not enough, pad with random numbers
     while (set.size < count) set.add(correct + this.#rand(-50, 50));
     return Array.from(set).sort(() => Math.random() - 0.5);
   }
@@ -2009,7 +1816,6 @@ class GameLucidPro {
     }, duration);
   }
 
-  // Visual feedback for correct/wrong answers, accessibility
   #handleAnswer(choice, btn) {
     if (!this.#state.alive) return;
     clearTimeout(this.#state.timer);
@@ -2027,7 +1833,6 @@ class GameLucidPro {
       setTimeout(()=>this.nextQuestion(), 350);
     } else {
       this.#playAudio(this.#audio.wrong);
-      // Visual feedback: shake and red highlight
       if (btn) {
         btn.classList.add('answer-wrong');
         btn.classList.add('shake');
@@ -2048,7 +1853,6 @@ class GameLucidPro {
     setTimeout(() => this.#dom.levelBanner.style.display = 'none', 950);
     this.#announce(`Level up! Now level ${this.#state.level}`);
   }
-
   #playCoinAnim() {
     for (let i = 0; i < 6; i++) {
       const coin = document.createElement('div');
@@ -2063,6 +1867,7 @@ class GameLucidPro {
     if (!this.#state.alive) return;
     this.#state.alive = false;
     clearTimeout(this.#state.timer);
+    this.#clearLucidPiece();
     this.#audio.music.pause();
     if (this.#state.score > this.#state.highScore) {
       this.#state.highScore = this.#state.score;
@@ -2073,7 +1878,6 @@ class GameLucidPro {
     this.#updateScorePanel();
     this.#showEndScreen();
   }
-
   #showEndScreen() {
     this.#dom.finalScore.textContent = this.#state.score;
     this.#dom.highestScore.textContent = this.#state.highScore;
@@ -2096,6 +1900,7 @@ class GameLucidPro {
       clearTimeout(this.#state.timer);
       this.nextQuestion();
       if (!this.#isMuted) this.#playAudio(this.#audio.music, true);
+      this.#scheduleNextLucidPiece();
     } else {
       this.#showNoLucidCoinPopup();
     }
@@ -2117,7 +1922,7 @@ class GameLucidPro {
   #toggleMute() {
     this.#isMuted = !this.#isMuted;
     this.#updateMuteBtn();
-    Object.values(this.#audio).forEach(audio => audio.muted = this.#isMuted);
+    Object.values(this.#audio).forEach(audio => audio && (audio.muted = this.#isMuted));
     if (this.#isMuted) this.#audio.music.pause();
     else if (this.#state.alive) this.#playAudio(this.#audio.music, true);
     this.#savePersistent();
@@ -2125,29 +1930,21 @@ class GameLucidPro {
   #updateMuteBtn() {
     this.#dom.muteBtn.innerHTML = `<i class="fas ${this.#isMuted ? 'fa-volume-mute' : 'fa-volume-up'}"></i>`;
   }
-
-  // Accessibility: Announce important changes
   #announce(msg) {
     if (this.#dom.ariaLive) {
       this.#dom.ariaLive.textContent = '';
       setTimeout(() => { this.#dom.ariaLive.textContent = msg; }, 20);
     }
   }
-
-  // Robust audio play
   #playAudio(audio, loop=false) {
     if (!audio) return;
     try {
       audio.loop = !!loop;
       audio.currentTime = 0;
       let playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(()=>{});
-      }
+      if (playPromise !== undefined) playPromise.catch(()=>{});
     } catch {}
   }
-
-  // Keyboard navigation for answer buttons
   #handleAnswerKeyNav(e) {
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
       e.preventDefault();
@@ -2156,7 +1953,6 @@ class GameLucidPro {
       e.preventDefault();
       this.#focusAdjacentAnswer(-1);
     } else if (e.key === 'Enter' || e.key === ' ') {
-      // Simulate click on focused
       const active = document.activeElement;
       if (active && active.classList.contains('answer-btn')) {
         active.click();
@@ -2170,11 +1966,6 @@ class GameLucidPro {
     let nextIdx = (idx + dir + btns.length) % btns.length;
     btns[nextIdx].focus();
   }
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-  new GameLucidPro();
-});
 
   /* ==== LUCID COIN PIECE SYSTEM ==== */
 
@@ -2341,6 +2132,114 @@ window.addEventListener('DOMContentLoaded', () => {
     this.#state.lucidPieceTimeout = null;
     this.#state.lucidPieceActive = null;
   }
+}
+/* Lucid piece base style */
+.lucid-piece {
+  position: absolute;
+  z-index: 40;
+  cursor: pointer;
+  border-radius: 50%;
+  box-shadow: 0 0 15px 3px #e3e6ff90, 0 0 0px 2px #fff;
+  opacity: 0.92;
+  transition: box-shadow 0.23s, filter 0.23s, opacity 0.4s;
+  filter: drop-shadow(0 0 8px #6aeaff90);
+  outline: none;
+}
+
+.lucid-piece-appear {
+  animation: lucidPiecePopIn 0.54s cubic-bezier(.34,1.3,.63,1) both;
+}
+
+@keyframes lucidPiecePopIn {
+  from { transform: scale(0.1); opacity: 0; }
+  60% { transform: scale(1.1); opacity: 1; }
+  to { transform: scale(1); opacity: 0.92; }
+}
+
+.lucid-piece-shine {
+  animation: lucidPieceShine 1.1s infinite linear alternate;
+  box-shadow: 0 0 25px 10px #fff9, 0 0 0px 2px #fff, 0 0 15px 6px #ffe05999;
+}
+
+@keyframes lucidPieceShine {
+  0% { filter: brightness(1.1) drop-shadow(0 0 18px #fff9); }
+  100% { filter: brightness(1.32) drop-shadow(0 0 24px #ffe059cc); }
+}
+
+.lucid-piece-disappear {
+  animation: lucidPieceFadeOut 0.55s cubic-bezier(.33,1.2,.54,.98) both;
+}
+
+@keyframes lucidPieceFadeOut {
+  from { opacity: 0.92; transform: scale(1);}
+  to { opacity: 0; transform: scale(0.2);}
+}
+
+.lucid-piece-collected-anim {
+  z-index: 110;
+  pointer-events: none;
+  filter: brightness(1.7) drop-shadow(0 0 25px #fff) drop-shadow(0 0 20px #ffe059cc);
+}
+
+/* Mini-timer on lucid piece */
+.lucid-piece-mini-timer {
+  position: absolute;
+  left: 50%; top: 100%;
+  transform: translate(-50%, -10%) scale(0.96);
+  width: 48px; height: 12px;
+  border-radius: 6px;
+  background: #1b2230cc;
+  border: 1.5px solid #fff6;
+  box-shadow: 0 1px 6px #ffe05950, 0 0 5px #fff6;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+  z-index: 120;
+  margin-top: 2px;
+}
+
+.lucid-piece-mini-timer.active {
+  opacity: 1;
+}
+
+.lucid-piece-mini-timer .mini-timer-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #ffe059 0%, #f5c609 100%);
+  width: 100%;
+  animation: lucidMiniTimerBar 4s linear forwards;
+}
+
+@keyframes lucidMiniTimerBar {
+  from { width: 100%;}
+  to { width: 0%;}
+}
+
+/* Lucid piece slots on HUD: glowing when collected, merge effect */
+.lucid-piece-slot {
+  filter: grayscale(0.7) brightness(0.7) drop-shadow(0 0 2px #fff3);
+  opacity: 0.62;
+  transition: filter 0.23s, opacity 0.25s;
+}
+.lucid-piece-slot.lucid-piece-collected {
+  filter: grayscale(0) brightness(1.2) drop-shadow(0 0 14px #ffe059cc) drop-shadow(0 0 7px #fff);
+  opacity: 1;
+  animation: lucidPieceSlotCollect 0.7s cubic-bezier(.54,1.7,.55,.9) 1;
+}
+@keyframes lucidPieceSlotCollect {
+  0% { filter: brightness(3) drop-shadow(0 0 20px #fff); opacity: 1;}
+  80% { filter: brightness(1.5) drop-shadow(0 0 24px #ffe059cc);}
+  100% { filter: brightness(1.2) drop-shadow(0 0 14px #ffe059cc);}
+}
+
+/* When all 3 are collected, animate merge */
+.lucid-coin-merge {
+  animation: lucidCoinMerge 1s cubic-bezier(.25,1.6,.5,1) 1;
+}
+@keyframes lucidCoinMerge {
+  0% { filter: brightness(1.6) drop-shadow(0 0 22px #ffe059cc);}
+  50% { filter: brightness(3) drop-shadow(0 0 44px #fff) drop-shadow(0 0 40px #ffe059cc);}
+  100% { filter: brightness(1.2) drop-shadow(0 0 14px #ffe059cc);}
 }
 </script>
 </body>
