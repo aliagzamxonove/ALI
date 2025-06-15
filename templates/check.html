@@ -1536,25 +1536,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   );
 });
-
-window.addEventListener('DOMContentLoaded', () => {
-  const loadingOverlay = document.getElementById('loading-overlay');
-  const loadingText = document.getElementById('loading-text');
-  const spinnerFill = document.getElementById('loading-spinner-fill');
-  preloadAssets(GAME_ASSETS,
-    percent => {
-      loadingText.textContent = `${percent}%`;
-      // Animate spinner: 0% = 0deg, 100% = 360deg
-      spinnerFill.style.transform = `rotate(${(percent/100)*360 - 90}deg)`;
-    },
-    () => {
-      loadingOverlay.classList.add('fade-out');
-      setTimeout(() => loadingOverlay.remove(), 1000);
-      // Now start your game!
-      new GameLucidPro();
-    }
-  );
-});
 // Stars (звёзды)
 (function(){
   const starsCanvas = document.getElementById('stars-canvas');
