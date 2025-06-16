@@ -2205,6 +2205,19 @@ if (this.#state.lucidPieceActive) {
     audio.play().catch(() => {});
   }
 }
+function updateHomeInfoFromStorage() {
+  const highScore = +localStorage.getItem('highScore') || 0;
+  const totalCoins = +localStorage.getItem('totalCoins') || 0;
+
+  const homeHighScoreEl = document.getElementById('home-high-score');
+  const homeCoinsEl = document.getElementById('home-coins');
+
+  if (homeHighScoreEl) homeHighScoreEl.textContent = highScore;
+  if (homeCoinsEl) homeCoinsEl.textContent = totalCoins;
+}
+
+// вызови при старте или при возврате домой
+updateHomeInfoFromStorage();
 
 // Инициализация
 window.addEventListener('DOMContentLoaded', () => {
