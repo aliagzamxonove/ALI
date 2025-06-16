@@ -502,22 +502,26 @@ header {
         { img: '/static/house4.png', title: "SkyStack", icon: '<i class="fas fa-layer-group"></i>', link: '', price: 2000 },
         { img: '/static/house5.png', title: "MindTwist", icon: '<i class="fas fa-brain"></i>', link: '', price: 3500 }
       ];
-      let unlocked = JSON.parse(localStorage.getItem('lucid_unlocked_games') || '[true,false,false,false,false]');
-      unlocked[0] = true;
-      let coins = +localStorage.getItem('lucid_coins') || 500;
-      let highScore = +localStorage.getItem('lucid_highscore') || 0;
-      let lucidCoin = +localStorage.getItem('lucid_lucidcoin') || 0;
-      let pieces = JSON.parse(localStorage.getItem('lucid_pieces') || '[false,false,false]');
-      let selectedIdx = 0;
-      const $coin = document.getElementById('coinCount');
-      const $highScore = document.getElementById('highScore');
-      const $lucidCoin = document.getElementById('lucidCoinCount');
-      const $pieceImgs = [1,2,3].map(i=>document.getElementById('piece'+i));
-      const $carouselTrack = document.getElementById('carouselTrack');
-      const $carouselInner = document.getElementById('carouselInner');
-      const $arrowL = document.getElementById('arrowLeft');
-      const $arrowR = document.getElementById('arrowRight');
-      const $playBtn = document.getElementById('playGameBtn');
+let unlocked = JSON.parse(localStorage.getItem('lucidUnlockedGames') || '[true,false,false,false,false]');
+unlocked[0] = true;
+
+let coins = +localStorage.getItem('totalCoins') || 500;
+let highScore = +localStorage.getItem('highScore') || 0;
+let lucidCoin = +localStorage.getItem('lucidCoins') || 0;
+let pieces = JSON.parse(localStorage.getItem('lucidPieces') || '[false,false,false]');
+
+let selectedIdx = 0;
+
+const $coin = document.getElementById('coinCount');
+const $highScore = document.getElementById('highScore');
+const $lucidCoin = document.getElementById('lucidCoinCount');
+const $pieceImgs = [1, 2, 3].map(i => document.getElementById('piece' + i));
+
+const $carouselTrack = document.getElementById('carouselTrack');
+const $carouselInner = document.getElementById('carouselInner');
+const $arrowL = document.getElementById('arrowLeft');
+const $arrowR = document.getElementById('arrowRight');
+const $playBtn = document.getElementById('playGameBtn');
 
       function getSidePaddingPx() {
         const style = getComputedStyle($carouselInner);
