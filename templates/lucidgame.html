@@ -977,11 +977,10 @@ body {
   position: fixed;
   z-index: 1999;
 
-  /* Адаптивный размер с ограничениями */
-  width: clamp(20px, 7.5vw, 38px);
-  height: clamp(20px, 7.5vw, 38px);
+  /* Coin-sized dimensions with responsive scaling */
+  width: clamp(16px, 4.5vw, 26px);
+  height: clamp(16px, 4.5vw, 26px);
 
-  /* Начальный стиль */
   pointer-events: none;
   animation:
     lucid-fall 2.5s ease-in forwards,
@@ -1024,8 +1023,8 @@ body {
 /* Меньшие размеры на сверхмалых экранах */
 @media (max-width: 400px) {
   .lucid-piece-falling {
-    width: clamp(18px, 8vw, 26px);
-    height: clamp(18px, 8vw, 26px);
+    width: clamp(14px, 6vw, 22px);
+    height: clamp(14px, 6vw, 22px);
   }
 }
 
