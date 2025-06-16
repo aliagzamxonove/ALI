@@ -1769,6 +1769,8 @@ window.addEventListener('DOMContentLoaded', () => {
   }
   drawBlueStars();
 })();
+  const GAME_ID = "mathgame"; // <-- Заменяй это на уникальный ID каждой игры
+
 class GameLucidPro {
   #state = {
     score: 0,
@@ -1827,20 +1829,20 @@ class GameLucidPro {
     };
   }
 
-  #loadPersistent() {
-    this.#state.highScore = +localStorage.getItem('highScore') || 0;
-    this.#state.totalCoins = +localStorage.getItem('totalCoins') || 0;
-    this.#state.lucidCoins = +localStorage.getItem('lucidCoins') || 2;
-    this.#isMuted = localStorage.getItem('isMuted') === 'true';
-    Object.values(this.#audio).forEach(a => a && (a.muted = this.#isMuted));
-  }
+#loadPersistent() {
+  this.#state.highScore = +localStorage.getItem(`highScore_${GAME_ID}`) || 0;
+  this.#state.totalCoins = +localStorage.getItem('totalCoins') || 0;
+  this.#state.lucidCoins = +localStorage.getItem('lucidCoins') || 2;
+  this.#isMuted = localStorage.getItem('isMuted') === 'true';
+  Object.values(this.#audio).forEach(a => a && (a.muted = this.#isMuted));
+}
 
-  #savePersistent() {
-    localStorage.setItem('highScore', this.#state.highScore);
-    localStorage.setItem('totalCoins', this.#state.totalCoins);
-    localStorage.setItem('lucidCoins', this.#state.lucidCoins);
-    localStorage.setItem('isMuted', this.#isMuted);
-  }
+#savePersistent() {
+  localStorage.setItem(`highScore_${GAME_ID}`, this.#state.highScore);
+  localStorage.setItem('totalCoins', this.#state.totalCoins);
+  localStorage.setItem('lucidCoins', this.#state.lucidCoins);
+  localStorage.setItem('isMuted', this.#isMuted);
+}
 
   #bindUI() {
     this.#dom.startBtn.onclick = () => this.startGame();
