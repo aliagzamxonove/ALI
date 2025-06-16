@@ -1484,12 +1484,12 @@ const GAME_ASSETS = [
   '/static/lucid_piece1.png',
   '/static/lucid_piece2.png',
   '/static/lucid_piece3.png',
-  '/static/coin.mp3',
-  '/static/wrong.mp3',
-  '/static/bg-music.mp3',
-  '/static/lucid-appear.mp3',
-  '/static/lucid-collect.mp3',
-  '/static/lucid-full.mp3'
+  '/static/audio/coin.wav',
+  '/static/audio/wrong.wav',
+  '/static/audio/menu-loop.mp3.mp3',
+  '/static/audio/lucid-appear.mp3',
+  '/static/audio/lucid-collect.mp3',
+  '/static/audio/lucid-full.mp3'
 ];
 
 function preloadAssets(assetList, onProgress, onComplete) {
@@ -1729,125 +1729,72 @@ window.addEventListener('DOMContentLoaded', () => {
   }
   drawBlueStars();
 })();
-/* ==== GameLucid Pro MAX: 100% robust, bug-free, bulletproof ==== */
 class GameLucidPro {
   #state = {
     score: 0,
     coins: 0,
     level: 1,
     alive: false,
-    lucidCoins: 0,
-    // Now tracking which pieces have been collected in this game
-    lucidPieces: 0, // 0-3
-    collectedPieceIdxs: [], // stores 0,1,2 for blue,green,yellow
     timer: null,
-    question: null,
-    correctAnswer: null,
-    highScore: 0,
-    totalCoins: 0,
-    lucidPieceTimeout: null, // controls the piece appearance/disappearance
-    lucidPieceMiniTimer: null, // for mini-timer
-    lucidPieceActive: null, // {idx, dom, timer, miniTimer}
+    timerId: 0,
+    currentTimerId: 0,
+    lucidCoins: 0,
+    lucidPieces: 0,
+    collectedPieceIdxs: [],
+    lucidPieceTimeout: null,
+    lucidPieceActive: null
   };
   #config = {
-    minTimer: 1200,
-    baseTimer: 3500,
-    timerDecay: 150,
-    lucidCoinCost: 1,
-    answersCount: 4,
-    lucidPieceAppearMin: 12000, // min between pieces
-    lucidPieceAppearMax: 22000, // max between pieces
-    lucidPieceShowTotal: 12000, // total time piece visible
-    lucidPieceMiniTimer: 4000,  // show mini-timer last 4s
-    backgrounds: [
-      '/static/backgrounds/bg1.png',
-      '/static/backgrounds/bg2.png',
-      '/static/backgrounds/bg3.png',
-      '/static/backgrounds/bg4.png',
-      '/static/backgrounds/bg5.png'
-    ]
+    minTimer: 1200, baseTimer: 3500, timerDecay: 150,
+    lucidCoinCost: 1, answersCount: 4,
+    lucidPieceAppearMin: 12000, lucidPieceAppearMax: 22000,
+    lucidPieceShowTotal: 12000, lucidPieceMiniTimer: 4000
   };
-  #dom = {};
-  #audio = {};
-  #isMuted = false;
+  #dom = {}; #audio = {}; #isMuted = false;
 
   constructor() {
     this.#cacheDOM();
     this.#loadPersistent();
     this.#bindUI();
-    this.#setupBackground();
-    this.#updateHomeScreen();
-    this.#updateScorePanel();
     this.#setupAriaLive();
+    this.#updateHomeScreen();
   }
 
   #cacheDOM() {
+    const $ = id => document.getElementById(id);
     this.#dom = {
-      homeScreen: document.getElementById('home-screen'),
-      gameScreen: document.getElementById('game-screen'),
-      gameContainer: document.getElementById('game-container'),
-      equation: document.getElementById('equation'),
-      answers: document.getElementById('answers'),
-      timerBar: document.getElementById('timer-bar'),
-      timerFill: document.getElementById('timer-fill'),
-      levelBanner: document.getElementById('level-up-banner'),
-      scorePanel: document.getElementById('score-panel'),
-      score: document.getElementById('score'),
-      coins: document.getElementById('coins'),
-      highScore: document.getElementById('high-score'),
-      lucidPanel: document.getElementById('lucid-panel'),
-      lucidCoinCount: document.getElementById('lucidCoinCount'),
-      lucidPieceImgs: [
-        document.getElementById('lucidPieceImg1'),
-        document.getElementById('lucidPieceImg2'),
-        document.getElementById('lucidPieceImg3')
-      ],
-      homeHighScore: document.getElementById('home-high-score'),
-      homeCoins: document.getElementById('home-coins'),
-      endScreen: document.getElementById('end-screen'),
-      finalScore: document.getElementById('final-score'),
-      highestScore: document.getElementById('highest-score'),
-      buyChanceBtn: document.getElementById('buy-chance-btn'),
-      restartBtn: document.getElementById('restart-btn'),
-      homeBtn: document.getElementById('home-btn'),
-      startBtn: document.getElementById('start-btn'),
-      muteBtn: document.getElementById('mute-btn'),
-      lucidCoinImage: document.getElementById('lucidCoinImage'),
-      ariaLive: document.getElementById('aria-live-region')
+      homeScreen: $('home-screen'), gameScreen: $('game-screen'),
+      gameContainer: $('game-container'), equation: $('equation'),
+      answers: $('answers'), timerFill: $('timer-fill'),
+      levelBanner: $('level-up-banner'), scorePanel: $('score-panel'),
+      score: $('score'), coins: $('coins'), highScore: $('high-score'),
+      lucidPanel: $('lucid-panel'), lucidCoinCount: $('lucidCoinCount'),
+      lucidPieceImgs: [ $('lucidPieceImg1'), $('lucidPieceImg2'), $('lucidPieceImg3') ],
+      homeHighScore: $('home-high-score'), homeCoins: $('home-coins'),
+      endScreen: $('end-screen'), finalScore: $('final-score'),
+      highestScore: $('highest-score'), buyChanceBtn: $('buy-chance-btn'),
+      restartBtn: $('restart-btn'), homeBtn: $('home-btn'),
+      startBtn: $('start-btn'), muteBtn: $('mute-btn'),
+      ariaLive: $('aria-live-region')
     };
+     
     this.#audio = {
-      coin: document.getElementById('coin-sound'),
-      wrong: document.getElementById('wrong-sound'),
-      music: document.getElementById('bg-music'),
-      // Add custom sound for lucid piece appear/collect (optional)
-      lucidAppear: document.getElementById('lucid-appear-sound'),
-      lucidCollect: document.getElementById('lucid-collect-sound'),
-      lucidFull: document.getElementById('lucid-full-sound')
+      coin: $('coin-sound'), wrong: $('wrong-sound'),
+      music: $('bg-music'),
+      lucidAppear: $('lucid-appear-sound'),
+      lucidCollect: $('lucid-collect-sound'),
+      lucidFull: $('lucid-full-sound')
     };
-  }
-
-  #setupAriaLive() {
-    if (!this.#dom.ariaLive) {
-      const live = document.createElement('div');
-      live.id = 'aria-live-region';
-      live.setAttribute('aria-live', 'polite');
-      live.setAttribute('role', 'status');
-      live.style.position = 'absolute';
-      live.style.left = '-9999px';
-      document.body.appendChild(live);
-      this.#dom.ariaLive = live;
-    }
   }
 
   #loadPersistent() {
-    this.#state.highScore = parseInt(localStorage.getItem('highScore') || '0');
-    this.#state.totalCoins = parseInt(localStorage.getItem('totalCoins') || '0');
-    this.#state.lucidCoins = parseInt(localStorage.getItem('lucidCoins') || '2');
+    this.#state.highScore = +localStorage.getItem('highScore') || 0;
+    this.#state.totalCoins = +localStorage.getItem('totalCoins') || 0;
+    this.#state.lucidCoins = +localStorage.getItem('lucidCoins') || 2;
     this.#isMuted = localStorage.getItem('isMuted') === 'true';
-    this.#updateLucidCoinUI();
-    this.#updateMuteBtn();
-    Object.values(this.#audio).forEach(audio => audio && (audio.muted = this.#isMuted));
+    Object.values(this.#audio).forEach(a => a && (a.muted = this.#isMuted));
   }
+
   #savePersistent() {
     localStorage.setItem('highScore', this.#state.highScore);
     localStorage.setItem('totalCoins', this.#state.totalCoins);
@@ -1856,56 +1803,43 @@ class GameLucidPro {
   }
 
   #bindUI() {
-    this.#dom.startBtn.addEventListener('click', () => this.startGame());
-    this.#dom.muteBtn.addEventListener('click', () => this.#toggleMute());
-    this.#dom.restartBtn.addEventListener('click', () => this.restartGame());
-    this.#dom.homeBtn.addEventListener('click', () => window.location.href = "gamehome.html");
-    this.#dom.buyChanceBtn.addEventListener('click', () => this.buyChance());
+    this.#dom.startBtn.onclick = () => this.startGame();
+    this.#dom.restartBtn.onclick = () => this.restartGame();
+    this.#dom.buyChanceBtn.onclick = () => this.buyChance();
+    this.#dom.homeBtn.onclick = () => (window.location.href = 'gamehome');
+    this.#dom.muteBtn.onclick = () => this.#toggleMute();
     this.#dom.answers.addEventListener('keydown', e => this.#handleAnswerKeyNav(e));
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) this.#audio.music.pause();
-      else if (!this.#isMuted && this.#state.alive) this.#audio.music.play().catch(()=>{});
-    });
+    this.#dom.playAgainBtn.onclick = () => this.startGame();
+    this.#dom.startGameBtn.onclick = () => this.startGame();
   }
 
-  #updateHomeScreen() {
-    this.#dom.homeHighScore.textContent = this.#state.highScore;
-    this.#dom.homeCoins.textContent = this.#state.totalCoins;
-    this.#updateLucidCoinUI();
-  }
-  #updateScorePanel() {
-    this.#dom.score.textContent = this.#state.score;
-    this.#dom.coins.textContent = this.#state.coins;
-    this.#dom.highScore.textContent = this.#state.highScore;
-    this.#updateLucidCoinUI();
-    this.#announce(`Score: ${this.#state.score}, Level: ${this.#state.level}`);
-  }
-  #updateLucidCoinUI() {
-    this.#dom.lucidCoinCount.textContent = this.#state.lucidCoins;
-    this.#dom.lucidPieceImgs.forEach((img, i) => {
-      img.className = "lucid-piece-slot" + (this.#state.collectedPieceIdxs.includes(i) ? " lucid-piece-collected" : "");
-    });
-  }
-  #setupBackground() {
-    const bg = this.#config.backgrounds[Math.floor(Math.random() * this.#config.backgrounds.length)];
-    const dynamicBg = document.getElementById('dynamic-bg');
-    if (dynamicBg) dynamicBg.style.backgroundImage = `url('${bg}')`;
+  #setupAriaLive() {
+    if (!this.#dom.ariaLive) {
+      const live = document.createElement('div');
+      live.id = 'aria-live-region';
+      live.setAttribute('aria-live', 'polite');
+      live.setAttribute('role', 'status');
+      live.style.position = 'absolute'; live.style.left = '-9999px';
+      document.body.appendChild(live);
+      this.#dom.ariaLive = live;
+    }
   }
 
   startGame() {
+  
     this.#resetLucidPieces();
     clearTimeout(this.#state.timer);
+clearTimeout(this.#state.lucidPieceTimeout);
+if (this.#state.lucidPieceActive) {
+  clearTimeout(this.#state.lucidPieceActive.timer);
+  clearTimeout(this.#state.lucidPieceActive.miniTimer);
+}
     this.#state.alive = true;
-    this.#dom.endScreen.style.display = "none";
-    this.#dom.endScreen.classList.remove("active");
-    this.#state.score = 0;
-    this.#state.coins = 0;
-    this.#state.level = 1;
-    this.#state.lucidPieces = 0;
+    Object.assign(this.#state, { score: 0, coins: 0, level: 1, lucidPieces: 0, collectedPieceIdxs: [] });
     this.#updateScorePanel();
-    this.#dom.homeScreen.style.display = "none";
-    this.#dom.gameScreen.style.display = "block";
-    this.#dom.levelBanner.style.display = "none";
+    this.#dom.homeScreen.style.display = 'none';
+    this.#dom.gameScreen.style.display = 'block';
+    this.#dom.levelBanner.style.display = 'none';
     this.#audio.music.currentTime = 0;
     if (!this.#isMuted) this.#playAudio(this.#audio.music, true);
     this.nextQuestion();
@@ -1914,124 +1848,85 @@ class GameLucidPro {
 
   nextQuestion() {
     if (!this.#state.alive) return;
-    this.#state.question = this.#generateQuestion(this.#state.level);
-    this.#state.correctAnswer = this.#state.question.correct;
-    this.#dom.equation.textContent = this.#state.question.text;
+    const q = this.#generateQuestion(this.#state.level);
+    this.#state.question = q.text;
+    this.#state.correctAnswer = q.correct;
+    this.#dom.equation.textContent = q.text;
     this.#dom.answers.innerHTML = '';
     this.#dom.answers.setAttribute('tabindex', '-1');
     this.#dom.answers.focus();
-    this.#state.question.choices.forEach((choice, idx) => {
+    q.choices.forEach(c => {
       const btn = document.createElement('button');
-      btn.textContent = choice;
-      btn.setAttribute('aria-label', "Answer: " + choice);
-      btn.setAttribute('tabindex', '0');
+      btn.textContent = c;
       btn.className = 'answer-btn';
-      btn.onclick = () => this.#handleAnswer(choice, btn);
-      btn.dataset.idx = idx;
+      btn.setAttribute('aria-label', 'Answer: ' + c);
+      btn.onclick = () => this.#handleAnswer(c, btn);
       this.#dom.answers.appendChild(btn);
     });
-    const firstBtn = this.#dom.answers.querySelector('button');
-    if (firstBtn) firstBtn.focus();
+    const first = this.#dom.answers.querySelector('button');
+    if (first) first.focus();
     this.#startTimer();
   }
 
   #generateQuestion(level) {
-    let eq = '', correct = 0, choices = [], min=1, max=9, ops = ['+', '-'];
-    if (level <= 5) {
-      eq = `${this.#rand(min,max)} ${this.#pick(ops)} ${this.#rand(min,max)}`;
-    } else if (level <= 12) {
-      eq = `${this.#rand(min,max)} ${this.#pick(ops)} ${this.#rand(min,max)} ${this.#pick(ops)} ${this.#rand(min,max)}`;
-    } else if (level <= 18) {
-      ops = ['+', '-', '*'];
-      min = 2; max = 15;
-      eq = `${this.#rand(min,max)} ${this.#pick(ops)} ${this.#rand(min,max)}`;
-    } else if (level <= 24) {
-      ops = ['+', '-', '*', '/'];
-      min = 2; max = 16;
-      let a = this.#rand(min,max), b = this.#rand(min,max);
-      let op = this.#pick(ops);
-      if (op === '/') {
-        b = this.#rand(2, max);
-        a = b * this.#rand(2, Math.floor(max/2));
-      }
-      eq = `${a} ${op} ${b}`;
-    } else {
-      ops = ['+', '-', '*', '/'];
-      min = 5; max = 30;
-      let a = this.#rand(min,max), b = this.#rand(min,max), c = this.#rand(2,max), d = this.#rand(2,max);
-      let op1 = this.#pick(ops), op2 = this.#pick(ops), op3 = this.#pick(ops);
-      if (op1 === '/') { b = this.#rand(2, max); a = b * this.#rand(2, Math.floor(max/2)); }
-      if (op2 === '/') { c = this.#rand(2, max); b = c * this.#rand(2, Math.floor(max/2)); }
-      if (op3 === '/') { d = this.#rand(2, max); c = d * this.#rand(2, Math.floor(max/2)); }
-      eq = `${a} ${op1} ${b} ${op2} ${c} ${op3} ${d}`;
-    }
-    correct = this.#evaluate(eq);
-    choices = this.#generateAnswerOptions(correct, this.#config.answersCount, level);
-    return {text: eq + " = ?", correct, choices};
+    const min = 1, max = level < 10 ? 9 : 15;
+    const a = this.#rand(min, max), b = this.#rand(min, max);
+    const op = level < 5 ? this.#pick(['+', '-']) : this.#pick(['+', '-', '*']);
+    const expr = `${a} ${op} ${b}`;
+    const correct = Math.floor(eval(expr));
+    const choices = this.#generateAnswerOptions(correct, this.#config.answersCount, level);
+    return { text: expr + ' = ?', correct, choices };
   }
-  #evaluate(expr) {
-    try { 
-      let safeExpr = expr.replace(/\//g, '/');
-      let res = Function('return Math.floor(' + safeExpr + ')')();
-      return Number.isFinite(res) ? res : 0;
-    }
-    catch { return 0; }
-  }
+
   #generateAnswerOptions(correct, count, level) {
     const set = new Set([correct]);
-    let range = Math.max(5, Math.round(Math.abs(correct) * 0.5));
-    let tries = 0;
-    while (set.size < count && tries < 40) {
-      let fake = correct + this.#rand(-range, range);
-      if (fake === correct || set.has(fake) || !Number.isFinite(fake)) {
-        tries++; continue;
-      }
-      set.add(fake);
-      tries++;
+    const range = Math.max(5, Math.abs(correct) >> 1);
+    while (set.size < count) {
+      const fake = correct + this.#rand(-range, range);
+      if (Number.isFinite(fake)) set.add(fake);
     }
-    while (set.size < count) set.add(correct + this.#rand(-50, 50));
     return Array.from(set).sort(() => Math.random() - 0.5);
   }
-  #rand(a,b) { return Math.floor(Math.random()*(b-a+1))+a; }
-  #pick(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+
+  #rand(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
+  #pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
   #startTimer() {
+    this.#state.alive = true;
     clearTimeout(this.#state.timer);
-    const duration = Math.max(this.#config.minTimer, this.#config.baseTimer - this.#state.level * this.#config.timerDecay);
-    this.#dom.timerFill.style.transition = 'none';
-    this.#dom.timerFill.style.width = '100%';
-    setTimeout(() => {
-      this.#dom.timerFill.style.transition = `width ${duration}ms linear`;
-      this.#dom.timerFill.style.width = '0%';
-    }, 10);
+    const dur = Math.max(this.#config.minTimer, this.#config.baseTimer - this.#state.level * this.#config.timerDecay);
+    const F = this.#dom.timerFill;
+    F.style.transition = 'none'; F.style.width = '100%';
+    void F.offsetWidth;
+    F.style.transition = `width ${dur}ms linear`;
+    F.style.width = '0%';
+    const myId = ++this.#state.timerId;
+    this.#state.currentTimerId = myId;
     this.#state.timer = setTimeout(() => {
-      if (this.#state.alive) this.#timeOut();
-    }, duration);
+      if (this.#state.currentTimerId !== myId || !this.#state.alive) return;
+      this.#timeOut();
+    }, dur);
   }
 
   #handleAnswer(choice, btn) {
     if (!this.#state.alive) return;
     clearTimeout(this.#state.timer);
-    const isCorrect = (choice === this.#state.correctAnswer);
-    if (isCorrect) {
+    const correct = choice === this.#state.correctAnswer;
+    if (correct) {
       this.#playAudio(this.#audio.coin);
-      this.#state.score++;
-      this.#state.coins++;
+      this.#state.score++; this.#state.coins++;
       this.#state.level++;
-      if (this.#state.level % 5 === 1 && this.#state.level > 1) {
-        this.#showLevelUp();
-      }
+      if (this.#state.level % 5 === 1 && this.#state.level > 1) this.#showLevelUp();
       this.#updateScorePanel();
       this.#playCoinAnim();
-      setTimeout(()=>this.nextQuestion(), 350);
+      setTimeout(() => this.nextQuestion(), 350);
     } else {
       this.#playAudio(this.#audio.wrong);
       if (btn) {
-        btn.classList.add('answer-wrong');
-        btn.classList.add('shake');
-        setTimeout(() => { btn.classList.remove('shake'); btn.classList.remove('answer-wrong'); }, 900);
+        btn.classList.add('answer-wrong', 'shake');
+        setTimeout(() => btn.classList.remove('shake', 'answer-wrong'), 900);
       }
-      setTimeout(()=>this.#endGame(), 600);
+      setTimeout(() => this.#endGame(), 600);
     }
   }
 
@@ -2041,11 +1936,32 @@ class GameLucidPro {
     this.#endGame();
   }
 
+  #endGame() {
+    if (!this.#state.alive) return;
+    this.#state.alive = false;
+    clearTimeout(this.#state.timer);
+    this.#playAudio(this.#audio.music, false);
+    if (this.#state.score > this.#state.highScore) this.#state.highScore = this.#state.score;
+    this.#state.totalCoins += this.#state.coins;
+    this.#savePersistent();
+    this.#updateScorePanel();
+    this.#dom.finalScore.textContent = this.#state.score;
+    this.#dom.highestScore.textContent = this.#state.highScore;
+    this.#dom.endScreen.style.display = 'flex';
+    this.#dom.endScreen.classList.add('active');
+  }
+  
+    restartGame() {
+  this.#dom.endScreen.style.display = 'none';
+  this.startGame();
+}
+
   #showLevelUp() {
     this.#dom.levelBanner.style.display = 'block';
     setTimeout(() => this.#dom.levelBanner.style.display = 'none', 950);
     this.#announce(`Level up! Now level ${this.#state.level}`);
   }
+
   #playCoinAnim() {
     for (let i = 0; i < 6; i++) {
       const coin = document.createElement('div');
@@ -2056,113 +1972,7 @@ class GameLucidPro {
     }
   }
 
-  #endGame() {
-    if (!this.#state.alive) return;
-    this.#state.alive = false;
-    clearTimeout(this.#state.timer);
-    this.#clearLucidPiece();
-    this.#audio.music.pause();
-    if (this.#state.score > this.#state.highScore) {
-      this.#state.highScore = this.#state.score;
-    }
-    this.#state.totalCoins += this.#state.coins;
-    this.#savePersistent();
-    this.#updateHomeScreen();
-    this.#updateScorePanel();
-    this.#showEndScreen();
-  }
-  #showEndScreen() {
-    this.#dom.finalScore.textContent = this.#state.score;
-    this.#dom.highestScore.textContent = this.#state.highScore;
-    this.#dom.endScreen.style.display = 'flex';
-    this.#dom.endScreen.classList.add('active');
-  }
-
-  restartGame() {
-    this.startGame();
-  }
-
-  buyChance() {
-    if (this.#state.lucidCoins >= this.#config.lucidCoinCost) {
-      this.#state.lucidCoins -= this.#config.lucidCoinCost;
-      this.#savePersistent();
-      this.#updateLucidCoinUI();
-      this.#dom.endScreen.style.display = 'none';
-      this.#dom.endScreen.classList.remove("active");
-      this.#state.alive = true;
-      clearTimeout(this.#state.timer);
-      this.nextQuestion();
-      if (!this.#isMuted) this.#playAudio(this.#audio.music, true);
-      this.#scheduleNextLucidPiece();
-    } else {
-      this.#showNoLucidCoinPopup();
-    }
-  }
-  #showNoLucidCoinPopup() {
-    let popup = document.getElementById('no-lucid-coin-popup');
-    if (!popup) {
-      popup = document.createElement('div');
-      popup.id = 'no-lucid-coin-popup';
-      popup.innerHTML = `
-        <div style="margin-bottom:1em;font-size:1.12em;">Not enough <img src="/static/lucid_coin_total.png" alt="Lucid Coin" style="width:1.3em;vertical-align:middle"> Lucid Coins!</div>
-        <button onclick="this.parentNode.style.display='none'">OK</button>
-      `;
-      document.body.appendChild(popup);
-    }
-    popup.style.display = 'block';
-  }
-
-  #toggleMute() {
-    this.#isMuted = !this.#isMuted;
-    this.#updateMuteBtn();
-    Object.values(this.#audio).forEach(audio => audio && (audio.muted = this.#isMuted));
-    if (this.#isMuted) this.#audio.music.pause();
-    else if (this.#state.alive) this.#playAudio(this.#audio.music, true);
-    this.#savePersistent();
-  }
-  #updateMuteBtn() {
-    this.#dom.muteBtn.innerHTML = `<i class="fas ${this.#isMuted ? 'fa-volume-mute' : 'fa-volume-up'}"></i>`;
-  }
-  #announce(msg) {
-    if (this.#dom.ariaLive) {
-      this.#dom.ariaLive.textContent = '';
-      setTimeout(() => { this.#dom.ariaLive.textContent = msg; }, 20);
-    }
-  }
-  #playAudio(audio, loop=false) {
-    if (!audio) return;
-    try {
-      audio.loop = !!loop;
-      audio.currentTime = 0;
-      let playPromise = audio.play();
-      if (playPromise !== undefined) playPromise.catch(()=>{});
-    } catch {}
-  }
-  #handleAnswerKeyNav(e) {
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-      e.preventDefault();
-      this.#focusAdjacentAnswer(1);
-    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-      e.preventDefault();
-      this.#focusAdjacentAnswer(-1);
-    } else if (e.key === 'Enter' || e.key === ' ') {
-      const active = document.activeElement;
-      if (active && active.classList.contains('answer-btn')) {
-        active.click();
-      }
-    }
-  }
-  #focusAdjacentAnswer(dir) {
-    const btns = Array.from(this.#dom.answers.querySelectorAll('button'));
-    let idx = btns.findIndex(btn => btn === document.activeElement);
-    if (idx === -1) idx = 0;
-    let nextIdx = (idx + dir + btns.length) % btns.length;
-    btns[nextIdx].focus();
-  }
-
-  /* ==== LUCID COIN PIECE SYSTEM ==== */
-
-  // Reset lucid pieces for a new game
+  /* ==== LUCID COIN PIECE ==== */
   #resetLucidPieces() {
     this.#state.lucidPieces = 0;
     this.#state.collectedPieceIdxs = [];
@@ -2170,7 +1980,6 @@ class GameLucidPro {
     this.#clearLucidPiece();
   }
 
-  // Schedule next Lucid Piece appearance
   #scheduleNextLucidPiece() {
     this.#clearLucidPiece();
     if (!this.#state.alive || this.#state.collectedPieceIdxs.length >= 3) return;
@@ -2178,154 +1987,187 @@ class GameLucidPro {
     this.#state.lucidPieceTimeout = setTimeout(() => this.#spawnLucidPiece(), delay);
   }
 
-  // Actually spawn a Lucid Piece on the screen
   #spawnLucidPiece() {
     if (!this.#state.alive || this.#state.collectedPieceIdxs.length >= 3) return;
-    // Find what pieces remain to be collected
-    const allIdxs = [0,1,2];
-    const available = allIdxs.filter(idx => !this.#state.collectedPieceIdxs.includes(idx));
-    if (available.length === 0) return;
-    const idx = this.#pick(available); // which piece: 0=blue/top, 1=green/left, 2=yellow/bottom
-    const imgSrc = [
+    const available = [0,1,2].filter(i => !this.#state.collectedPieceIdxs.includes(i));
+    if (!available.length) return;
+    const idx = this.#pick(available);
+    const img = document.createElement('img');
+    img.src = [
       '/static/lucid_piece1.png',
       '/static/lucid_piece2.png',
       '/static/lucid_piece3.png'
     ][idx];
-    const altText = [
-      'Lucid Piece: Blue (top)',
-      'Lucid Piece: Green (left)',
-      'Lucid Piece: Yellow (bottom)'
-    ][idx];
-    // Create DOM node
-    const piece = document.createElement('img');
-    piece.src = imgSrc;
-    piece.alt = altText;
-    piece.className = 'lucid-piece lucid-piece-appear lucid-piece-' + (idx+1);
-    piece.setAttribute('tabindex', '0');
-    piece.setAttribute('aria-label', altText + ', click to collect');
-    // Random position within gameContainer (avoid edges)
-    const container = this.#dom.gameContainer;
-    const rect = container.getBoundingClientRect();
-    const size = Math.floor(rect.width * 0.12); // about 12vw
-    const pad = Math.max(size, 64); // avoid edges
-    const maxX = rect.width - pad, maxY = rect.height - pad;
-    const x = this.#rand(pad, maxX);
-    const y = this.#rand(pad, maxY);
-    piece.style.left = x + 'px';
-    piece.style.top = y + 'px';
-    piece.style.width = size + 'px';
-    piece.style.height = size + 'px';
-    // Animation: Shine, glow, scale-up
-    piece.classList.add('lucid-piece-shine');
+    img.alt = ['Blue','Green','Yellow'][idx];
+    img.className = `lucid-piece lucid-piece-${idx+1}`;
+    img.tabIndex = 0;
+    img.setAttribute('aria-label', img.alt);
+    const R = this.#dom.gameContainer.getBoundingClientRect();
+    const size = R.width * 0.12;
+    img.style.left = this.#rand(size, R.width - size) + 'px';
+    img.style.top = this.#rand(size, R.height - size) + 'px';
 
-    // Click to collect
-    const collectHandler = (ev) => {
-      ev.preventDefault();
-      this.#collectLucidPiece(idx, piece);
-    };
-    piece.addEventListener('click', collectHandler);
-    piece.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') { collectHandler(e); }
-    });
+    img.onclick = e => { e.preventDefault(); this.#collectLucidPiece(idx, img); };
+    img.onkeydown = e => { if (e.key==='Enter'||e.key===' ') this.#collectLucidPiece(idx, img); };
 
-    // Add to DOM
-    container.appendChild(piece);
-
-    // Track active piece
-    this.#state.lucidPieceActive = {idx, dom: piece, timer: null, miniTimer: null};
-    // Play appear sound if available
+    this.#dom.gameContainer.appendChild(img);
+    this.#state.lucidPieceActive = { idx, dom: img, timer: null, miniTimer: null };
     this.#playAudio(this.#audio.lucidAppear);
 
-    // Start timer: after (showTotal - miniTimer) show mini-timer, after showTotal, remove
     this.#state.lucidPieceActive.timer = setTimeout(() => {
-      this.#showLucidPieceMiniTimer(piece, idx);
+      this.#showLucidPieceMiniTimer(img);
       this.#state.lucidPieceActive.miniTimer = setTimeout(() => {
-        this.#fadeOutLucidPiece(piece);
+        this.#fadeOutLucidPiece(img);
         this.#clearLucidPiece();
         this.#scheduleNextLucidPiece();
       }, this.#config.lucidPieceMiniTimer);
     }, this.#config.lucidPieceShowTotal - this.#config.lucidPieceMiniTimer);
   }
 
-  // Show mini-timer on piece for last 4 seconds
-  #showLucidPieceMiniTimer(piece, idx) {
-    let miniTimer = document.createElement('div');
-    miniTimer.className = 'lucid-piece-mini-timer';
-    miniTimer.innerHTML = `<div class="mini-timer-bar"></div>`;
-    piece.appendChild(miniTimer);
-    setTimeout(() => { miniTimer.classList.add('active'); }, 10);
-    setTimeout(() => { miniTimer.classList.remove('active'); }, this.#config.lucidPieceMiniTimer);
+  #showLucidPieceMiniTimer(img) {
+    const mini = document.createElement('div');
+    mini.className = 'lucid-piece-mini-timer';
+    mini.innerHTML = `<div class="mini-timer-bar"></div>`;
+    img.appendChild(mini);
+    setTimeout(() => mini.classList.add('active'), 10);
   }
 
-  // Fade-out and remove piece from DOM
-  #fadeOutLucidPiece(piece) {
-    piece.classList.remove('lucid-piece-appear');
-    piece.classList.add('lucid-piece-disappear');
-    setTimeout(() => { if (piece.parentNode) piece.parentNode.removeChild(piece); }, 600);
+  #fadeOutLucidPiece(img) {
+    img.classList.replace('lucid-piece-appear', 'lucid-piece-disappear');
+    setTimeout(() => img.remove(), 600);
   }
 
-  // Collect the lucid piece
-  #collectLucidPiece(idx, piece) {
-    if (this.#state.collectedPieceIdxs.includes(idx)) return; // already collected
+  #collectLucidPiece(idx, img) {
+    if (this.#state.collectedPieceIdxs.includes(idx)) return;
     this.#state.collectedPieceIdxs.push(idx);
     this.#state.lucidPieces = this.#state.collectedPieceIdxs.length;
     this.#updateLucidCoinUI();
-    piece.classList.add('lucid-piece-collected-anim');
+    img.classList.add('lucid-piece-collected-anim');
     this.#playAudio(this.#audio.lucidCollect);
-
-    // Animate piece flying to its slot
-    const slotImg = this.#dom.lucidPieceImgs[idx];
-    const slotRect = slotImg.getBoundingClientRect();
-    const pieceRect = piece.getBoundingClientRect();
-    const deltaX = slotRect.left + slotRect.width/2 - (pieceRect.left + pieceRect.width/2);
-    const deltaY = slotRect.top + slotRect.height/2 - (pieceRect.top + pieceRect.height/2);
-
-    piece.style.transition = 'transform 0.7s cubic-bezier(.54,1.7,.55,.9), opacity 0.7s';
-    piece.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.4)`;
-    piece.style.opacity = '0.75';
+    const slot = this.#dom.lucidPieceImgs[idx].getBoundingClientRect();
+    const pie = img.getBoundingClientRect();
+    const dx = slot.left + slot.width/2 - (pie.left + pie.width/2);
+    const dy = slot.top + slot.height/2 - (pie.top + pie.height/2);
+    img.style.transition = 'transform .7s cubic-bezier(.54,1.7,.55,.9), opacity .7s';
+    img.style.transform = `translate(${dx}px,${dy}px) scale(.4)`;
+    img.style.opacity = '0.75';
     setTimeout(() => {
-      if (piece.parentNode) piece.parentNode.removeChild(piece);
+      img.remove();
       this.#clearLucidPiece();
-      this.#scheduleNextLucidPiece();
-      // If all 3 collected, merge into Lucid Coin
-      if (this.#state.collectedPieceIdxs.length === 3) {
-        this.#awardLucidCoin();
-      }
+      if (this.#state.collectedPieceIdxs.length === 3) this.#awardLucidCoin();
+      else this.#scheduleNextLucidPiece();
     }, 700);
   }
 
-  // Award the Lucid Coin with animation
   #awardLucidCoin() {
-    // Animate all 3 pieces glowing and merging into the main Lucid Coin image
     this.#dom.lucidPieceImgs.forEach(img => {
       img.classList.add('lucid-coin-merge');
       setTimeout(() => img.classList.remove('lucid-coin-merge'), 1000);
     });
     this.#playAudio(this.#audio.lucidFull);
     setTimeout(() => {
-      this.#state.lucidCoins += 1;
+      this.#state.lucidCoins++;
       this.#resetLucidPieces();
       this.#savePersistent();
       this.#updateLucidCoinUI();
       this.#announce('You earned a Lucid Coin!');
-      // Next piece spawn will wait after animation completes
       this.#scheduleNextLucidPiece();
     }, 1000);
   }
 
-  // Clear lucid piece timers and DOM
   #clearLucidPiece() {
     if (this.#state.lucidPieceTimeout) clearTimeout(this.#state.lucidPieceTimeout);
-    if (this.#state.lucidPieceActive) {
-      if (this.#state.lucidPieceActive.timer) clearTimeout(this.#state.lucidPieceActive.timer);
-      if (this.#state.lucidPieceActive.miniTimer) clearTimeout(this.#state.lucidPieceActive.miniTimer);
-      const dom = this.#state.lucidPieceActive.dom;
-      if (dom && dom.parentNode) dom.parentNode.removeChild(dom);
+    const act = this.#state.lucidPieceActive;
+    if (act) {
+      clearTimeout(act.timer); clearTimeout(act.miniTimer);
+      act.dom.remove();
     }
     this.#state.lucidPieceTimeout = null;
     this.#state.lucidPieceActive = null;
   }
+
+  buyChance() {
+    if (this.#state.lucidCoins < this.#config.lucidCoinCost) {
+      alert('Not enough Lucid Coins!');
+      return;
+    }
+    this.#state.lucidCoins--;
+    this.#savePersistent();
+    this.#updateLucidCoinUI();
+    this.#dom.endScreen.style.display = 'none';
+    this.#state.alive = true;
+    this.nextQuestion();
+    this.#scheduleNextLucidPiece();
+    if (!this.#isMuted) this.#playAudio(this.#audio.music, true);
+  }
+
+  #toggleMute() {
+    this.#isMuted = !this.#isMuted;
+    Object.values(this.#audio).forEach(a => a && (a.muted = this.#isMuted));
+    if (!this.#isMuted && this.#state.alive) this.#playAudio(this.#audio.music, true);
+    this.#dom.muteBtn.innerHTML = this.#isMuted
+      ? '<i class="fas fa-volume-mute"></i>'
+      : '<i class="fas fa-volume-up"></i>';
+    this.#savePersistent();
+  }
+
+  #updateScorePanel() {
+    this.#dom.score.textContent = this.#state.score;
+    this.#dom.coins.textContent = this.#state.coins;
+    this.#dom.highScore.textContent = this.#state.highScore;
+    this.#updateLucidCoinUI();
+    this.#announce(`Score: ${this.#state.score}, Level: ${this.#state.level}`);
+  }
+
+  #updateLucidCoinUI() {
+    this.#dom.lucidCoinCount.textContent = this.#state.lucidCoins;
+    this.#dom.lucidPieceImgs.forEach((img, i) => {
+      img.className = 'lucid-piece-slot' +
+        (this.#state.collectedPieceIdxs.includes(i) ? ' lucid-piece-collected' : '');
+    });
+  }
+
+  #updateHomeScreen() {
+    this.#dom.homeHighScore.textContent = this.#state.highScore;
+    this.#dom.homeCoins.textContent = this.#state.totalCoins;
+    this.#updateLucidCoinUI();
+  }
+
+  #announce(msg) {
+    if (this.#dom.ariaLive) {
+      this.#dom.ariaLive.textContent = '';
+      setTimeout(() => this.#dom.ariaLive.textContent = msg, 20);
+    }
+  }
+
+  #handleAnswerKeyNav(e) {
+    const btns = [...this.#dom.answers.querySelectorAll('button')];
+    const idx = btns.indexOf(document.activeElement);
+    let next;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (idx+1)%btns.length;
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (idx-1+btns.length)%btns.length;
+    if ([...Array(4)].includes(e.key.length && e.key)) next = idx;
+    if (next != null) {
+      e.preventDefault(); btns[next]?.focus();
+    }
+    if (e.key === 'Enter' || e.key === ' ') {
+      const a = document.activeElement;
+      if (a && a.classList.contains('answer-btn')) a.click();
+    }
+  }
+
+  #playAudio(audio, loop = false) {
+    if (!audio) return;
+    audio.loop = loop;
+    audio.currentTime = 0;
+    audio.play().catch(() => {});
+  }
 }
+
+// Инициализация
+window.addEventListener('DOMContentLoaded', () => {
+  new GameLucidPro();
+});
 </script>
 </body>
 </html>
