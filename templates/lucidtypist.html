@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lucid Typist</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(135deg, #0a0f1c, #122c5c, #0f1a3d);
+      font-family: 'Orbitron', sans-serif;
+      color: #00d9ff;
+      overflow-x: hidden;
+    }
+
+    .neon-text {
+      text-shadow: 0 0 5px #00f0ff, 0 0 10px #00f0ff, 0 0 20px #00cfff, 0 0 30px #009aff;
+    }
+
+    .text-area span.correct {
+      color: #00ff95;
+    }
+
+    .text-area span.incorrect {
+      color: #ff5050;
+      animation: melt 0.4s ease-in-out forwards;
+    }
+
+    @keyframes melt {
+      to {
+        opacity: 0.2;
+        transform: translateY(10px) scale(0.85);
+        text-decoration: line-through;
+        color: #ff0000;
+      }
+    }
+
+    .burning-char {
+      animation: burn 0.8s ease-in-out infinite alternate;
+    }
+
+    @keyframes burn {
+      0% { color: #fff; text-shadow: 0 0 4px #ff0000; }
+      50% { color: orange; text-shadow: 0 0 8px #ff8000; }
+      100% { color: red; text-shadow: 0 0 16px red; transform: scale(1.05); }
+    }
+
+    .glow-button {
+      background: transparent;
+      border: 2px solid #00d9ff;
+      padding: 12px 24px;
+      border-radius: 12px;
+      color: #00d9ff;
+      text-shadow: 0 0 10px #00d9ff;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    .glow-button:hover {
+      box-shadow: 0 0 20px #00d9ff, inset 0 0 10px #00d9ff;
+      cursor: pointer;
+      background-color: rgba(0, 217, 255, 0.1);
+    }
+
+    .overlay-popup {
+      background-color: rgba(10, 20, 30, 0.9);
+      backdrop-filter: blur(14px);
+      border: 2px solid #00d9ff;
+      box-shadow: 0 0 30px #00d9ff;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 90vw;
+      max-width: 420px;
+      transform: translate(-50%, -50%);
+      z-index: 10000;
+      border-radius: 18px;
+      padding: 28px 20px;
+      color: #00d9ff;
+      text-align: center;
+      animation: fadeInPopup 0.4s ease-in-out forwards;
+    }
+
+    @keyframes fadeInPopup {
+      from { opacity: 0; transform: translate(-50%, -60%) scale(0.95); }
+      to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
+
+    .overlay-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 9999;
+    }
+
+    #countdown {
+      font-weight: 900;
+      font-size: 6rem;
+      color: #00d9ff;
+      text-shadow: 0 0 15px #00d9ff, 0 0 30px #00d9ff;
+      user-select: none;
+      margin-bottom: 1.5rem;
+    }
+
+    #quote::before {
+      content: "Type this:";
+      display: block;
+      font-size: 1rem;
+      color: #88e1ff;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+
+    .fade-out {
+      animation: fadeOutGame 0.5s ease-in-out forwards;
+    }
+
+    @keyframes fadeOutGame {
+      to {
+        opacity: 0;
+        transform: scale(0.95);
+        pointer-events: none;
+      }
+    }
+
+    #flameBar {
+      height: 8px;
+      background: linear-gradient(90deg, red, orange, yellow);
+      border-radius: 9999px;
+      margin-bottom: 10px;
+      transition: width 0.1s linear;
+    }
+  </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen px-4 py-10">
+  <div class="text-center mb-8">
+    <h1 class="text-5xl font-bold neon-text mb-4">Lucid Typist</h1>
+    <p class="text-lg text-cyan-100">Master your typing speed. Dodge the flames. Earn Lucid Coins!</p>
+    <p class="text-sm mt-2 text-cyan-300">High Score: <span id="highWpm">0</span> WPM | Most Coins: <span id="highCoins">0</span></p>
+  </div>
+
+  <div id="game" class="w-full max-w-4xl relative transition-all duration-500">
+    <div id="countdown" class="neon-text hidden"></div>
+    <div id="flameBar" class="w-full"></div>
+    <div id="quote" class="text-area text-2xl bg-black/30 rounded-xl border border-cyan-400 p-6 min-h-[160px] text-white backdrop-blur-xl mb-6 leading-relaxed transition-all duration-300 shadow-xl"></div>
+    <div class="flex justify-between mt-2 text-base text-cyan-200">
+      <div>Speed: <span id="wpm">0</span> WPM</div>
+      <div>Coins: <span id="coins">0</span></div>
+    </div>
+    <div id="input" class="absolute top-[360px] left-[-9999px]" contenteditable="true" spellcheck="false"></div>
+    <div class="flex justify-center gap-4 mt-10">
+      <button id="startBtn" class="glow-button">Start</button>
+      <button id="restartBtn" class="glow-button hidden">Restart</button>
+    </div>
+  </div>
+
+  <div id="popupOverlay" class="overlay-bg hidden"></div>
+  <div id="popup" class="overlay-popup hidden">
+    <h2 class="text-2xl font-bold mb-2">🔥 You got burned!</h2>
+    <p class="mb-6">Don't give up! Retry and dominate the leaderboard.</p>
+    <div class="flex justify-center gap-4">
+      <button id="popupRestartBtn" class="glow-button">Try Again</button>
+    </div>
+  </div>
+
+  <script>
+    const startBtn = document.getElementById("startBtn");
+    const restartBtn = document.getElementById("restartBtn");
+    const popup = document.getElementById("popup");
+    const popupOverlay = document.getElementById("popupOverlay");
+    const popupRestartBtn = document.getElementById("popupRestartBtn");
+    const input = document.getElementById("input");
+    const quoteEl = document.getElementById("quote");
+    const wpmEl = document.getElementById("wpm");
+    const coinsEl = document.getElementById("coins");
+    const countdownEl = document.getElementById("countdown");
+    const flameBar = document.getElementById("flameBar");
+    const highWpmEl = document.getElementById("highWpm");
+    const highCoinsEl = document.getElementById("highCoins");
+
+    let coins = 0;
+    let startTime, quote, timer, flameInterval;
+    const timeLimit = 10000;
+
+    const quotes = [
+      "The quick brown fox jumps over the lazy dog.",
+      "Typing fast requires practice.",
+      "Lucid Typist is a fun game."
+    ];
+
+    function getQuote() {
+      return quotes[Math.floor(Math.random() * quotes.length)];
+    }
+
+    function displayQuote(q) {
+      quoteEl.innerHTML = q.split('').map(char => `<span>${char}</span>`).join('');
+    }
+
+    function updateStats() {
+      const typed = input.textContent.trim();
+      const elapsed = (new Date() - startTime) / 1000;
+      const words = typed.split(/\s+/).length;
+      const wpm = Math.round((words / elapsed) * 60);
+      wpmEl.textContent = wpm;
+
+      // Store High WPM
+      const stored = parseInt(localStorage.getItem("highWPM") || 0);
+      if (wpm > stored) {
+        localStorage.setItem("highWPM", wpm);
+        highWpmEl.textContent = wpm;
+      }
+    }
+
+    function updateFlameBar() {
+      let timeLeft = timeLimit;
+      flameBar.style.width = "100%";
+      clearInterval(flameInterval);
+      flameInterval = setInterval(() => {
+        timeLeft -= 100;
+        flameBar.style.width = `${(timeLeft / timeLimit) * 100}%`;
+        if (timeLeft <= 0) clearInterval(flameInterval);
+      }, 100);
+    }
+
+    function nextQuote() {
+      coins++;
+      coinsEl.textContent = coins;
+
+      // Store High Coins
+      const high = parseInt(localStorage.getItem("highCoins") || 0);
+      if (coins > high) {
+        localStorage.setItem("highCoins", coins);
+        highCoinsEl.textContent = coins;
+      }
+
+      clearTimeout(timer);
+      startGame();
+    }
+
+    function showBurnedPopup() {
+      input.setAttribute('contenteditable', 'false');
+      document.getElementById('game').classList.add('fade-out');
+      popupOverlay.classList.remove('hidden');
+      popup.classList.remove('hidden');
+      restartBtn.classList.remove('hidden');
+    }
+
+    input.addEventListener("input", () => {
+      updateStats();
+      const spans = quoteEl.querySelectorAll("span");
+      let val = input.textContent;
+
+      if (val.length > quote.length) {
+        val = val.slice(0, quote.length);
+        input.textContent = val;
+        window.getSelection().collapse(input.firstChild, val.length);
+      }
+
+      let correct = true;
+      spans.forEach((span, i) => {
+        const char = val[i];
+        if (char == null) {
+          span.classList.remove("correct", "incorrect", "burning-char");
+        } else if (char === span.textContent) {
+          span.classList.add("correct");
+          span.classList.remove("incorrect", "burning-char");
+        } else {
+          span.classList.add("incorrect", "burning-char");
+          span.classList.remove("correct");
+          correct = false;
+        }
+      });
+
+      if (correct && val.length === quote.length) {
+        nextQuote();
+      }
+    });
+
+    function startGame() {
+      quote = getQuote();
+      displayQuote(quote);
+      input.textContent = "";
+      input.setAttribute('contenteditable', 'true');
+      input.focus();
+      startTime = new Date();
+      updateFlameBar();
+      timer = setTimeout(showBurnedPopup, timeLimit);
+    }
+
+    startBtn.addEventListener("click", () => {
+      startBtn.classList.add("hidden");
+      countdownEl.classList.remove("hidden");
+      let count = 3;
+      countdownEl.textContent = count;
+      const interval = setInterval(() => {
+        count--;
+        if (count > 0) {
+          countdownEl.textContent = count;
+        } else {
+          clearInterval(interval);
+          countdownEl.textContent = "Go!";
+          setTimeout(() => {
+            countdownEl.classList.add("hidden");
+            startGame();
+          }, 500);
+        }
+      }, 1000);
+    });
+
+    restartBtn.addEventListener("click", () => location.reload());
+    popupRestartBtn.addEventListener("click", () => location.reload());
+
+    // Disable copy/paste
+    input.addEventListener("paste", e => e.preventDefault());
+    input.addEventListener("copy", e => e.preventDefault());
+
+    // Load High Scores
+    highWpmEl.textContent = localStorage.getItem("highWPM") || 0;
+    highCoinsEl.textContent = localStorage.getItem("highCoins") || 0;
+  </script>
+</body>
+</html>
