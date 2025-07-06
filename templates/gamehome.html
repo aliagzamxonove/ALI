@@ -546,41 +546,50 @@ const $playBtn = document.getElementById('playGameBtn');
           img.classList.toggle('collected', !!pieces[i]);
         });
       }
-      function renderCarousel() {
-        $carouselInner.innerHTML = '';
-        games.forEach((g,i) => {
-          const card = document.createElement('div');
-          card.className = 'game-card' + (i===selectedIdx?' selected':'') + (unlocked[i]?'':' locked');
-          card.tabIndex = 0;
-          card.setAttribute('data-idx',i);
-          card.innerHTML = `
-            <div class="game-icon">${g.icon}</div>
-            <img src="${g.img}" alt="${g.title}">
-            <div class="game-title">${g.title}</div>
-          `;
-          if (!unlocked[i]) {
-            card.innerHTML += `
-              <div class="unlock-block">
-                <div class="unlock-price"><i class="fas fa-coins"></i> ${g.price}</div>
-                <button ${coins<g.price?'disabled':''}>Unlock</button>
-              </div>`;
-            card.querySelector('button').onclick = e => {
-              e.stopPropagation();
-              unlockGame(i);
-            }
-          }
-          card.onclick = () => {
-            if (selectedIdx !== i) {
-              selectedIdx = i;
-              afterSelectOrRender();
-            }
-          };
-          $carouselInner.appendChild(card);
-        });
-        updateHeader();
-        updateArrows();
-        setTimeout(()=>centerSelected(),50);
+function renderCarousel() {
+  $carouselInner.innerHTML = '';
+  games.forEach((g, i) => {
+    const card = document.createElement('div');
+    const isUnlocked = unlocked[i];
+    const hasEnoughCoins = Number(coins) >= Number(g.price);
+
+    card.className = 'game-card' + (i === selectedIdx ? ' selected' : '') + (isUnlocked ? '' : ' locked');
+    card.tabIndex = 0;
+    card.setAttribute('data-idx', i);
+
+    card.innerHTML = `
+      <div class="game-icon">${g.icon}</div>
+      <img src="${g.img}" alt="${g.title}">
+      <div class="game-title">${g.title}</div>
+    `;
+
+    if (!isUnlocked) {
+      card.innerHTML += `
+        <div class="unlock-block">
+          <div class="unlock-price"><i class="fas fa-coins"></i> ${g.price}</div>
+          <button ${hasEnoughCoins ? '' : 'disabled'}>Unlock</button>
+        </div>`;
+      
+      card.querySelector('button').onclick = e => {
+        e.stopPropagation();
+        unlockGame(i);
+      };
+    }
+
+    card.onclick = () => {
+      if (selectedIdx !== i) {
+        selectedIdx = i;
+        afterSelectOrRender();
       }
+    };
+
+    $carouselInner.appendChild(card);
+  });
+
+  updateHeader();
+  updateArrows();
+  setTimeout(() => centerSelected(), 50);
+}
       function centerSelected(smooth=true) {
         const cards = Array.from($carouselInner.children);
         if (!cards[selectedIdx]) return;
