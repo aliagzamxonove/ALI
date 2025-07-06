@@ -288,23 +288,27 @@
     timer = setTimeout(showBurnedPopup, timeLeftRemaining);
   }
 
-  function increaseCoins() {
-    coins++;
-    coinsEl.textContent = coins;
+function increaseCoins() {
+  coins++;
+  coinsEl.textContent = coins;
 
-    const high = parseInt(localStorage.getItem('highCoins') || '0', 10);
-    if (coins > high) {
-      localStorage.setItem('highCoins', coins);
-      highCoinsEl.textContent = coins;
-    }
-
-    coinEffect.classList.remove('hidden');
-    coinEffect.classList.remove('animate');
-    void coinEffect.offsetWidth;
-    coinEffect.classList.add('animate');
-    setTimeout(() => coinEffect.classList.add('hidden'), 800);
+  // update high‑coins session best
+  const high = parseInt(localStorage.getItem('highCoins') || '0', 10);
+  if (coins > high) {
+    localStorage.setItem('highCoins', coins);
+    highCoinsEl.textContent = coins;
   }
 
+  /* 🚀 NEW — add +1 to the shared wallet that GameHome reads */
+  const newTotal = (parseInt(localStorage.getItem('totalCoins') || '0', 10) + 1);
+  localStorage.setItem('totalCoins', newTotal);
+
+  // coin‑fly animation
+  coinEffect.classList.remove('hidden', 'animate');
+  void coinEffect.offsetWidth;
+  coinEffect.classList.add('animate');
+  setTimeout(() => coinEffect.classList.add('hidden'), 800);
+}
   function showBurnedPopup() {
     burnSound.currentTime = 0;
     burnSound.play().catch(() => {});
