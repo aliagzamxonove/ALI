@@ -624,36 +624,40 @@ function renderCarousel() {
         if(e.key==="ArrowRight" && selectedIdx<games.length-1){selectedIdx++;afterSelectOrRender();}
         if(e.key==="ArrowLeft" && selectedIdx>0){selectedIdx--;afterSelectOrRender();}
       });
-      function unlockGame(idx) {
-        if(coins<games[idx].price) {
-          return showModal({
-            title:"Not Enough Coins",
-            message:`You need <b>${games[idx].price}</b> coins to unlock this game.<br>Your coins: <b>${coins}</b>`,
-            actions:[{label:"OK",className:"cancel"}]
+function unlockGame(idx) {
+  if (coins < games[idx].price) {
+    return showModal({
+      title: "Not Enough Coins",
+      message: `You need <b>${games[idx].price}</b> coins to unlock this game.<br>Your coins: <b>${coins}</b>`,
+      actions: [{ label: "OK", className: "cancel" }]
+    });
+  }
+
+  showModal({
+    title: "Unlock Game?",
+    message: `Do you want to unlock <b>${games[idx].title}</b> for <b>${games[idx].price} coins</b>?`,
+    actions: [
+      { label: "Cancel", className: "cancel" },
+      {
+        label: "Unlock",
+        callback: () => {
+          coins -= games[idx].price;
+          unlocked[idx] = true;
+          localStorage.setItem('lucidUnlockedGames', JSON.stringify(unlocked));
+          localStorage.setItem('totalCoins', coins);
+          updateHeader();
+          afterSelectOrRender();
+          showModal({
+            title: "Game Unlocked!",
+            message: `Enjoy your new game!`,
+            actions: [{ label: "OK", className: "cancel" }]
           });
         }
-        showModal({
-          title:"Unlock Game?",
-          message:`Do you want to unlock <b>${games[idx].title}</b> for <b>${games[idx].price} coins</b>?`,
-          actions:[
-            {label:"Cancel",className:"cancel"},
-            {label:"Unlock",callback: () => {
-  coins -= games[idx].price;
-  unlocked[idx] = true;
-  localStorage.setItem('lucidUnlockedGames', JSON.stringify(unlocked));
-  localStorage.setItem('totalCoins', coins);
-  updateHeader(); // <‑‑ add this
-  afterSelectOrRender();
-  showModal({
-    title:"Game Unlocked!",
-    message:`Enjoy your new game!`,
-    actions:[{label:"OK", className:"cancel"}]
-  });
-}
-            }}
-          ]
-        });
       }
+    ]
+  }); 
+}
+
       function updatePlayButton() {
         const game = games[selectedIdx];
         if (unlocked[selectedIdx] && game.link) {
