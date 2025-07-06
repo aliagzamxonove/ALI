@@ -255,21 +255,39 @@ f<!DOCTYPE html>
     'Speed is the result of discipline, not haste.',
     'Focus is the true accelerator of performance.',
     'Precision transforms practice into progress.',
-    'Great typists don’t rush — they flow.'
+    'Great typists don’t rush — they flow.',
+    'Typing is like dancing with your fingers.',
+    'Consistency beats bursts of speed.',
+    'Slow is smooth, and smooth is fast.',
+    'Your keyboard is your dojo.',
+    'Type with purpose, not panic.',
+    'Accuracy first, speed second.',
+    'Each word typed is one step closer to mastery.',
+    'Typos are just stepping stones to perfection.',
+    'Mindful typing sharpens your focus.',
+    'Let your rhythm guide your fingers.'
   ];
+
   async function getQuote() {
     try {
-      const r = await fetch('https://api.quotable.io/random');
-      if (!r.ok) throw 0;
-      const j = await r.json();
-      return j.content;
-    } catch {
+      // Optional proxy to avoid CORS issues
+      // const proxy = 'https://corsproxy.io/?';
+      const res = await fetch('https://api.quotable.io/random');
+      if (!res.ok) throw new Error('API error');
+      const json = await res.json();
+      return json.content;
+    } catch (e) {
+      console.warn('Quote API failed, using fallback:', e);
       return fallback[Math.floor(Math.random() * fallback.length)];
     }
   }
+
   function displayQuote(q) {
     quoteWords = q.trim().split(/\s+/);
-    quoteEl.innerHTML = q.split('').map(c => `<span>${c}</span>`).join('');
+    quoteEl.innerHTML = 'Loading...';
+    setTimeout(() => {
+      quoteEl.innerHTML = q.split('').map(c => `<span>${c}</span>`).join('');
+    }, 100);
   }
 
   /* === FX HELPERS === */
