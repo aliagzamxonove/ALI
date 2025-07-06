@@ -625,8 +625,8 @@ const $playBtn = document.getElementById('playGameBtn');
             {label:"Unlock",callback:()=>{
               coins -= games[idx].price;
               unlocked[idx]=true;
-              localStorage.setItem('lucid_unlocked_games',JSON.stringify(unlocked));
-              localStorage.setItem('lucid_coins',coins);
+              localStorage.setItem('lucidUnlockedGames', JSON.stringify(unlocked));
+              localStorage.setItem('totalCoins', coins);
               afterSelectOrRender();
               showModal({
                 title:"Game Unlocked!",
