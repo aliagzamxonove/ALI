@@ -379,30 +379,35 @@ header {
 @media (max-width: 1200px) {
   .carousel-wrapper { max-width: 100vw; }
 }
+
 @media (max-width: 950px) {
   header { font-size: .85em; }
-  .main-content { margin-top: var(--header-height);}
-  .carousel-wrapper { min-height: 340px; height: 420px;}
-  .game-card { min-width: 120px; height: 160px; }
-  .game-card img { height: 60px; }
-  .carousel-inner { padding-top: 10px; padding-bottom: 10px;}
+  .main-content { margin-top: var(--header-height); }
+  .carousel-wrapper { min-height: 440px; height: auto; }
+  .game-card { min-width: 200px; height: 280px; }
+  .game-card img { height: 120px; }
+  .carousel-inner { padding-top: 10px; padding-bottom: 10px; }
 }
+
 @media (max-width: 700px) {
-  header { font-size: .78em; padding: .7rem .4rem;}
-  .main-content { margin-top: var(--header-height-mobile);}
-  .carousel-arrow { width: 34px; height: 34px; font-size: 1.3em;}
-  .game-card { min-width: 80px; height: 110px; }
-  .game-card img { height: 34px; }
+  header { font-size: .78em; padding: .7rem .4rem; }
+  .main-content { margin-top: var(--header-height-mobile); }
+  .carousel-arrow { width: 34px; height: 34px; font-size: 1.3em; }
+  .game-card { min-width: 160px; height: 220px; }
+  .game-card img { height: 90px; }
   .modal-content { padding: 1.1em .5em .8em; }
-  .play-game-btn { font-size: 1.2em; padding: .7em 1.7em;}
-  .carousel-inner { padding-top: 5px; padding-bottom: 5px;}
+  .play-game-btn { font-size: 1.2em; padding: .7em 1.7em; }
+  .carousel-inner { padding-top: 5px; padding-bottom: 5px; }
 }
+
 @media (max-width: 480px) {
-  header { font-size: .65em; padding: .45rem .15rem;}
+  header { font-size: .65em; padding: .45rem .15rem; }
   .carousel-wrapper { padding-top: 18px; }
-  .main-content { margin-top: 50px;}
-  .play-game-btn { font-size: .9em; padding: .5em 1.1em;}
-  .carousel-inner { padding-top: 2px; padding-bottom: 2px;}
+  .main-content { margin-top: 50px; }
+  .play-game-btn { font-size: .9em; padding: .5em 1.1em; }
+  .carousel-inner { padding-top: 2px; padding-bottom: 2px; }
+  .game-card { min-width: 140px; height: 190px; }
+  .game-card img { height: 75px; }
 }
 @keyframes fadeIn {0%{opacity:0}100%{opacity:1}}
 @keyframes popIn {0%{transform:scale(.93);opacity:0}100%{transform:scale(1);opacity:1}}
