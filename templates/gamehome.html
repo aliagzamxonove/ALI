@@ -549,10 +549,10 @@ const $playBtn = document.getElementById('playGameBtn');
 function renderCarousel() {
   $carouselInner.innerHTML = '';
   games.forEach((g, i) => {
-    const card = document.createElement('div');
     const isUnlocked = unlocked[i];
     const hasEnoughCoins = Number(coins) >= Number(g.price);
 
+    const card = document.createElement('div');
     card.className = 'game-card' + (i === selectedIdx ? ' selected' : '') + (isUnlocked ? '' : ' locked');
     card.tabIndex = 0;
     card.setAttribute('data-idx', i);
@@ -563,32 +563,34 @@ function renderCarousel() {
       <div class="game-title">${g.title}</div>
     `;
 
+    // Only add unlock block if game is locked
     if (!isUnlocked) {
-      card.innerHTML += `
-        <div class="unlock-block">
-          <div class="unlock-price"><i class="fas fa-coins"></i> ${g.price}</div>
-          <button ${hasEnoughCoins ? '' : 'disabled'}>Unlock</button>
-        </div>`;
-      
-      card.querySelector('button').onclick = e => {
+      const unlockBlock = document.createElement('div');
+      unlockBlock.className = 'unlock-block';
+
+      const priceDiv = document.createElement('div');
+      priceDiv.className = 'unlock-price';
+      priceDiv.innerHTML = `<i class="fas fa-coins"></i> ${g.price}`;
+
+      const unlockBtn = document.createElement('button');
+      unlockBtn.textContent = 'Unlock';
+      if (!hasEnoughCoins) unlockBtn.disabled = true;
+
+      unlockBtn.onclick = (e) => {
         e.stopPropagation();
         unlockGame(i);
       };
-    }
 
-    card.onclick = () => {
-      if (selectedIdx !== i) {
-        selectedIdx = i;
-        afterSelectOrRender();
-      }
-    };
+      unlockBlock.appendChild(priceDiv);
+      unlockBlock.appendChild(unlockBtn);
+      card.appendChild(unlockBlock);
+    }
 
     $carouselInner.appendChild(card);
   });
 
-  updateHeader();
+  centerSelected();
   updateArrows();
-  setTimeout(() => centerSelected(), 50);
 }
       function centerSelected(smooth=true) {
         const cards = Array.from($carouselInner.children);
