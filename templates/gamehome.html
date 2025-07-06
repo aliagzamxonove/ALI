@@ -226,7 +226,6 @@ header {
 .game-card.locked {
   filter: grayscale(1) brightness(0.8) contrast(1.05);
   cursor: not-allowed;
-  pointer-events: none;
   opacity: 0.82;
 }
 .game-card img {
@@ -638,17 +637,19 @@ function renderCarousel() {
           message:`Do you want to unlock <b>${games[idx].title}</b> for <b>${games[idx].price} coins</b>?`,
           actions:[
             {label:"Cancel",className:"cancel"},
-            {label:"Unlock",callback:()=>{
-              coins -= games[idx].price;
-              unlocked[idx]=true;
-              localStorage.setItem('lucidUnlockedGames', JSON.stringify(unlocked));
-              localStorage.setItem('totalCoins', coins);
-              afterSelectOrRender();
-              showModal({
-                title:"Game Unlocked!",
-                message:`Enjoy your new game!`,
-                actions:[{label:"OK",className:"cancel"}]
-              });
+            {label:"Unlock",callback: () => {
+  coins -= games[idx].price;
+  unlocked[idx] = true;
+  localStorage.setItem('lucidUnlockedGames', JSON.stringify(unlocked));
+  localStorage.setItem('totalCoins', coins);
+  updateHeader(); // <‑‑ add this
+  afterSelectOrRender();
+  showModal({
+    title:"Game Unlocked!",
+    message:`Enjoy your new game!`,
+    actions:[{label:"OK", className:"cancel"}]
+  });
+}
             }}
           ]
         });
