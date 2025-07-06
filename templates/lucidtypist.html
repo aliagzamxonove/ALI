@@ -8,45 +8,30 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    /* ---------------------- CORE STYLES ---------------------- */
     body {
       background: linear-gradient(135deg, #0a0f1c, #122c5c, #0f1a3d);
       font-family: 'Orbitron', sans-serif;
       color: #00d9ff;
       overflow-x: hidden;
     }
-
     .neon-text {
       text-shadow: 0 0 5px #00f0ff, 0 0 10px #00f0ff, 0 0 20px #00cfff, 0 0 30px #009aff;
     }
-
-    .text-area span.correct {
-      color: #00ff95;
-    }
-
+    .text-area span.correct { color: #00ff95; }
     .text-area span.incorrect {
       color: #ff5050;
       animation: melt 0.4s ease-in-out forwards;
     }
-
     @keyframes melt {
-      to {
-        opacity: 0.2;
-        transform: translateY(10px) scale(0.85);
-        text-decoration: line-through;
-        color: #ff0000;
-      }
+      to { opacity: 0.2; transform: translateY(10px) scale(0.85); text-decoration: line-through; color: #ff0000; }
     }
-
-    .burning-char {
-      animation: burn 0.8s ease-in-out infinite alternate;
-    }
-
+    .burning-char { animation: burn 0.8s ease-in-out infinite alternate; }
     @keyframes burn {
-      0% { color: #fff; text-shadow: 0 0 4px #ff0000; }
-      50% { color: orange; text-shadow: 0 0 8px #ff8000; }
-      100% { color: red; text-shadow: 0 0 16px red; transform: scale(1.05); }
+      0%   { color: #fff;   text-shadow: 0 0 4px #ff0000; }
+      50%  { color: orange; text-shadow: 0 0 8px #ff8000; }
+      100% { color: red;    text-shadow: 0 0 16px red; transform: scale(1.05); }
     }
-
     .glow-button {
       background: transparent;
       border: 2px solid #00d9ff;
@@ -57,23 +42,19 @@
       font-weight: bold;
       transition: all 0.3s ease;
     }
-
     .glow-button:hover {
       box-shadow: 0 0 20px #00d9ff, inset 0 0 10px #00d9ff;
       cursor: pointer;
       background-color: rgba(0, 217, 255, 0.1);
     }
-
     .overlay-popup {
       background-color: rgba(10, 20, 30, 0.9);
       backdrop-filter: blur(14px);
       border: 2px solid #00d9ff;
       box-shadow: 0 0 30px #00d9ff;
       position: fixed;
-      top: 50%;
-      left: 50%;
-      width: 90vw;
-      max-width: 420px;
+      top: 50%; left: 50%;
+      width: 90vw; max-width: 420px;
       transform: translate(-50%, -50%);
       z-index: 10000;
       border-radius: 18px;
@@ -82,28 +63,18 @@
       text-align: center;
       animation: fadeInPopup 0.4s ease-in-out forwards;
     }
-
     @keyframes fadeInPopup {
       from { opacity: 0; transform: translate(-50%, -60%) scale(0.95); }
-      to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
     }
-
-    .overlay-bg {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.85);
-      z-index: 9999;
-    }
-
+    .overlay-bg { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); z-index: 9999; }
     #countdown {
       font-weight: 900;
       font-size: 6rem;
       color: #00d9ff;
       text-shadow: 0 0 15px #00d9ff, 0 0 30px #00d9ff;
-      user-select: none;
       margin-bottom: 1.5rem;
     }
-
     #quote::before {
       content: "Type this:";
       display: block;
@@ -112,19 +83,10 @@
       margin-bottom: 8px;
       letter-spacing: 1px;
     }
-
-    .fade-out {
-      animation: fadeOutGame 0.5s ease-in-out forwards;
-    }
-
+    .fade-out { animation: fadeOutGame 0.5s ease-in-out forwards; }
     @keyframes fadeOutGame {
-      to {
-        opacity: 0;
-        transform: scale(0.95);
-        pointer-events: none;
-      }
+      to { opacity: 0; transform: scale(0.95); pointer-events: none; }
     }
-
     #flameBar {
       height: 8px;
       background: linear-gradient(90deg, red, orange, yellow);
@@ -132,241 +94,309 @@
       margin-bottom: 10px;
       transition: width 0.1s linear;
     }
-
     #input {
       width: 100%;
-      background: rgba(0,0,0,0.4);
+      background: rgba(0, 0, 0, 0.4);
       border: 1px solid #00d9ff;
       border-radius: 0.75rem;
       padding: 0.75rem 1rem;
-      color: #ffffff;
+      color: #fff;
       font-size: 1.25rem;
       outline: none;
       caret-color: #00ff95;
     }
-
-    #coinEffect {
+    #coinEffect, #lucidEffect {
       position: absolute;
-      top: 10px;
-      right: 20px;
-      color: gold;
+      top: 10px; right: 20px;
       font-size: 1.5rem;
       font-weight: bold;
       opacity: 0;
       pointer-events: none;
       z-index: 999;
     }
-
-    .animate {
-      animation: coinFly 0.8s ease-out forwards;
-    }
-
+    #coinEffect  { color: gold;    }
+    #lucidEffect { color: #00ffc8; }
+    .animate { animation: coinFly 0.8s ease-out forwards; }
     @keyframes coinFly {
-      0% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        text-shadow: 0 0 8px gold;
-      }
-      100% {
-        opacity: 0;
-        transform: translateY(-40px) scale(1.5);
-      }
+      0%   { opacity: 1; transform: translateY(0)    scale(1);   }
+      100% { opacity: 0; transform: translateY(-40px) scale(1.5); }
     }
   </style>
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen px-4 py-10">
-  <audio id="burnSound" src="static/audio/burn.mp3" preload="auto"></audio>
 
+  <!-- ---------------------- AUDIO ---------------------- -->
+  <audio id="burnSound"   src="static/audio/burn.mp3"   preload="auto"></audio>
+  <audio id="recordSound" src="static/audio/record.mp3" preload="auto"></audio>
+
+  <!-- ---------------------- HEADER ---------------------- -->
   <div class="text-center mb-8">
     <h1 class="text-5xl font-bold neon-text mb-4">Lucid Typist</h1>
     <p class="text-lg text-cyan-100">Master your typing speed. Dodge the flames. Earn Lucid Coins!</p>
-    <p class="text-sm mt-2 text-cyan-300">High Score: <span id="highWpm">0</span> WPM | Most Coins: <span id="highCoins">0</span></p>
+
+    <p class="text-sm mt-2 text-cyan-300">High Score: <span id="highWpm">0</span> WPM | Total Coins: <span id="totalCoins">0</span></p>
+    <p class="text-xs text-cyan-400 mt-1">Weekly challenge: 50 coins → badge&nbsp;<span id="weekProgress"></span></p>
+    <p class="text-xs text-cyan-400">Total Badges Earned: <span id="totalBadges">0</span></p>
+    <p id="badgeMsg" class="text-sm text-green-300 mt-2 hidden">Badge earned this week! 🎉 +10 Lucid Coins</p>
   </div>
 
+  <!-- ---------------------- GAME AREA ---------------------- -->
   <div id="game" class="w-full max-w-4xl relative transition-all duration-500" aria-live="polite">
     <div id="countdown" class="neon-text hidden" aria-label="Countdown"></div>
+
     <div id="flameBar" class="w-full" aria-label="Time left"></div>
     <div id="quote" class="text-area text-2xl bg-black/30 rounded-xl border border-cyan-400 p-6 min-h-[160px] text-white backdrop-blur-xl mb-6 leading-relaxed transition-all duration-300 shadow-xl" role="text" aria-live="polite"></div>
     <input id="input" type="text" autocomplete="off" spellcheck="false" aria-label="Typing input" class="hidden" />
-    <div class="flex justify-between mt-2 text-base text-cyan-200">
+
+    <!-- ---------------------- SCORE PANEL ---------------------- -->
+    <div class="flex justify-between items-center mt-2 text-base text-cyan-200 gap-2 flex-wrap">
       <div>Speed: <span id="wpm">0</span> WPM</div>
       <div>Coins: <span id="coins">0</span></div>
+      <div class="flex items-center gap-1">
+        <img src="{{ url_for('static', filename='lucid_coin_total.png') }}" alt="Lucid Coin" class="w-5 h-5" />
+        <span id="lucidCoinsTotal">0</span>
+      </div>
     </div>
+
+    <!-- ---------------------- CONTROLS ---------------------- -->
     <div class="flex justify-center gap-4 mt-10">
-      <button id="startBtn" class="glow-button" aria-label="Start game">Start</button>
-      <button id="pauseBtn" class="glow-button hidden" aria-label="Pause game">Pause</button>
-      <button id="restartBtn" class="glow-button hidden" aria-label="Restart game">Restart</button>
+      <button id="startBtn"    class="glow-button" aria-label="Start game">Start</button>
+      <button id="pauseBtn"    class="glow-button hidden" aria-label="Pause game">Pause</button>
+      <button id="restartBtn"  class="glow-button hidden" aria-label="Restart game">Restart</button>
     </div>
-    <div id="coinEffect" class="hidden">+1 🪙</div>
+
+    <!-- ---------------------- FX TEXT ---------------------- -->
+    <div id="coinEffect"  class="hidden">+1 🪙</div>
+    <div id="lucidEffect" class="hidden">+1 🪙 Lucid</div>
   </div>
 
-  <div id="popupOverlay" class="overlay-bg hidden" aria-hidden="true"></div>
+  <!-- ---------------------- BURNED POPUP (still used) ---------------------- -->
+  <div id="popupOverlay" class="overlay-bg hidden"></div>
   <div id="popup" class="overlay-popup hidden" role="alertdialog" aria-modal="true" aria-labelledby="popupTitle" aria-describedby="popupDesc">
     <h2 id="popupTitle" class="text-2xl font-bold mb-2">🔥 You got burned!</h2>
-    <p id="popupDesc" class="mb-6">Don't give up! Retry and dominate the leaderboard.</p>
+    <p id="popupDesc"  class="mb-6">Don't give up! Retry and dominate the leaderboard.</p>
     <div class="flex justify-center gap-4">
       <button id="popupRestartBtn" class="glow-button" aria-label="Try again">Try Again</button>
     </div>
   </div>
 
 <script>
-  const startBtn = document.getElementById('startBtn');
-  const pauseBtn = document.getElementById('pauseBtn');
-  const restartBtn = document.getElementById('restartBtn');
-  const popup = document.getElementById('popup');
-  const popupOverlay = document.getElementById('popupOverlay');
-  const popupRestartBtn = document.getElementById('popupRestartBtn');
-  const input = document.getElementById('input');
-  const quoteEl = document.getElementById('quote');
-  const wpmEl = document.getElementById('wpm');
-  const coinsEl = document.getElementById('coins');
-  const countdownEl = document.getElementById('countdown');
-  const flameBar = document.getElementById('flameBar');
-  const highWpmEl = document.getElementById('highWpm');
-  const highCoinsEl = document.getElementById('highCoins');
-  const burnSound = document.getElementById('burnSound');
-  const coinEffect = document.getElementById('coinEffect');
+  /* === UTILITY === */
+  const $ = id => document.getElementById(id);
+  const startBtn       = $('startBtn'),   pauseBtn  = $('pauseBtn'),   restartBtn   = $('restartBtn');
+  const input          = $('input'),      quoteEl   = $('quote'),      wpmEl        = $('wpm'),
+        coinsEl        = $('coins'),      countdownEl = $('countdown'), flameBar     = $('flameBar');
+  const highWpmEl      = $('highWpm'),    totalCoinsEl = $('totalCoins');
+  const burnSound      = $('burnSound'),  recordSound = $('recordSound');
+  const coinFx         = $('coinEffect'), lucidFx     = $('lucidEffect');
+  const weekProgress   = $('weekProgress');
+  const badgeMsg       = $('badgeMsg');
+  const popup          = $('popup'), popupOverlay = $('popupOverlay'), popupRestartBtn = $('popupRestartBtn');
+  const lucidTotalEl   = $('lucidCoinsTotal');
+  const totalBadgesEl  = $('totalBadges');
 
-  let coins = 0;
-  let quote = '';
-  const timeLimit = 10000;
-  let timeLeftRemaining = timeLimit;
-  let flameInterval;
-  let timer;
+  /* === GAME STATE === */
+  let coins = 0, wordBuffer = 0;
+  let quote = '', quoteWords = [], lastCredited = -1;
   let gamePaused = false;
+  const timeLimit = 10000; // ms per quote
+  let timeLeft = timeLimit, flameInterval, timer;
 
-  const fallbackQuotes = [
-    'The quick brown fox jumps over the lazy dog.',
-    'Typing fast requires practice.',
-    'Lucid Typist is a fun game.'
-  ];
+  /* === WEEKLY LOGIC === */
+  function getWeekStart() {
+    const d = new Date();
+    d.setUTCHours(0, 0, 0, 0);
+    d.setUTCDate(d.getUTCDate() - d.getUTCDay());
+    return d.getTime();
+  }
 
-  async function getQuote() {
-    try {
-      const res = await fetch('https://api.quotable.io/random');
-      if (!res.ok) throw new Error('API Error');
-      const data = await res.json();
-      return data.content;
-    } catch {
-      return fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
+  function addLucidCoins(amount) {
+    const current = parseInt(localStorage.getItem('lucidCoins') || '0', 10) + amount;
+    localStorage.setItem('lucidCoins', current);
+    lucidTotalEl.textContent = current;
+    flashFx(lucidFx, `+${amount} 🪙 Lucid`);
+  }
+
+  function updateWeekCoins(add = 0) {
+    const weekStart = getWeekStart();
+    const stored = JSON.parse(localStorage.getItem('weeklyData') || '{}');
+    if (stored.start !== weekStart) {
+      stored.start = weekStart;
+      stored.coins = 0;
+      stored.badge = false;
+    }
+    stored.coins += add;
+    localStorage.setItem('weeklyData', JSON.stringify(stored));
+    weekProgress.textContent = `(${stored.coins}/50)`;
+
+    // --- Badge reached ---
+    if (!stored.badge && stored.coins >= 50) {
+      stored.badge = true;
+      localStorage.setItem('weeklyData', JSON.stringify(stored));
+
+      // 1) +10 Lucid Coins
+      addLucidCoins(10);
+
+      // 2) Increment total badge counter
+      const totalBadges = parseInt(localStorage.getItem('totalBadges') || '0', 10) + 1;
+      localStorage.setItem('totalBadges', totalBadges);
+      totalBadgesEl.textContent = totalBadges;
+
+      // 3) Show message (auto‑hide)
+      badgeMsg.classList.remove('hidden');
+      setTimeout(() => badgeMsg.classList.add('hidden'), 6000);
     }
   }
 
+  /* === QUOTES === */
+  const fallback = [
+    'Mastery is built one keystroke at a time.',
+    'Speed is the result of discipline, not haste.',
+    'Focus is the true accelerator of performance.',
+    'Precision transforms practice into progress.',
+    'Great typists don’t rush — they flow.'
+  ];
+  async function getQuote() {
+    try {
+      const r = await fetch('https://api.quotable.io/random');
+      if (!r.ok) throw 0;
+      const j = await r.json();
+      return j.content;
+    } catch {
+      return fallback[Math.floor(Math.random() * fallback.length)];
+    }
+  }
   function displayQuote(q) {
+    quoteWords = q.trim().split(/\s+/);
     quoteEl.innerHTML = q.split('').map(c => `<span>${c}</span>`).join('');
   }
 
+  /* === FX HELPERS === */
+  function flashFx(el, text) {
+    el.textContent = text;
+    el.classList.remove('hidden', 'animate');
+    void el.offsetWidth; // reflow
+    el.classList.add('animate');
+    setTimeout(() => el.classList.add('hidden'), 800);
+  }
+
+  /* === COIN HANDLERS === */
+  function increaseCoins() {
+    coins++;
+    coinsEl.textContent = coins;
+    updateWeekCoins(1);
+
+    // Persist total coins
+    const newTotal = parseInt(localStorage.getItem('totalCoins') || '0', 10) + 1;
+    localStorage.setItem('totalCoins', newTotal);
+    totalCoinsEl.textContent = newTotal;
+
+    flashFx(coinFx, '+1 🪙');
+  }
+
+  /* === PERSONAL BEST === */
   function updateStats() {
     const typed = input.value.trim();
-    const elapsed = Math.max((timeLimit - timeLeftRemaining) / 1000, 0.1);
+    const elapsed = Math.max((timeLimit - timeLeft) / 1000, 0.1);
     const words = typed ? typed.split(/\s+/).length : 0;
     const wpm = Math.round((words / elapsed) * 60);
     wpmEl.textContent = isFinite(wpm) ? wpm : 0;
 
-    const storedHigh = parseInt(localStorage.getItem('highWPM') || '0', 10);
-    if (wpm > storedHigh) {
+    const best = parseInt(localStorage.getItem('highWPM') || '0', 10);
+    if (wpm > best) {
       localStorage.setItem('highWPM', wpm);
       highWpmEl.textContent = wpm;
+      addLucidCoins(1);
+      recordSound.currentTime = 0;
+      recordSound.play().catch(() => {});
     }
   }
 
-  function resetFlameBar() {
-    flameBar.style.width = '100%';
-  }
-
+  /* === TIMER === */
+  function resetFlame() { flameBar.style.width = '100%'; }
   function startTimer() {
-    clearInterval(flameInterval);
-    clearTimeout(timer);
-
+    clearInterval(flameInterval); clearTimeout(timer);
     flameInterval = setInterval(() => {
       if (gamePaused) return;
-      timeLeftRemaining -= 100;
-      flameBar.style.width = `${(timeLeftRemaining / timeLimit) * 100}%`;
-      if (timeLeftRemaining <= 0) clearInterval(flameInterval);
+      timeLeft -= 100;
+      flameBar.style.width = `${(timeLeft / timeLimit) * 100}%`;
+      if (timeLeft <= 0) clearInterval(flameInterval);
     }, 100);
-
-    timer = setTimeout(showBurnedPopup, timeLeftRemaining);
+    timer = setTimeout(showBurned, timeLeft);
   }
 
-function increaseCoins() {
-  coins++;
-  coinsEl.textContent = coins;
-
-  // update high‑coins session best
-  const high = parseInt(localStorage.getItem('highCoins') || '0', 10);
-  if (coins > high) {
-    localStorage.setItem('highCoins', coins);
-    highCoinsEl.textContent = coins;
-  }
-
-  /* 🚀 NEW — add +1 to the shared wallet that GameHome reads */
-  const newTotal = (parseInt(localStorage.getItem('totalCoins') || '0', 10) + 1);
-  localStorage.setItem('totalCoins', newTotal);
-
-  // coin‑fly animation
-  coinEffect.classList.remove('hidden', 'animate');
-  void coinEffect.offsetWidth;
-  coinEffect.classList.add('animate');
-  setTimeout(() => coinEffect.classList.add('hidden'), 800);
-}
-  function showBurnedPopup() {
+  /* --- Burn event --- */
+  function showBurned() {
     burnSound.currentTime = 0;
     burnSound.play().catch(() => {});
     input.disabled = true;
-    document.getElementById('game').classList.add('fade-out');
+    game.classList.add('fade-out');
     popupOverlay.classList.remove('hidden');
     popup.classList.remove('hidden');
-    restartBtn.classList.remove('hidden');
-    pauseBtn.classList.add('hidden');
   }
 
+  /* === INPUT HANDLER === */
   input.addEventListener('input', () => {
     if (gamePaused) return;
     updateStats();
+
     const spans = quoteEl.querySelectorAll('span');
     const val = input.value;
     let correct = true;
 
-    spans.forEach((span, i) => {
-      const char = val[i] || null;
-      if (char === null) {
-        span.classList.remove('correct', 'incorrect', 'burning-char');
-      } else if (char === span.textContent) {
-        span.classList.add('correct');
-        span.classList.remove('incorrect', 'burning-char');
+    // Per‑character comparison
+    spans.forEach((s, i) => {
+      const ch = val[i] || null;
+      if (ch === null) {
+        s.classList.remove('correct', 'incorrect', 'burning-char');
+      } else if (ch === s.textContent) {
+        s.classList.add('correct');
+        s.classList.remove('incorrect', 'burning-char');
       } else {
-        span.classList.add('incorrect', 'burning-char');
-        span.classList.remove('correct');
+        s.classList.add('incorrect', 'burning-char');
+        s.classList.remove('correct');
         correct = false;
       }
     });
 
+    // Word‑buffer logic for standard coins
+    const typedWords = val.trim().split(/\s+/);
+    for (let i = lastCredited + 1; i < typedWords.length; i++) {
+      if (typedWords[i] === quoteWords[i]) {
+        lastCredited = i;
+        wordBuffer++;
+        if (wordBuffer >= 3) { increaseCoins(); wordBuffer -= 3; }
+      } else { break; }
+    }
+
+    // Whole quote completed correctly
     if (correct && val.length === quote.length) nextQuote();
   });
 
+  /* === QUOTE ADVANCE === */
   async function nextQuote() {
-    increaseCoins();
-    clearInterval(flameInterval);
-    clearTimeout(timer);
-    timeLeftRemaining = timeLimit;
-    resetFlameBar();
+    clearInterval(flameInterval); clearTimeout(timer);
+    timeLeft = timeLimit;
+    resetFlame();
 
     quote = await getQuote();
     displayQuote(quote);
+
     input.value = '';
     input.focus();
     startTimer();
+    lastCredited = -1;
   }
 
+  /* === GAME START === */
   async function startGame() {
     quote = await getQuote();
     displayQuote(quote);
 
-    coins = 0;
-    coinsEl.textContent = '0';
-    timeLeftRemaining = timeLimit;
-    resetFlameBar();
+    coins = 0; coinsEl.textContent = '0';
+    wordBuffer = 0; timeLeft = timeLimit;
 
+    resetFlame();
     input.classList.remove('hidden');
     input.disabled = false;
     input.value = '';
@@ -374,20 +404,23 @@ function increaseCoins() {
 
     pauseBtn.classList.remove('hidden');
     restartBtn.classList.remove('hidden');
+
     startTimer();
+    lastCredited = -1;
   }
 
+  /* === BUTTON EVENTS === */
   startBtn.addEventListener('click', () => {
     startBtn.classList.add('hidden');
     countdownEl.classList.remove('hidden');
-    let count = 3;
-    countdownEl.textContent = count;
-    const interval = setInterval(() => {
-      count--;
-      if (count > 0) {
-        countdownEl.textContent = count;
+    let c = 3;
+    countdownEl.textContent = c;
+    const iv = setInterval(() => {
+      c--;
+      if (c > 0) {
+        countdownEl.textContent = c;
       } else {
-        clearInterval(interval);
+        clearInterval(iv);
         countdownEl.textContent = 'Go!';
         setTimeout(() => {
           countdownEl.classList.add('hidden');
@@ -400,21 +433,15 @@ function increaseCoins() {
   pauseBtn.addEventListener('click', () => {
     gamePaused = !gamePaused;
     pauseBtn.textContent = gamePaused ? 'Resume' : 'Pause';
-    pauseBtn.setAttribute('aria-label', gamePaused ? 'Resume game' : 'Pause game');
     input.disabled = gamePaused;
-    if (!gamePaused) {
-      input.focus();
-      startTimer();
-    } else {
-      clearInterval(flameInterval);
-      clearTimeout(timer);
-    }
+    if (!gamePaused) { input.focus(); startTimer(); }
+    else { clearInterval(flameInterval); clearTimeout(timer); }
   });
 
-  restartBtn.addEventListener('click', () => window.location.reload());
-  popupRestartBtn.addEventListener('click', () => window.location.reload());
-  document.addEventListener('paste', e => e.preventDefault());
-  document.addEventListener('copy', e => e.preventDefault());
+  restartBtn.addEventListener('click', () => location.reload());
+  popupRestartBtn.addEventListener('click', () => location.reload());
+
+  // Start with Enter key
   document.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !startBtn.classList.contains('hidden')) {
       e.preventDefault();
@@ -422,8 +449,13 @@ function increaseCoins() {
     }
   });
 
-  highWpmEl.textContent = localStorage.getItem('highWPM') || '0';
-  highCoinsEl.textContent = localStorage.getItem('highCoins') || '0';
+  /* === INIT STATS FROM STORAGE === */
+  highWpmEl.textContent     = localStorage.getItem('highWPM')    || '0';
+  totalCoinsEl.textContent  = localStorage.getItem('totalCoins') || '0';
+  lucidTotalEl.textContent  = localStorage.getItem('lucidCoins') || '0';
+  totalBadgesEl.textContent = localStorage.getItem('totalBadges') || '0';
+  updateWeekCoins(0); // load weekly progress
 </script>
+
 </body>
 </html>
