@@ -131,193 +131,294 @@
       margin-bottom: 10px;
       transition: width 0.1s linear;
     }
+
+    #input {
+      width: 100%;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid #00d9ff;
+      border-radius: 0.75rem;
+      padding: 0.75rem 1rem;
+      color: #ffffff;
+      font-size: 1.25rem;
+      outline: none;
+      caret-color: #00ff95;
+    }
+
+    #coinEffect {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      color: gold;
+      font-size: 1.5rem;
+      font-weight: bold;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    .animate {
+      animation: coinFly 0.8s ease-out forwards;
+    }
+
+    @keyframes coinFly {
+      0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        text-shadow: 0 0 8px gold;
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-40px) scale(1.5);
+      }
+    }
   </style>
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen px-4 py-10">
+  <audio id="burnSound" src="burn.mp3" preload="auto"></audio>
+
   <div class="text-center mb-8">
     <h1 class="text-5xl font-bold neon-text mb-4">Lucid Typist</h1>
     <p class="text-lg text-cyan-100">Master your typing speed. Dodge the flames. Earn Lucid Coins!</p>
     <p class="text-sm mt-2 text-cyan-300">High Score: <span id="highWpm">0</span> WPM | Most Coins: <span id="highCoins">0</span></p>
   </div>
 
-  <div id="game" class="w-full max-w-4xl relative transition-all duration-500">
-    <div id="countdown" class="neon-text hidden"></div>
-    <div id="flameBar" class="w-full"></div>
-    <div id="quote" class="text-area text-2xl bg-black/30 rounded-xl border border-cyan-400 p-6 min-h-[160px] text-white backdrop-blur-xl mb-6 leading-relaxed transition-all duration-300 shadow-xl"></div>
+  <div id="game" class="w-full max-w-4xl relative transition-all duration-500" aria-live="polite">
+    <div id="countdown" class="neon-text hidden" aria-label="Countdown"></div>
+    <div id="flameBar" class="w-full" aria-label="Time left"></div>
+    <div id="quote" class="text-area text-2xl bg-black/30 rounded-xl border border-cyan-400 p-6 min-h-[160px] text-white backdrop-blur-xl mb-6 leading-relaxed transition-all duration-300 shadow-xl" role="text" aria-live="polite"></div>
+    <input id="input" type="text" autocomplete="off" spellcheck="false" aria-label="Typing input" class="hidden" />
     <div class="flex justify-between mt-2 text-base text-cyan-200">
       <div>Speed: <span id="wpm">0</span> WPM</div>
       <div>Coins: <span id="coins">0</span></div>
     </div>
-    <div id="input" class="absolute top-[360px] left-[-9999px]" contenteditable="true" spellcheck="false"></div>
     <div class="flex justify-center gap-4 mt-10">
-      <button id="startBtn" class="glow-button">Start</button>
-      <button id="restartBtn" class="glow-button hidden">Restart</button>
+      <button id="startBtn" class="glow-button" aria-label="Start game">Start</button>
+      <button id="pauseBtn" class="glow-button hidden" aria-label="Pause game">Pause</button>
+      <button id="restartBtn" class="glow-button hidden" aria-label="Restart game">Restart</button>
     </div>
+    <div id="coinEffect" class="hidden">+1 🪙</div>
   </div>
 
-  <div id="popupOverlay" class="overlay-bg hidden"></div>
-  <div id="popup" class="overlay-popup hidden">
-    <h2 class="text-2xl font-bold mb-2">🔥 You got burned!</h2>
-    <p class="mb-6">Don't give up! Retry and dominate the leaderboard.</p>
+  <div id="popupOverlay" class="overlay-bg hidden" aria-hidden="true"></div>
+  <div id="popup" class="overlay-popup hidden" role="alertdialog" aria-modal="true" aria-labelledby="popupTitle" aria-describedby="popupDesc">
+    <h2 id="popupTitle" class="text-2xl font-bold mb-2">🔥 You got burned!</h2>
+    <p id="popupDesc" class="mb-6">Don't give up! Retry and dominate the leaderboard.</p>
     <div class="flex justify-center gap-4">
-      <button id="popupRestartBtn" class="glow-button">Try Again</button>
+      <button id="popupRestartBtn" class="glow-button" aria-label="Try again">Try Again</button>
     </div>
   </div>
 
-  <script>
-    const startBtn = document.getElementById("startBtn");
-    const restartBtn = document.getElementById("restartBtn");
-    const popup = document.getElementById("popup");
-    const popupOverlay = document.getElementById("popupOverlay");
-    const popupRestartBtn = document.getElementById("popupRestartBtn");
-    const input = document.getElementById("input");
-    const quoteEl = document.getElementById("quote");
-    const wpmEl = document.getElementById("wpm");
-    const coinsEl = document.getElementById("coins");
-    const countdownEl = document.getElementById("countdown");
-    const flameBar = document.getElementById("flameBar");
-    const highWpmEl = document.getElementById("highWpm");
-    const highCoinsEl = document.getElementById("highCoins");
+<script>
+  const startBtn = document.getElementById('startBtn');
+  const pauseBtn = document.getElementById('pauseBtn');
+  const restartBtn = document.getElementById('restartBtn');
+  const popup = document.getElementById('popup');
+  const popupOverlay = document.getElementById('popupOverlay');
+  const popupRestartBtn = document.getElementById('popupRestartBtn');
+  const input = document.getElementById('input');
+  const quoteEl = document.getElementById('quote');
+  const wpmEl = document.getElementById('wpm');
+  const coinsEl = document.getElementById('coins');
+  const countdownEl = document.getElementById('countdown');
+  const flameBar = document.getElementById('flameBar');
+  const highWpmEl = document.getElementById('highWpm');
+  const highCoinsEl = document.getElementById('highCoins');
+  const burnSound = document.getElementById('burnSound');
+  const coinEffect = document.getElementById('coinEffect');
 
-    let coins = 0;
-    let startTime, quote, timer, flameInterval;
-    const timeLimit = 10000;
+  let coins = 0;
+  let quote = '';
+  const timeLimit = 10000;
+  let timeLeftRemaining = timeLimit;
+  let flameInterval;
+  let timer;
+  let gamePaused = false;
 
-    const quotes = [
-      "The quick brown fox jumps over the lazy dog.",
-      "Typing fast requires practice.",
-      "Lucid Typist is a fun game."
-    ];
+  const fallbackQuotes = [
+    'The quick brown fox jumps over the lazy dog.',
+    'Typing fast requires practice.',
+    'Lucid Typist is a fun game.'
+  ];
 
-    function getQuote() {
-      return quotes[Math.floor(Math.random() * quotes.length)];
+  async function getQuote() {
+    try {
+      const res = await fetch('https://api.quotable.io/random');
+      if (!res.ok) throw new Error('API Error');
+      const data = await res.json();
+      return data.content;
+    } catch {
+      return fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
+    }
+  }
+
+  function displayQuote(q) {
+    quoteEl.innerHTML = q.split('').map(c => `<span>${c}</span>`).join('');
+  }
+
+  function updateStats() {
+    const typed = input.value.trim();
+    const elapsed = Math.max((timeLimit - timeLeftRemaining) / 1000, 0.1);
+    const words = typed ? typed.split(/\s+/).length : 0;
+    const wpm = Math.round((words / elapsed) * 60);
+    wpmEl.textContent = isFinite(wpm) ? wpm : 0;
+
+    const storedHigh = parseInt(localStorage.getItem('highWPM') || '0', 10);
+    if (wpm > storedHigh) {
+      localStorage.setItem('highWPM', wpm);
+      highWpmEl.textContent = wpm;
+    }
+  }
+
+  function resetFlameBar() {
+    flameBar.style.width = '100%';
+  }
+
+  function startTimer() {
+    clearInterval(flameInterval);
+    clearTimeout(timer);
+
+    flameInterval = setInterval(() => {
+      if (gamePaused) return;
+      timeLeftRemaining -= 100;
+      flameBar.style.width = `${(timeLeftRemaining / timeLimit) * 100}%`;
+      if (timeLeftRemaining <= 0) clearInterval(flameInterval);
+    }, 100);
+
+    timer = setTimeout(showBurnedPopup, timeLeftRemaining);
+  }
+
+  function increaseCoins() {
+    coins++;
+    coinsEl.textContent = coins;
+
+    const high = parseInt(localStorage.getItem('highCoins') || '0', 10);
+    if (coins > high) {
+      localStorage.setItem('highCoins', coins);
+      highCoinsEl.textContent = coins;
     }
 
-    function displayQuote(q) {
-      quoteEl.innerHTML = q.split('').map(char => `<span>${char}</span>`).join('');
-    }
+    coinEffect.classList.remove('hidden');
+    coinEffect.classList.remove('animate');
+    void coinEffect.offsetWidth;
+    coinEffect.classList.add('animate');
+    setTimeout(() => coinEffect.classList.add('hidden'), 800);
+  }
 
-    function updateStats() {
-      const typed = input.textContent.trim();
-      const elapsed = (new Date() - startTime) / 1000;
-      const words = typed.split(/\s+/).length;
-      const wpm = Math.round((words / elapsed) * 60);
-      wpmEl.textContent = wpm;
+  function showBurnedPopup() {
+    burnSound.currentTime = 0;
+    burnSound.play().catch(() => {});
+    input.disabled = true;
+    document.getElementById('game').classList.add('fade-out');
+    popupOverlay.classList.remove('hidden');
+    popup.classList.remove('hidden');
+    restartBtn.classList.remove('hidden');
+    pauseBtn.classList.add('hidden');
+  }
 
-      // Store High WPM
-      const stored = parseInt(localStorage.getItem("highWPM") || 0);
-      if (wpm > stored) {
-        localStorage.setItem("highWPM", wpm);
-        highWpmEl.textContent = wpm;
-      }
-    }
+  input.addEventListener('input', () => {
+    if (gamePaused) return;
+    updateStats();
+    const spans = quoteEl.querySelectorAll('span');
+    const val = input.value;
+    let correct = true;
 
-    function updateFlameBar() {
-      let timeLeft = timeLimit;
-      flameBar.style.width = "100%";
-      clearInterval(flameInterval);
-      flameInterval = setInterval(() => {
-        timeLeft -= 100;
-        flameBar.style.width = `${(timeLeft / timeLimit) * 100}%`;
-        if (timeLeft <= 0) clearInterval(flameInterval);
-      }, 100);
-    }
-
-    function nextQuote() {
-      coins++;
-      coinsEl.textContent = coins;
-
-      // Store High Coins
-      const high = parseInt(localStorage.getItem("highCoins") || 0);
-      if (coins > high) {
-        localStorage.setItem("highCoins", coins);
-        highCoinsEl.textContent = coins;
-      }
-
-      clearTimeout(timer);
-      startGame();
-    }
-
-    function showBurnedPopup() {
-      input.setAttribute('contenteditable', 'false');
-      document.getElementById('game').classList.add('fade-out');
-      popupOverlay.classList.remove('hidden');
-      popup.classList.remove('hidden');
-      restartBtn.classList.remove('hidden');
-    }
-
-    input.addEventListener("input", () => {
-      updateStats();
-      const spans = quoteEl.querySelectorAll("span");
-      let val = input.textContent;
-
-      if (val.length > quote.length) {
-        val = val.slice(0, quote.length);
-        input.textContent = val;
-        window.getSelection().collapse(input.firstChild, val.length);
-      }
-
-      let correct = true;
-      spans.forEach((span, i) => {
-        const char = val[i];
-        if (char == null) {
-          span.classList.remove("correct", "incorrect", "burning-char");
-        } else if (char === span.textContent) {
-          span.classList.add("correct");
-          span.classList.remove("incorrect", "burning-char");
-        } else {
-          span.classList.add("incorrect", "burning-char");
-          span.classList.remove("correct");
-          correct = false;
-        }
-      });
-
-      if (correct && val.length === quote.length) {
-        nextQuote();
+    spans.forEach((span, i) => {
+      const char = val[i] || null;
+      if (char === null) {
+        span.classList.remove('correct', 'incorrect', 'burning-char');
+      } else if (char === span.textContent) {
+        span.classList.add('correct');
+        span.classList.remove('incorrect', 'burning-char');
+      } else {
+        span.classList.add('incorrect', 'burning-char');
+        span.classList.remove('correct');
+        correct = false;
       }
     });
 
-    function startGame() {
-      quote = getQuote();
-      displayQuote(quote);
-      input.textContent = "";
-      input.setAttribute('contenteditable', 'true');
+    if (correct && val.length === quote.length) nextQuote();
+  });
+
+  async function nextQuote() {
+    increaseCoins();
+    clearInterval(flameInterval);
+    clearTimeout(timer);
+    timeLeftRemaining = timeLimit;
+    resetFlameBar();
+
+    quote = await getQuote();
+    displayQuote(quote);
+    input.value = '';
+    input.focus();
+    startTimer();
+  }
+
+  async function startGame() {
+    quote = await getQuote();
+    displayQuote(quote);
+
+    coins = 0;
+    coinsEl.textContent = '0';
+    timeLeftRemaining = timeLimit;
+    resetFlameBar();
+
+    input.classList.remove('hidden');
+    input.disabled = false;
+    input.value = '';
+    input.focus();
+
+    pauseBtn.classList.remove('hidden');
+    restartBtn.classList.remove('hidden');
+    startTimer();
+  }
+
+  startBtn.addEventListener('click', () => {
+    startBtn.classList.add('hidden');
+    countdownEl.classList.remove('hidden');
+    let count = 3;
+    countdownEl.textContent = count;
+    const interval = setInterval(() => {
+      count--;
+      if (count > 0) {
+        countdownEl.textContent = count;
+      } else {
+        clearInterval(interval);
+        countdownEl.textContent = 'Go!';
+        setTimeout(() => {
+          countdownEl.classList.add('hidden');
+          startGame();
+        }, 500);
+      }
+    }, 1000);
+  });
+
+  pauseBtn.addEventListener('click', () => {
+    gamePaused = !gamePaused;
+    pauseBtn.textContent = gamePaused ? 'Resume' : 'Pause';
+    pauseBtn.setAttribute('aria-label', gamePaused ? 'Resume game' : 'Pause game');
+    input.disabled = gamePaused;
+    if (!gamePaused) {
       input.focus();
-      startTime = new Date();
-      updateFlameBar();
-      timer = setTimeout(showBurnedPopup, timeLimit);
+      startTimer();
+    } else {
+      clearInterval(flameInterval);
+      clearTimeout(timer);
     }
+  });
 
-    startBtn.addEventListener("click", () => {
-      startBtn.classList.add("hidden");
-      countdownEl.classList.remove("hidden");
-      let count = 3;
-      countdownEl.textContent = count;
-      const interval = setInterval(() => {
-        count--;
-        if (count > 0) {
-          countdownEl.textContent = count;
-        } else {
-          clearInterval(interval);
-          countdownEl.textContent = "Go!";
-          setTimeout(() => {
-            countdownEl.classList.add("hidden");
-            startGame();
-          }, 500);
-        }
-      }, 1000);
-    });
+  restartBtn.addEventListener('click', () => window.location.reload());
+  popupRestartBtn.addEventListener('click', () => window.location.reload());
+  document.addEventListener('paste', e => e.preventDefault());
+  document.addEventListener('copy', e => e.preventDefault());
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !startBtn.classList.contains('hidden')) {
+      e.preventDefault();
+      startBtn.click();
+    }
+  });
 
-    restartBtn.addEventListener("click", () => location.reload());
-    popupRestartBtn.addEventListener("click", () => location.reload());
-
-    // Disable copy/paste
-    input.addEventListener("paste", e => e.preventDefault());
-    input.addEventListener("copy", e => e.preventDefault());
-
-    // Load High Scores
-    highWpmEl.textContent = localStorage.getItem("highWPM") || 0;
-    highCoinsEl.textContent = localStorage.getItem("highCoins") || 0;
-  </script>
+  highWpmEl.textContent = localStorage.getItem('highWPM') || '0';
+  highCoinsEl.textContent = localStorage.getItem('highCoins') || '0';
+</script>
 </body>
 </html>
