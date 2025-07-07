@@ -16,8 +16,7 @@
   <!-- ---------- CORE STYLES ---------- -->
   <style>
     /* ---- neon layout ---- */
-    body{background:linear-gradient(135deg,#0a0f1c,#122c5c,#0f1a3d);
-         font-family:'Orbitron',sans-serif;color:#00d9ff;overflow-x:hidden}
+    body{background:linear-gradient(135deg,#0a0f1c,#122c5c,#0f1a3d);font-family:'Orbitron',sans-serif;color:#00d9ff;overflow-x:hidden}
 
     .neon-text{text-shadow:0 0 5px #00f0ff,0 0 10px #00f0ff,0 0 20px #00cfff,0 0 30px #009aff}
     .text-area span.correct{color:#00ff95}
@@ -27,14 +26,10 @@
     .burning-char{animation:burn .8s ease-in-out infinite alternate}
     @keyframes burn{0%{color:#fff;text-shadow:0 0 4px #ff0000}50%{color:orange;text-shadow:0 0 8px #ff8000}100%{color:red;text-shadow:0 0 16px red;transform:scale(1.05)}}
 
-    .glow-button{background:transparent;border:2px solid #00d9ff;padding:12px 24px;border-radius:12px;color:#00d9ff;
-                 text-shadow:0 0 10px #00d9ff;font-weight:bold;transition:all .3s ease}
+    .glow-button{background:transparent;border:2px solid #00d9ff;padding:12px 24px;border-radius:12px;color:#00d9ff;text-shadow:0 0 10px #00d9ff;font-weight:bold;transition:all .3s ease}
     .glow-button:hover{box-shadow:0 0 20px #00d9ff,inset 0 0 10px #00d9ff;cursor:pointer;background-color:rgba(0,217,255,.1)}
 
-    .overlay-popup{background-color:rgba(10,20,30,.9);backdrop-filter:blur(14px);border:2px solid #00d9ff;
-                   box-shadow:0 0 30px #00d9ff;position:fixed;top:50%;left:50%;width:90vw;max-width:420px;
-                   transform:translate(-50%,-50%);z-index:10000;border-radius:18px;padding:28px 20px;
-                   color:#00d9ff;text-align:center;animation:fadeInPopup .4s ease-in-out forwards}
+    .overlay-popup{background-color:rgba(10,20,30,.9);backdrop-filter:blur(14px);border:2px solid #00d9ff;box-shadow:0 0 30px #00d9ff;position:fixed;top:50%;left:50%;width:90vw;max-width:420px;transform:translate(-50%,-50%);z-index:10000;border-radius:18px;padding:28px 20px;color:#00d9ff;text-align:center;animation:fadeInPopup .4s ease-in-out forwards}
     @keyframes fadeInPopup{from{opacity:0;transform:translate(-50%,-60%) scale(.95)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
     .overlay-bg{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999}
 
@@ -48,12 +43,23 @@
     .overlay-popup svg{filter:drop-shadow(0 0 6px rgba(255,160,0,.6))}
     #popupProgressBar{box-shadow:0 0 8px rgba(0,255,150,.7)}
 
-    @keyframes flyUp{
-      0%{opacity:0;transform:translateY(20px) scale(.8)}
-      50%{opacity:1;transform:translateY(-10px) scale(1.2)}
-      100%{opacity:0;transform:translateY(-60px) scale(.9)}
-    }
+    @keyframes flyUp{0%{opacity:0;transform:translateY(20px) scale(.8)}50%{opacity:1;transform:translateY(-10px) scale(1.2)}100%{opacity:0;transform:translateY(-60px) scale(.9)}}
     .lucid-fx{animation:flyUp 1s ease-out forwards;transition:opacity .4s}
+@keyframes fadeInDown {
+  0% { opacity: 0; transform: translate(-50%, -20px); }
+  100% { opacity: 1; transform: translate(-50%, 0); }
+}
+@keyframes fadeOutUp {
+  0% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -20px); }
+}
+.toast-show {
+  display: block !important;
+  animation: fadeInDown 0.4s ease forwards;
+}
+.toast-hide {
+  animation: fadeOutUp 0.4s ease forwards;
+}
   </style>
 </head>
 
@@ -84,7 +90,7 @@
   <input id="input" type="text" autocomplete="off" spellcheck="false" aria-label="Typing input" class="hidden" />
 
   <!-- SCORE PANEL -->
-  <div class="flex justify-between items-center mt-2 text-base text-cyan-200 gap-2 flex-wrap">
+  <div class="grid grid-cols-3 sm:flex justify-between items-center mt-2 text-base text-cyan-200 gap-2 flex-wrap whitespace-nowrap">
     <div>Speed: <span id="wpm">0</span> WPM</div>
     <div>Coins: <span id="coins">0</span></div>
     <div class="flex items-center gap-1">
@@ -148,7 +154,12 @@
 
   <button id="popupRestartBtn" class="glow-button" aria-label="Try again">Try Again</button>
 </div>
-
+<!-- TOAST NOTIFICATION -->
+<div id="toast" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 hidden 
+            bg-black/80 text-cyan-100 border border-cyan-500 px-5 py-3 rounded-xl 
+            shadow-lg text-center text-sm backdrop-blur-md animate-fadeInDown">
+  ⚠️ Cheating is not allowed. Please type the text.
+</div>
 <!-- ---------- MAIN SCRIPT ---------- -->
 <script>
 /* === DOM Shortcuts === */
@@ -164,9 +175,34 @@ const coinFx=$('coinEffect'), lucidFx=$('lucidEffect');
 const weekProgress=$('weekProgress'), badgeMsg=$('badgeMsg');
 const popup=$('popup'), popupOverlay=$('popupOverlay'), popupRestartBtn=$('popupRestartBtn');
 const lucidTotalEl=$('lucidCoinsTotal'), totalBadgesEl=$('totalBadges');
+
 // Prevent copy-paste and right-click on input field
 function showCheatingAlert() {
-  alert("⚠️ Cheating is not allowed. Please type the text.");
+  const wasRunning = !gamePaused;
+
+  if (wasRunning) {
+    gamePaused = true;
+    clearInterval(flameInterval);
+    clearTimeout(timer);
+    input.disabled = true;
+  }
+
+  const toast = $('toast');
+  toast.classList.remove('toast-hide', 'hidden');
+  toast.classList.add('toast-show');
+
+  setTimeout(() => {
+    toast.classList.remove('toast-show');
+    toast.classList.add('toast-hide');
+    setTimeout(() => toast.classList.add('hidden'), 400);
+    
+    if (wasRunning) {
+      gamePaused = false;
+      input.disabled = false;
+      input.focus();
+      startTimer();
+    }
+  }, 4000);
 }
 input.addEventListener('paste', e => { e.preventDefault(); showCheatingAlert(); });
 input.addEventListener('copy', e => { e.preventDefault(); showCheatingAlert(); });
@@ -177,6 +213,7 @@ input.addEventListener('contextmenu', e => { e.preventDefault(); showCheatingAle
 let coins=0, quote='', quoteWords=[];
 let gamePaused=false, timeLeft, flameInterval, timer;
 const timeLimit=10000;
+let correctWordsCount=0; // NEW: counts correctly completed words
 
 /* === Weekly / Lucid‑coin Helpers === */
 function getWeekStart(){const d=new Date();d.setUTCHours(0,0,0,0);d.setUTCDate(d.getUTCDate()-d.getUTCDay());return d.getTime();}
@@ -261,17 +298,27 @@ function increaseCoins(){
 }
 
 /* === Stats === */
-function updateStats(){
-  const typed=input.value.trim();
-  const elapsed=Math.max((timeLimit-timeLeft)/1000,0.1);
-  const words=typed?typed.split(/\s+/).length:0;
-  const wpm=Math.round((words/elapsed)*60);
-  wpmEl.textContent=isFinite(wpm)?wpm:0;
-  const best=parseInt(localStorage.getItem('highWPM')||'0',10);
-  if(wpm>best){
-    localStorage.setItem('highWPM',wpm); highWpmEl.textContent=wpm;
-    addLucidCoins(1); recordSound.currentTime=0; recordSound.play().catch(()=>{});
+function updateStats() {
+  const typed = input.value;
+  const elapsed = Math.max((timeLimit - timeLeft) / 1000, 1); // avoid divide by 0
+  const minutes = elapsed / 60;
+
+  let correct = 0, mistakes = 0;
+  for (let i = 0; i < typed.length; i++) {
+    if (typed[i] === quote[i]) correct++;
+    else mistakes++;
   }
+
+  const grossWPM = ((typed.length) / 5) / minutes;
+  const netWPM = ((typed.length - mistakes) / 5) / minutes;
+  const acc = (correct / typed.length) * 100;
+
+  wpmEl.textContent = Math.max(Math.round(netWPM), 0);
+
+  // Optional: show more stats in popup
+  $('popupHighWpm').textContent = Math.round(grossWPM);
+  $('popupAccuracy').textContent = isNaN(acc) ? '--%' : `${Math.round(acc)}%`;
+  $('popupProgressBar').style.width = `${Math.min(Math.round(acc), 100)}%`;
 }
 
 /* === Timer === */
@@ -304,10 +351,10 @@ function showBurned(){
   $('popupProgressBar').style.width=`${accuracy}%`;
 
   $('popupMotivation').textContent =
-    high>=90 ? "🔥 You're elite. Can you hit 100 WPM?"
-    : high>=70 ? "You’re in the top 20%! Push higher!"
-    : high>=50 ? "You’re in the top 35%! Aim for the top 20!"
-    : "You're improving! Let’s climb the leaderboard!";
+    high>=90 ? "🔥 You're elite. Can you hit 100 WPM?" :
+    high>=70 ? "You’re in the top 20%! Push higher!" :
+    high>=50 ? "You’re in the top 35%! Aim for the top 20!" :
+    "You're improving! Let’s climb the leaderboard!";
 }
 
 /* === Input Handler === */
@@ -323,8 +370,18 @@ input.addEventListener('input',()=>{
     else if(ch===s.textContent){s.classList.add('correct');s.classList.remove('incorrect','burning-char');}
     else{s.classList.add('incorrect','burning-char');s.classList.remove('correct');correct=false;}
   });
+
+  /* --- NEW: coin every 3 correctly typed words --- */
+  if(val.endsWith(' ')){
+    const words = val.trim().split(/\s+/);
+    const idx = words.length - 1;
+    if(idx>=0 && words[idx]===quoteWords[idx]){
+      correctWordsCount++;
+      if(correctWordsCount%3===0){ increaseCoins(); }
+    }
+  }
+
   if(correct && val.length===quote.length){
-    increaseCoins();
     nextQuote();
   }
 });
@@ -335,13 +392,14 @@ async function nextQuote(){
   timeLeft=timeLimit; resetFlame();
   quote=await getQuote(); displayQuote(quote);
   input.value=''; input.focus(); startTimer();
+  correctWordsCount=0; // reset per quote
 }
 
 /* === Game Start === */
 async function startGame(){
   game.classList.remove('fade-out');
   quote=await getQuote(); displayQuote(quote);
-  coins=0; coinsEl.textContent='0';
+  coins=0; coinsEl.textContent='0'; correctWordsCount=0;
   timeLeft=timeLimit; resetFlame();
   input.classList.remove('hidden'); input.disabled=false; input.value=''; input.focus();
   pauseBtn.classList.remove('hidden'); restartBtn.classList.remove('hidden');
@@ -367,6 +425,7 @@ popupRestartBtn.addEventListener('click',()=>{
   popup.classList.add('hidden'); popupOverlay.classList.add('hidden');
   game.classList.remove('fade-out'); startGame();
 });
+
 document.addEventListener('keydown',e=>{
   if(e.key==='Enter' && !startBtn.classList.contains('hidden')){e.preventDefault(); startBtn.click();}
 });
