@@ -164,6 +164,14 @@ const coinFx=$('coinEffect'), lucidFx=$('lucidEffect');
 const weekProgress=$('weekProgress'), badgeMsg=$('badgeMsg');
 const popup=$('popup'), popupOverlay=$('popupOverlay'), popupRestartBtn=$('popupRestartBtn');
 const lucidTotalEl=$('lucidCoinsTotal'), totalBadgesEl=$('totalBadges');
+// Prevent copy-paste and right-click on input field
+function showCheatingAlert() {
+  alert("⚠️ Cheating is not allowed. Please type the text.");
+}
+input.addEventListener('paste', e => { e.preventDefault(); showCheatingAlert(); });
+input.addEventListener('copy', e => { e.preventDefault(); showCheatingAlert(); });
+input.addEventListener('cut',  e => { e.preventDefault(); showCheatingAlert(); });
+input.addEventListener('contextmenu', e => { e.preventDefault(); showCheatingAlert(); });
 
 /* === Game State === */
 let coins=0, quote='', quoteWords=[];
