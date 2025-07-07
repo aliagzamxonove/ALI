@@ -4,61 +4,78 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lucid Typist</title>
-  <link rel="icon" href="{{ url_for('static', filename='IFTA5458.png') }}" type="image/png" />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="preload" as="image" href="{{ url_for('static', filename='lucid_coin_total.png') }}">
+
+  <!-- Favicon & Fonts -->
+  <link rel="icon" href="{{ url_for('static', filename='IFTA5458.png') }}" type="image/png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet"/>
+  <link rel="preload" as="image" href="{{ url_for('static', filename='lucid_coin_total.png') }}"/>
+
+  <!-- Tailwind (play CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- ✨—— CORE STYLES (unchanged) ——✨ -->
+  <!-- ---------- CORE STYLES ---------- -->
   <style>
-    body{background:linear-gradient(135deg,#0a0f1c,#122c5c,#0f1a3d);font-family:'Orbitron',sans-serif;color:#00d9ff;overflow-x:hidden}
+    /* ---- neon layout ---- */
+    body{background:linear-gradient(135deg,#0a0f1c,#122c5c,#0f1a3d);
+         font-family:'Orbitron',sans-serif;color:#00d9ff;overflow-x:hidden}
+
     .neon-text{text-shadow:0 0 5px #00f0ff,0 0 10px #00f0ff,0 0 20px #00cfff,0 0 30px #009aff}
     .text-area span.correct{color:#00ff95}
     .text-area span.incorrect{color:#ff5050;animation:melt .4s ease-in-out forwards}
+
     @keyframes melt{to{opacity:.2;transform:translateY(10px) scale(.85);text-decoration:line-through;color:#ff0000}}
     .burning-char{animation:burn .8s ease-in-out infinite alternate}
     @keyframes burn{0%{color:#fff;text-shadow:0 0 4px #ff0000}50%{color:orange;text-shadow:0 0 8px #ff8000}100%{color:red;text-shadow:0 0 16px red;transform:scale(1.05)}}
-    .glow-button{background:transparent;border:2px solid #00d9ff;padding:12px 24px;border-radius:12px;color:#00d9ff;text-shadow:0 0 10px #00d9ff;font-weight:bold;transition:all .3s ease}
+
+    .glow-button{background:transparent;border:2px solid #00d9ff;padding:12px 24px;border-radius:12px;color:#00d9ff;
+                 text-shadow:0 0 10px #00d9ff;font-weight:bold;transition:all .3s ease}
     .glow-button:hover{box-shadow:0 0 20px #00d9ff,inset 0 0 10px #00d9ff;cursor:pointer;background-color:rgba(0,217,255,.1)}
-    .overlay-popup{background-color:rgba(10,20,30,.9);backdrop-filter:blur(14px);border:2px solid #00d9ff;box-shadow:0 0 30px #00d9ff;position:fixed;top:50%;left:50%;width:90vw;max-width:420px;transform:translate(-50%,-50%);z-index:10000;border-radius:18px;padding:28px 20px;color:#00d9ff;text-align:center;animation:fadeInPopup .4s ease-in-out forwards}
+
+    .overlay-popup{background-color:rgba(10,20,30,.9);backdrop-filter:blur(14px);border:2px solid #00d9ff;
+                   box-shadow:0 0 30px #00d9ff;position:fixed;top:50%;left:50%;width:90vw;max-width:420px;
+                   transform:translate(-50%,-50%);z-index:10000;border-radius:18px;padding:28px 20px;
+                   color:#00d9ff;text-align:center;animation:fadeInPopup .4s ease-in-out forwards}
     @keyframes fadeInPopup{from{opacity:0;transform:translate(-50%,-60%) scale(.95)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
     .overlay-bg{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999}
+
     #countdown{font-weight:900;font-size:6rem;color:#00d9ff;text-shadow:0 0 15px #00d9ff,0 0 30px #00d9ff;margin-bottom:1.5rem}
-    #quote::before{content:"Type this:";display:block;font-size:1rem;color:#88e1ff;margin-bottom:8px;letter-spacing:1px}
-    .fade-out{animation:fadeOutGame .5s ease-in-out forwards}
-    @keyframes fadeOutGame{to{opacity:0;transform:scale(.95);pointer-events:none}}
     #flameBar{height:8px;background:linear-gradient(90deg,red,orange,yellow);border-radius:9999px;margin-bottom:10px;transition:width .1s linear}
     #input{width:100%;background:rgba(0,0,0,.4);border:1px solid #00d9ff;border-radius:.75rem;padding:.75rem 1rem;color:#fff;font-size:1.25rem;outline:none;caret-color:#00ff95}
     #coinEffect,#lucidEffect{position:absolute;top:10px;right:20px;font-size:1.5rem;font-weight:bold;opacity:0;pointer-events:none;z-index:999}
     #coinEffect{color:gold}#lucidEffect{color:#00ffc8}.animate{animation:coinFly .8s ease-out forwards}
     @keyframes coinFly{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-40px) scale(1.5)}}
-.overlay-popup svg {
-  filter: drop-shadow(0 0 6px rgba(255, 160, 0, 0.6));
-}  
-#popupProgressBar {
-  box-shadow: 0 0 8px rgba(0,255,150,0.7);
-}
-</style>
+
+    .overlay-popup svg{filter:drop-shadow(0 0 6px rgba(255,160,0,.6))}
+    #popupProgressBar{box-shadow:0 0 8px rgba(0,255,150,.7)}
+
+    @keyframes flyUp{
+      0%{opacity:0;transform:translateY(20px) scale(.8)}
+      50%{opacity:1;transform:translateY(-10px) scale(1.2)}
+      100%{opacity:0;transform:translateY(-60px) scale(.9)}
+    }
+    .lucid-fx{animation:flyUp 1s ease-out forwards;transition:opacity .4s}
+  </style>
 </head>
 
 <body class="flex flex-col items-center justify-center min-h-screen px-4 py-10">
 
-<!-- —————————— AUDIO —————————— -->
+<!-- ---------- AUDIO ---------- -->
 <audio id="burnSound"   src="static/audio/burn.mp3"   preload="auto"></audio>
 <audio id="recordSound" src="static/audio/record.mp3" preload="auto"></audio>
+<audio id="coinSound"   src="static/audio/coin.wav"   preload="auto"></audio>
 
-<!-- —————————— HEADER —————————— -->
+<!-- ---------- HEADER ---------- -->
 <div class="text-center mb-8">
   <h1 class="text-5xl font-bold neon-text mb-4">Lucid Typist</h1>
   <p class="text-lg text-cyan-100">Master your typing speed. Dodge the flames. Earn Lucid Coins!</p>
 
-  <p class="text-sm mt-2 text-cyan-300">High Score: <span id="highWpm">0</span> WPM | Total Coins: <span id="totalCoins">0</span></p>
-  <p class="text-xs text-cyan-400 mt-1">Weekly challenge: 50 coins → badge&nbsp;<span id="weekProgress"></span></p>
-  <p class="text-xs text-cyan-400">Total Badges Earned: <span id="totalBadges">0</span></p>
-  <p id="badgeMsg" class="text-sm text-green-300 mt-2 hidden">Badge earned this week! 🎉 +10 Lucid Coins</p>
+  <p class="text-sm mt-2 text-cyan-300">High Score: <span id="highWpm">0</span> WPM &nbsp;|&nbsp; Total Coins: <span id="totalCoins">0</span></p>
+  <p class="text-xs text-cyan-400 mt-1">Weekly challenge: 50 coins → badge <span id="weekProgress"></span></p>
+  <p class="text-xs text-cyan-400">Total Badges Earned: <span id="totalBadges">0</span></p>
+  <p id="badgeMsg" class="text-sm text-green-300 mt-2 hidden">Badge earned this week! 🎉 +10 Lucid Coins</p>
 </div>
 
-<!-- —————————— GAME AREA —————————— -->
+<!-- ---------- GAME AREA ---------- -->
 <div id="game" class="w-full max-w-4xl relative transition-all duration-500" aria-live="polite">
   <div id="countdown" class="neon-text hidden" aria-label="Countdown"></div>
 
@@ -66,33 +83,34 @@
   <div id="quote" class="text-area text-2xl bg-black/30 rounded-xl border border-cyan-400 p-6 min-h-[160px] text-white backdrop-blur-xl mb-6 leading-relaxed transition-all duration-300 shadow-xl" role="text" aria-live="polite"></div>
   <input id="input" type="text" autocomplete="off" spellcheck="false" aria-label="Typing input" class="hidden" />
 
-  <!-- —— SCORE PANEL —— -->
+  <!-- SCORE PANEL -->
   <div class="flex justify-between items-center mt-2 text-base text-cyan-200 gap-2 flex-wrap">
-    <div>Speed: <span id="wpm">0</span> WPM</div>
+    <div>Speed: <span id="wpm">0</span> WPM</div>
     <div>Coins: <span id="coins">0</span></div>
     <div class="flex items-center gap-1">
-      <img src="{{ url_for('static', filename='lucid_coin_total.png') }}" alt="Lucid Coin" class="w-7 h-7" />
+      <img src="{{ url_for('static', filename='lucid_coin_total.png') }}" alt="Lucid Coin" class="w-7 h-7"/>
       <span id="lucidCoinsTotal">0</span>
     </div>
   </div>
 
-  <!-- —— CONTROLS —— -->
+  <!-- CONTROLS -->
   <div class="flex justify-center gap-4 mt-10">
     <button id="startBtn"   class="glow-button" aria-label="Start game">Start</button>
     <button id="pauseBtn"   class="glow-button hidden" aria-label="Pause game">Pause</button>
     <button id="restartBtn" class="glow-button hidden" aria-label="Restart game">Restart</button>
   </div>
 
-  <!-- —— FX TEXT —— -->
-  <div id="coinEffect"  class="hidden">+1 🪙</div>
-  <div id="lucidEffect" class="hidden">+1 🪙 Lucid</div>
+  <!-- FX TEXT -->
+  <div id="coinEffect"  class="hidden">+1 🪙</div>
+  <div id="lucidEffect" class="hidden fixed z-50 pointer-events-none">
+    <img src="{{ url_for('static', filename='lucid_coin.png') }}" alt="Lucid Coin" class="w-12 h-12"/>
+  </div>
 </div>
 
-<!-- ---------------------- BURNED POPUP ---------------------- -->
+<!-- BURNED POP‑UP -->
 <div id="popupOverlay" class="overlay-bg hidden"></div>
 
 <div id="popup" class="overlay-popup hidden" role="alertdialog" aria-modal="true" aria-labelledby="popupTitle" aria-describedby="popupDesc">
-  
   <!-- 🔥 Title with Icon -->
   <div class="flex items-center justify-center gap-2 text-2xl font-bold mb-2 text-red-500">
     <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-orange-400" viewBox="0 0 24 24" fill="currentColor">
@@ -101,71 +119,61 @@
     <h2 id="popupTitle">You got burned!</h2>
   </div>
 
-  <!-- 🏆 Headline -->
+  <!-- Stats -->
   <p class="text-xl font-semibold text-cyan-100 mb-1">Your Highest Typing Score</p>
 
-  <!-- WPM + Accuracy Stat Panel -->
   <div class="bg-black/30 p-4 rounded-xl border border-cyan-500 mb-4 backdrop-blur-md shadow-lg w-full max-w-md mx-auto text-left space-y-3">
-    
-    <!-- WPM Row -->
     <div class="flex justify-between items-center">
-      <div class="text-cyan-300 font-medium flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M16 2H8a1 1 0 0 0-1 1v1H5a1 1 0 0 0-1 1v2a5 5 0 0 0 4 4.9V13a4 4 0 0 0 3 3.87V19H8a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2h-3v-2.13A4 4 0 0 0 16 13v-1.1a5 5 0 0 0 4-4.9V5a1 1 0 0 0-1-1h-2V3a1 1 0 0 0-1-1Zm-7 11v-1h6v1a2 2 0 1 1-6 0ZM6 7V6h1v3.9A3 3 0 0 1 6 7Zm12 0a3 3 0 0 1-1 2.9V6h1Z"/>
-        </svg>
+      <span class="text-cyan-300 font-medium flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24"><path d="M16 2H8a1 1 0 0 0-1 1v1H5a1 1 0 0 0-1 1v2a5 5 0 0 0 4 4.9V13a4 4 0 0 0 3 3.87V19H8a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2h-3v-2.13A4 4 0 0 0 16 13v-1.1a5 5 0 0 0 4-4.9V5a1 1 0 0 0-1-1h-2V3a1 1 0 0 0-1-1Zm-7 11v-1h6v1a2 2 0 1 1-6 0ZM6 7V6h1v3.9A3 3 0 0 1 6 7Zm12 0a3 3 0 0 1-1 2.9V6h1Z"/></svg>
         WPM
-      </div>
-      <div id="popupHighWpm" class="text-2xl font-bold text-cyan-100">0</div>
+      </span>
+      <span id="popupHighWpm" class="text-2xl font-bold text-cyan-100">0</span>
     </div>
 
-    <!-- Accuracy Row -->
     <div class="flex justify-between items-center">
-      <div class="text-cyan-300 font-medium flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20Zm1 14v-4h3l-4-5-4 5h3v4h2Z"/>
-        </svg>
-        Typing Clarity
-      </div>
-      <div id="popupAccuracy" class="text-2xl font-bold text-green-300">--%</div>
+      <span class="text-cyan-300 font-medium flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20Zm1 14v-4h3l-4-5-4 5h3v4h2Z"/></svg>
+        Typing Clarity
+      </span>
+      <span id="popupAccuracy" class="text-2xl font-bold text-green-300">--%</span>
     </div>
 
-    <!-- Progress Bar -->
     <div class="w-full h-2 bg-cyan-800 rounded-full overflow-hidden">
-      <div id="popupProgressBar" class="h-full bg-green-400 transition-all duration-300" style="width: 0%"></div>
+      <div id="popupProgressBar" class="h-full bg-green-400 transition-all duration-300" style="width:0%"></div>
     </div>
   </div>
 
-  <!-- Motivational Note -->
-  <p id="popupMotivation" class="text-sm text-center text-cyan-400 italic mb-4">You’re in the top 35%! Aim for the top 20!</p>
+  <p id="popupMotivation" class="text-sm text-center text-cyan-400 italic mb-4">You’re in the top 35%! Aim for the top 20!</p>
 
-  <!-- Button -->
-  <div class="flex justify-center">
-    <button id="popupRestartBtn" class="glow-button" aria-label="Try again">Try Again</button>
-  </div>
+  <button id="popupRestartBtn" class="glow-button" aria-label="Try again">Try Again</button>
 </div>
 
+<!-- ---------- MAIN SCRIPT ---------- -->
 <script>
-/* ========= DOM SHORTCUTS ========= */
-const $ = id => document.getElementById(id);
+/* === DOM Shortcuts === */
+const $   = id => document.getElementById(id);
+const game = $('game');
+
 const startBtn=$('startBtn'), pauseBtn=$('pauseBtn'), restartBtn=$('restartBtn');
 const input=$('input'), quoteEl=$('quote'), wpmEl=$('wpm'), coinsEl=$('coins');
 const countdownEl=$('countdown'), flameBar=$('flameBar');
 const highWpmEl=$('highWpm'), totalCoinsEl=$('totalCoins');
-const burnSound=$('burnSound'), recordSound=$('recordSound');
+const burnSound=$('burnSound'), recordSound=$('recordSound'), coinSound=$('coinSound');
 const coinFx=$('coinEffect'), lucidFx=$('lucidEffect');
 const weekProgress=$('weekProgress'), badgeMsg=$('badgeMsg');
 const popup=$('popup'), popupOverlay=$('popupOverlay'), popupRestartBtn=$('popupRestartBtn');
 const lucidTotalEl=$('lucidCoinsTotal'), totalBadgesEl=$('totalBadges');
 
-/* ========= GAME STATE ========= */
-let coins=0, wordBuffer=0, quote='', quoteWords=[], lastCredited=-1;
+/* === Game State === */
+let coins=0, quote='', quoteWords=[];
 let gamePaused=false, timeLeft, flameInterval, timer;
-const timeLimit=10000; // ms per quote
+const timeLimit=10000;
 
-/* ========= WEEKLY / LUCID COINS ========= */
+/* === Weekly / Lucid‑coin Helpers === */
 function getWeekStart(){const d=new Date();d.setUTCHours(0,0,0,0);d.setUTCDate(d.getUTCDate()-d.getUTCDay());return d.getTime();}
 function addLucidCoins(amount){
-  const current=parseInt(localStorage.getItem('lucidCoins')||'0',10)+amount;
+  const current=(parseInt(localStorage.getItem('lucidCoins')||'0',10)+amount);
   localStorage.setItem('lucidCoins',current); lucidTotalEl.textContent=current;
   flashFx(lucidFx,`+${amount} 🪙 Lucid`);
 }
@@ -184,7 +192,7 @@ function updateWeekCoins(add=0){
   }
 }
 
-/* ========= QUOTES ========= */
+/* === Quote Loader === */
 const fallback=[
   'Mastery is built one keystroke at a time.',
   'Speed is the result of discipline, not haste.',
@@ -195,48 +203,48 @@ const fallback=[
   'Consistency beats bursts of speed.',
   'Slow is smooth, and smooth is fast.',
   'Your keyboard is your dojo.',
-  'Type with purpose, not panic.',
-  'Accuracy first, speed second.',
-  'Each word typed is one step closer to mastery.',
-  'Typos are just stepping stones to perfection.',
-  'Mindful typing sharpens your focus.',
-  'Let your rhythm guide your fingers.'
+  'Type with purpose, not panic.'
 ];
-async function fetchWithTimeout(url,ms=3000){
-  const ctrl=new AbortController(), id=setTimeout(()=>ctrl.abort(),ms);
-  const res=await fetch(url,{signal:ctrl.signal}); clearTimeout(id); return res;
+async function fetchWithTimeout(url,ms=3500){
+  const ctrl=new AbortController(), to=setTimeout(()=>ctrl.abort(),ms);
+  try{const res=await fetch(url,{signal:ctrl.signal});clearTimeout(to);return res;}catch(e){clearTimeout(to);throw e;}
 }
-/* —— master quote loader —— */
 async function getQuote(){
   const CORS='https://api.allorigins.win/raw?url=';
   const sources=[
-    {url:'https://api.quotable.io/random', transform:j=>j.content},
-    {url:'https://zenquotes.io/api/random', transform:j=>j[0]?.q}
+    {url:'https://api.quotable.io/random',        extract:j=>j.content},
+    {url:'https://zenquotes.io/api/random',       extract:j=>j[0]?.q}
   ];
-  for(const s of sources){
+  for(const src of sources){
     try{
-      const res=await fetchWithTimeout(CORS+encodeURIComponent(s.url));
-      if(!res.ok) throw new Error('bad status');
+      const res=await fetchWithTimeout(CORS+encodeURIComponent(src.url));
+      if(!res.ok) throw new Error('Bad status');
       const data=await res.json();
-      const text=s.transform(data);
-      if(text && typeof text==='string' && text.length>10) return text;
-    }catch(e){/* try next */ }
+      const text=src.extract(data);
+      if(text && text.length>10) return text;
+    }catch{}
   }
   return fallback[Math.floor(Math.random()*fallback.length)];
 }
-/* —— display —— */
 function displayQuote(q){
-  quoteWords=q.trim().split(/\s+/).map(cleanWord);
-  quoteEl.innerHTML=q.split('').map(c=>`<span>${c}</span>`).join('');
+  quoteWords=q.trim().split(/\s+/);
+  quoteEl.innerHTML=[...q].map(c=>`<span>${c}</span>`).join('');
 }
 
-/* ========= WORD UTILS ========= */
-const cleanWord=w=>w.replace(/[^\w’']/g,'').toLowerCase();
+/* === FX Helpers === */
+function flashFx(el,txt=''){
+  if(el===lucidFx){
+    el.style.left='50%'; el.style.top='20%'; el.style.transform='translateX(-50%)';
+    el.classList.remove('hidden','lucid-fx'); void el.offsetWidth; el.classList.add('lucid-fx');
+    coinSound.currentTime=0; coinSound.play().catch(()=>{});
+    setTimeout(()=>el.classList.add('hidden'),1000);
+  }else{
+    el.textContent=txt; el.classList.remove('hidden','animate'); void el.offsetWidth; el.classList.add('animate');
+    setTimeout(()=>el.classList.add('hidden'),800);
+  }
+}
 
-/* ========= FX HELPERS ========= */
-function flashFx(el,text){el.textContent=text;el.classList.remove('hidden','animate');void el.offsetWidth;el.classList.add('animate');setTimeout(()=>el.classList.add('hidden'),800);}
-
-/* ========= COIN HANDLERS ========= */
+/* === Coin Handler === */
 function increaseCoins(){
   coins++; coinsEl.textContent=coins; updateWeekCoins(1);
   const newTotal=parseInt(localStorage.getItem('totalCoins')||'0',10)+1;
@@ -244,7 +252,7 @@ function increaseCoins(){
   flashFx(coinFx,'+1 🪙');
 }
 
-/* ========= PERSONAL BEST ========= */
+/* === Stats === */
 function updateStats(){
   const typed=input.value.trim();
   const elapsed=Math.max((timeLimit-timeLeft)/1000,0.1);
@@ -258,7 +266,7 @@ function updateStats(){
   }
 }
 
-/* ========= TIMER ========= */
+/* === Timer === */
 function resetFlame(){flameBar.style.width='100%';}
 function startTimer(){
   clearInterval(flameInterval); clearTimeout(timer);
@@ -269,40 +277,35 @@ function startTimer(){
   },100);
   timer=setTimeout(showBurned,timeLeft);
 }
-/* —— burn —— */
-function showBurned() {
-  burnSound.currentTime = 0;
-  burnSound.play().catch(() => {});
-  input.disabled = true;
-  game.classList.add('fade-out');
-  popupOverlay.classList.remove('hidden');
-  popup.classList.remove('hidden');
 
-  // ✅ High Score
-  const highWPM = parseInt(localStorage.getItem('highWPM') || '0', 10);
-  $('popupHighWpm').textContent = highWPM;
+/* === Burned Sequence === */
+function showBurned(){
+  burnSound.currentTime=0; burnSound.play().catch(()=>{});
+  input.disabled=true; game.classList.add('fade-out');
+  popupOverlay.classList.remove('hidden'); popup.classList.remove('hidden');
 
-  // ✅ Accuracy calculation
-  const val = input.value;
-  const totalChars = quote.length;
-  let correct = 0;
-  for (let i = 0; i < val.length && i < quote.length; i++) {
-    if (val[i] === quote[i]) correct++;
-  }
-  const accuracy = Math.round((correct / totalChars) * 100);
-  $('popupAccuracy').textContent = `${accuracy}%`;
-  $('popupProgressBar').style.width = `${accuracy}%`;
+  const high=parseInt(localStorage.getItem('highWPM')||'0',10);
+  $('popupHighWpm').textContent=high;
 
-  // ✅ Motivation Message
-  if (highWPM >= 90) $('popupMotivation').textContent = "🔥 You're elite. Can you hit 100 WPM?";
-  else if (highWPM >= 70) $('popupMotivation').textContent = "You’re in the top 20%! Push higher!";
-  else if (highWPM >= 50) $('popupMotivation').textContent = "You’re in the top 35%! Aim for the top 20!";
-  else $('popupMotivation').textContent = "You're improving! Let’s climb the leaderboard!";
+  const val=input.value;
+  const totalChars=quote.length;
+  let correct=0;
+  for(let i=0;i<val.length && i<quote.length;i++){if(val[i]===quote[i]) correct++;}
+  const accuracy=Math.round((correct/totalChars)*100);
+  $('popupAccuracy').textContent=`${accuracy}%`;
+  $('popupProgressBar').style.width=`${accuracy}%`;
+
+  $('popupMotivation').textContent =
+    high>=90 ? "🔥 You're elite. Can you hit 100 WPM?"
+    : high>=70 ? "You’re in the top 20%! Push higher!"
+    : high>=50 ? "You’re in the top 35%! Aim for the top 20!"
+    : "You're improving! Let’s climb the leaderboard!";
 }
 
-/* ========= INPUT HANDLER ========= */
+/* === Input Handler === */
 input.addEventListener('input',()=>{
-  if(gamePaused) return; updateStats();
+  if(gamePaused) return;
+  updateStats();
   const spans=quoteEl.querySelectorAll('span');
   const val=input.value;
   let correct=true;
@@ -312,55 +315,60 @@ input.addEventListener('input',()=>{
     else if(ch===s.textContent){s.classList.add('correct');s.classList.remove('incorrect','burning-char');}
     else{s.classList.add('incorrect','burning-char');s.classList.remove('correct');correct=false;}
   });
-
-  /* —— 3‑word coin logic —— */
-  const typedWords=val.trim().split(/\s+/).map(cleanWord);
-  for(let i=lastCredited+1;i<typedWords.length;i++){
-    if(typedWords[i] && typedWords[i]===quoteWords[i]){
-      lastCredited=i; wordBuffer++;
-      if(wordBuffer>=3){increaseCoins();wordBuffer-=3;}
-    }else break;
+  if(correct && val.length===quote.length){
+    increaseCoins();
+    nextQuote();
   }
-  if(correct && val.length===quote.length) nextQuote();
 });
 
-/* ========= QUOTE ADVANCE ========= */
+/* === Quote Advance === */
 async function nextQuote(){
   clearInterval(flameInterval); clearTimeout(timer);
   timeLeft=timeLimit; resetFlame();
   quote=await getQuote(); displayQuote(quote);
-  input.value=''; input.focus(); startTimer(); lastCredited=-1;
+  input.value=''; input.focus(); startTimer();
 }
 
-/* ========= GAME START ========= */
+/* === Game Start === */
 async function startGame(){
+  game.classList.remove('fade-out');
   quote=await getQuote(); displayQuote(quote);
-  coins=0; coinsEl.textContent='0'; wordBuffer=0; timeLeft=timeLimit;
-  resetFlame(); input.classList.remove('hidden'); input.disabled=false; input.value=''; input.focus();
+  coins=0; coinsEl.textContent='0';
+  timeLeft=timeLimit; resetFlame();
+  input.classList.remove('hidden'); input.disabled=false; input.value=''; input.focus();
   pauseBtn.classList.remove('hidden'); restartBtn.classList.remove('hidden');
-  startTimer(); lastCredited=-1;
+  startTimer();
 }
 
-/* ========= BUTTONS ========= */
+/* === Buttons === */
 startBtn.addEventListener('click',()=>{
   startBtn.classList.add('hidden'); countdownEl.classList.remove('hidden');
   let c=3; countdownEl.textContent=c;
-  const iv=setInterval(()=>{c--; if(c>0){countdownEl.textContent=c;}else{clearInterval(iv);countdownEl.textContent='Go!';setTimeout(()=>{countdownEl.classList.add('hidden');startGame();},500);}},1000);
+  const iv=setInterval(()=>{c--; if(c>0) countdownEl.textContent=c; else{
+    clearInterval(iv); countdownEl.textContent='Go!';
+    setTimeout(()=>{countdownEl.classList.add('hidden'); startGame();},500);
+  }},1000);
 });
 pauseBtn.addEventListener('click',()=>{
   gamePaused=!gamePaused; pauseBtn.textContent=gamePaused?'Resume':'Pause';
-  input.disabled=gamePaused; if(!gamePaused){input.focus();startTimer();}else{clearInterval(flameInterval);clearTimeout(timer);}
+  input.disabled=gamePaused;
+  if(!gamePaused){input.focus(); startTimer();}else{clearInterval(flameInterval); clearTimeout(timer);}
 });
 restartBtn.addEventListener('click',()=>location.reload());
-popupRestartBtn.addEventListener('click',()=>location.reload());
-document.addEventListener('keydown',e=>{if(e.key==='Enter'&&!startBtn.classList.contains('hidden')){e.preventDefault();startBtn.click();}});
+popupRestartBtn.addEventListener('click',()=>{
+  popup.classList.add('hidden'); popupOverlay.classList.add('hidden');
+  game.classList.remove('fade-out'); startGame();
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter' && !startBtn.classList.contains('hidden')){e.preventDefault(); startBtn.click();}
+});
 
-/* ========= INIT SAVED STATS ========= */
-highWpmEl.textContent    =localStorage.getItem('highWPM')||'0';
-totalCoinsEl.textContent =localStorage.getItem('totalCoins')||'0';
-lucidTotalEl.textContent =localStorage.getItem('lucidCoins')||'0';
+/* === Init Stored Stats === */
+highWpmEl.textContent   =localStorage.getItem('highWPM')   ||'0';
+totalCoinsEl.textContent=localStorage.getItem('totalCoins')||'0';
+lucidTotalEl.textContent=localStorage.getItem('lucidCoins')||'0';
 totalBadgesEl.textContent=localStorage.getItem('totalBadges')||'0';
-updateWeekCoins(0); // load existing weekly progress
+updateWeekCoins(0);
 </script>
 </body>
 </html>
