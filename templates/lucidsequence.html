@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lucid Sequence</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    :root {
+      --primary: #00ffc8;
+      --gold: #ffe46f;
+      --deep: #121827;
+      --surface: #1d2436;
+      --highlight: #0cf5b0;
+      --danger: #ff4f6d;
+      --white: #fff;
+      --radius: 20px;
+      --font-main: 'Orbitron', sans-serif;
+      --shadow: 0 0 20px rgba(0, 255, 200, 0.5);
+      --transition: 0.3s ease-in-out;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: radial-gradient(ellipse at center, #0d1b2a 0%, #060d1f 100%);
+      font-family: var(--font-main);
+      color: var(--white);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2em 1em;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      width: 100%;
+      max-width: 900px;
+      background: rgba(20, 30, 50, 0.9);
+      padding: 1em 2em;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 1.5em;
+    }
+
+    .score-info {
+      display: flex;
+      align-items: center;
+      font-size: 1.1em;
+    }
+
+    .score-info i {
+      margin-right: 0.5em;
+      color: var(--gold);
+    }
+
+    .score-info span {
+      margin-left: 0.3em;
+      font-weight: bold;
+      color: var(--gold);
+    }
+
+    #progressBarContainer {
+      width: 90%;
+      height: 10px;
+      background: #2e3c55;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-bottom: 1.5em;
+    }
+
+    #progressBar {
+      height: 100%;
+      width: 0%;
+      background: var(--highlight);
+      transition: width 0.5s ease;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      gap: 16px;
+      justify-content: center;
+      margin-top: 1em;
+    }
+
+    .tile {
+      width: 100px;
+      height: 100px;
+      border-radius: 16px;
+      background: var(--surface);
+      box-shadow: inset 0 0 10px #000, 0 0 15px rgba(0, 255, 200, 0.2);
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .tile:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 10px var(--primary);
+    }
+
+    .tile.flash {
+      background: var(--highlight);
+      box-shadow: 0 0 20px var(--highlight), inset 0 0 10px var(--highlight);
+      transform: scale(1.15);
+    }
+
+    .tile.clicked {
+      box-shadow: 0 0 25px var(--gold);
+    }
+
+    .controls {
+      margin-top: 2em;
+      display: flex;
+      gap: 1em;
+      justify-content: center;
+    }
+
+    button {
+      background: linear-gradient(135deg, var(--primary), #1a237e);
+      color: var(--deep);
+      font-weight: bold;
+      border: none;
+      padding: 0.8em 2.2em;
+      border-radius: 2em;
+      font-size: 1em;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 0 12px var(--highlight), inset 0 0 5px #fff2;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .message {
+      margin-top: 1.8em;
+      font-size: 1.3em;
+      text-align: center;
+      color: var(--gold);
+      text-shadow: 0 0 10px #00ffc880;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes coinFloat {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-50px) scale(1.3); opacity: 0; }
+    }
+
+    .floating-reward {
+      position: absolute;
+      color: var(--gold);
+      font-size: 1.3em;
+      pointer-events: none;
+      animation: coinFloat 1s ease-out forwards;
+      z-index: 99;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+    }
+
+    .shake {
+      animation: shake 0.4s ease;
+    }
+
+    @media (max-width: 500px) {
+      .grid {
+        grid-template-columns: repeat(3, 80px);
+        gap: 10px;
+      }
+
+      .tile {
+        width: 80px;
+        height: 80px;
+      }
+
+      button {
+        padding: 0.6em 1.5em;
+        font-size: 0.9em;
+      }
+    }
+  </style>
+  <audio id="sound-flash" src="https://cdn.pixabay.com/audio/2022/03/16/audio_36d467d3c5.mp3"></audio>
+  <audio id="sound-click" src="https://cdn.pixabay.com/audio/2022/03/16/audio_23c8891c2e.mp3"></audio>
+  <audio id="sound-error" src="https://cdn.pixabay.com/audio/2022/03/01/audio_155b631212.mp3"></audio>
+  <audio id="sound-pass" src="https://cdn.pixabay.com/audio/2022/03/09/audio_d199416012.mp3"></audio>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+  <header>
+    <nav style="position: absolute; top: 15px; left: 15px;">
+      <a href="gamehome" title="Go Home" style="text-decoration: none; font-size: 1.8em; color: var(--primary);">
+        <i class="fas fa-home"></i>
+      </a>
+    </nav>
+    <div class="score-info"><i class="fas fa-coins"></i> Coins: <span id="coins">0</span></div>
+    <div class="score-info">
+      <img src="coin_lucid_coin_total.png" alt="Lucid Coin" style="height:22px; margin-right: 6px;" />
+      <span id="lucidCoins"><span>0</span></span>
+    </div>
+    <div class="score-info"><i class="fas fa-trophy"></i> High: <span id="highScore">0</span></div>
+  </header>
+
+  <div id="progressBarContainer"><div id="progressBar"></div></div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="controls">
+    <button id="startBtn">Start</button>
+    <button id="retryBtn" disabled>Retry (1 <i class="fas fa-star"></i>)</button>
+  </div>
+
+  <div class="message" id="message"></div>
+
+<script>
+  const grid = document.getElementById('grid');
+  const message = document.getElementById('message');
+  const coinsEl = document.getElementById('coins');
+  const lucidEl = document.querySelector('#lucidCoins span');
+  const highScoreEl = document.getElementById('highScore');
+  const startBtn = document.getElementById('startBtn');
+  const retryBtn = document.getElementById('retryBtn');
+  const progressBar = document.getElementById('progressBar');
+
+  const sFlash = new Audio("https://cdn.pixabay.com/audio/2022/03/16/audio_36d467d3c5.mp3");
+  const sClick = new Audio("https://cdn.pixabay.com/audio/2022/03/16/audio_23c8891c2e.mp3");
+  const sPass = new Audio("https://cdn.pixabay.com/audio/2022/03/09/audio_d199416012.mp3");
+  const sError = new Audio("https://cdn.pixabay.com/audio/2022/03/01/audio_155b631212.mp3");
+
+  let fullSequence = [], userStep = 0, level = 0;
+  let coins = +localStorage.getItem('sequenceCoins') || 0;
+  let lucidCoins = +localStorage.getItem('sequenceLucid') || 0;
+  let highScore = +localStorage.getItem('sequenceHigh') || 0;
+  let canClick = false;
+
+function animateValue(el, start, end, duration = 600) {
+  const diff = Math.abs(end - start);
+
+  // If the difference is large, skip animation and jump to final
+  if (diff > 100) {
+    el.textContent = end;
+    return;
+  }
+
+  const step = Math.sign(end - start);
+  let current = start;
+  const interval = Math.max(10, Math.floor(duration / diff));
+
+  const timer = setInterval(() => {
+    current += step;
+    el.textContent = current;
+    if (current === end) clearInterval(timer);
+  }, interval);
+}
+
+
+  function updateHUD() {
+    animateValue(coinsEl, +coinsEl.textContent, coins);
+    animateValue(lucidEl, +lucidEl.textContent, lucidCoins);
+    animateValue(highScoreEl, +highScoreEl.textContent, highScore);
+  }
+
+  function makeGrid() {
+    for (let i = 0; i < 9; i++) {
+      const tile = document.createElement('div');
+      tile.className = 'tile';
+      tile.dataset.index = i;
+      tile.onclick = () => handleUserInput(i);
+      grid.appendChild(tile);
+    }
+  }
+
+  function flashTile(index, delay) {
+    const tile = grid.children[index];
+    setTimeout(() => {
+      sFlash.currentTime = 0;
+      sFlash.play();
+      tile.classList.add('flash');
+      setTimeout(() => tile.classList.remove('flash'), 500);
+    }, delay);
+  }
+
+  function playSequence() {
+    canClick = false;
+    const currentSequence = fullSequence.slice(0, level);
+    const speed = 700 - Math.min(level * 10, 400);
+    currentSequence.forEach((index, i) => {
+      flashTile(index, i * speed);
+    });
+    setTimeout(() => {
+      canClick = true;
+    }, currentSequence.length * speed);
+  }
+
+  function nextLevel() {
+    level++;
+    message.textContent = `Level ${level}`;
+    userStep = 0;
+    progressBar.style.width = `${level}%`;
+    playSequence();
+  }
+
+  function handleUserInput(index) {
+    if (!canClick) return;
+    sClick.currentTime = 0;
+    sClick.play();
+
+    const expectedIndex = fullSequence[userStep];
+    const tile = grid.children[index];
+    tile.classList.add('clicked');
+    setTimeout(() => tile.classList.remove('clicked'), 300);
+
+    if (index === expectedIndex) {
+      userStep++;
+      if (userStep === level) {
+        coins += 25;
+        showReward('🪙');
+        if (level % 5 === 0) {
+          lucidCoins++;
+          showReward('<img src="coin_lucid_coin_total.png" style="height:20px;vertical-align:middle;">');
+          if (level === 5) launchConfetti();
+        }
+        if (level > highScore) highScore = level;
+        storeData();
+        updateHUD();
+        sPass.currentTime = 0;
+        sPass.play();
+        setTimeout(nextLevel, 800);
+      }
+    } else {
+      gameOver();
+    }
+  }
+
+  function gameOver() {
+    message.textContent = `❌ Wrong! You reached Level ${level}`;
+    sError.currentTime = 0;
+    sError.play();
+    startBtn.disabled = false;
+    retryBtn.disabled = lucidCoins < 1;
+    canClick = false;
+    [...grid.children].forEach(tile => {
+      tile.classList.add('shake');
+      setTimeout(() => tile.classList.remove('shake'), 500);
+    });
+  }
+
+  function startGame() {
+    fullSequence = Array.from({ length: 100 }, () => Math.floor(Math.random() * 9));
+    userStep = 0;
+    level = 1;
+    message.textContent = '';
+    progressBar.style.width = '1%';
+    startBtn.disabled = true;
+    retryBtn.disabled = true;
+    resetGridState();
+    playSequence();
+  }
+
+  function retryGame() {
+    if (lucidCoins >= 1) {
+      lucidCoins--;
+      storeData();
+      updateHUD();
+      userStep = 0;
+      message.textContent = '↻ Retrying...';
+      resetGridState();
+      playSequence();
+    }
+  }
+
+  function storeData() {
+    localStorage.setItem('sequenceCoins', coins);
+    localStorage.setItem('sequenceLucid', lucidCoins);
+    localStorage.setItem('sequenceHigh', highScore);
+  }
+
+  function resetGridState() {
+    [...grid.children].forEach(tile => tile.classList.remove('flash', 'clicked', 'shake'));
+  }
+
+  function showReward(content) {
+    const reward = document.createElement('div');
+    reward.className = 'floating-reward';
+    reward.innerHTML = content;
+    reward.style.left = (window.innerWidth / 2 - 10) + 'px';
+    reward.style.top = '60%';
+    document.body.appendChild(reward);
+    setTimeout(() => reward.remove(), 1000);
+  }
+
+  function launchConfetti() {
+    if (typeof confetti !== 'undefined') {
+      confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 }, colors: ['#00ffc8', '#ffe46f'] });
+    }
+  }
+
+  startBtn.onclick = startGame;
+  retryBtn.onclick = retryGame;
+  window.addEventListener("beforeunload", storeData);
+
+  makeGrid();
+  updateHUD();
+</script>
+</body>
+</html>
