@@ -126,7 +126,7 @@ def generate_report():
         mileage_data_raw = request.form['mileage_data']
         logo_file = request.files.get('logo')
 
-        # Full state names → abbreviations
+        # State name to abbreviation map
         state_map = {
             'alabama': 'AL', 'alaska': 'AK', 'arizona': 'AZ', 'arkansas': 'AR', 'california': 'CA',
             'colorado': 'CO', 'connecticut': 'CT', 'delaware': 'DE', 'florida': 'FL', 'georgia': 'GA',
@@ -140,16 +140,19 @@ def generate_report():
             'virginia': 'VA', 'washington': 'WA', 'west virginia': 'WV', 'wisconsin': 'WI', 'wyoming': 'WY'
         }
 
-        # Normalize and parse mileage data
+        # Normalize input text
         normalized_text = mileage_data_raw.lower()
-        normalized_text = re.sub(r'[^\w\s().-]', ' ', normalized_text)
+        normalized_text = re.sub(r'[^\w\s().:-]', ' ', normalized_text)  # Remove unwanted punctuation
 
+        # Replace full state names with abbreviations
         for full in sorted(state_map.keys(), key=len, reverse=True):
             abbr = state_map[full]
-            normalized_text = re.sub(rf'\b{re.escape(full)}\b', abbr, normalized_text, flags=re.IGNORECASE)
+            normalized_text = re.sub(rf'\b{re.escape(full)}\b', abbr.lower(), normalized_text, flags=re.IGNORECASE)
 
-        matches = re.findall(r'\(?\b([A-Z]{2})\b\)?[\s:\-]*([0-9]+(?:\.[0-9]+)?)', normalized_text.upper())
+        # Find all occurrences of two-letter state codes and numbers
+        matches = re.findall(r'\(?\b([a-z]{2})\b\)?[\s:\-]*([0-9]+(?:\.[0-9]+)?)', normalized_text)
 
+        # Build mileage dictionary
         mileage_data = {}
         for state, miles_str in matches:
             try:
@@ -161,13 +164,13 @@ def generate_report():
 
         total_mileage = sum(mileage_data.values())
 
-        # Save logo temporarily
+        # Save uploaded logo temporarily
         logo_temp_path = None
         if logo_file and logo_file.filename != '':
             logo_temp_path = os.path.join(GENERATED_FOLDER, "temp_logo.png")
             logo_file.save(logo_temp_path)
 
-        # PDF Class
+        # PDF generation class
         class StyledPDF(FPDF):
             def header(self):
                 if logo_temp_path and os.path.exists(logo_temp_path):
@@ -211,18 +214,19 @@ def generate_report():
                 self.cell(col_width, 8, f"{total:.2f}", border=1, align="R")
                 self.ln(10)
 
+        # Generate PDF
         pdf = StyledPDF()
         pdf.add_page()
         pdf.add_table(truck_number, mileage_data, total_mileage)
 
-        # Safe filename
+        # Safe filename with timestamp
         safe_company = re.sub(r'[^a-zA-Z0-9_\-]', '_', company)
         timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
         filename = f"{safe_company}_{truck_number}_IFTA_{timestamp}.pdf"
         filepath = os.path.join(GENERATED_FOLDER, filename)
         pdf.output(filepath)
 
-        # Safe cleanup in background thread
+        # Clean up PDF and temp logo after sending (with delay to allow download)
         @after_this_request
         def cleanup(response):
             def delayed_delete():
