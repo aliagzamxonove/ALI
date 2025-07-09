@@ -33,7 +33,9 @@
 
       <div class="input-group with-button">
         <label>Mileage Data (State Miles):</label>
-        <textarea name="mileage_data" id="mileage_data" required placeholder="Example: AL 191.20 mi&#10;TX 5000 *&#10;FL 1234" oninput="autoResize(this)"></textarea>
+        <textarea name="mileage_data" id="mileage_data" required
+          placeholder="Example:\nAlabama 191.20\nTexas 5000\nFL 1234.50"
+          oninput="autoResize(this)"></textarea>
         <button type="button" class="inline-btn" onclick="pasteToField('mileage_data')">📋</button>
         <div id="mileage-error" style="color: red; margin-top: 5px;"></div>
       </div>
@@ -41,18 +43,19 @@
       <div class="input-group horizontal-group">
         <div class="field-with-label">
           <label>Total Mileage:</label>
-          <input type="number" name="total_mileage" id="total_mileage" step="0.01" placeholder="Calculated mileage will appear here" readonly />
+          <input type="number" name="total_mileage" id="total_mileage" step="0.01" readonly />
         </div>
         <button type="button" class="remove-btn" onclick="resetForm()" title="Clear All Fields">🗑️ Remove All</button>
       </div>
 
       <div class="input-group">
         <label>Upload Company Logo (optional):</label>
-        <input type="file" name="logo" accept="image/*" />
+        <input type="file" name="logo" accept="image/*" id="logo-input" />
+        <div id="logo-preview" style="margin-top: 5px; font-size: 14px; color: #333;"></div>
       </div>
 
       <div class="form-actions">
-        <button type="submit" class="primary-btn">Generate PDF</button>
+        <button type="submit" class="primary-btn" id="submit-btn">Generate PDF</button>
       </div>
     </form>
 
@@ -67,13 +70,18 @@
     const spinner = document.getElementById("loading-spinner");
     const mileageField = document.getElementById("mileage_data");
     const totalMileageInput = document.getElementById("total_mileage");
+    const logoInput = document.getElementById("logo-input");
+    const logoPreview = document.getElementById("logo-preview");
+    const submitBtn = document.getElementById("submit-btn");
 
     form.addEventListener("submit", () => {
       spinner.classList.remove("hidden");
+      submitBtn.disabled = true;
       window.scrollTo({ top: 0, behavior: "smooth" });
 
       setTimeout(() => {
         spinner.classList.add("hidden");
+        submitBtn.disabled = false;
       }, 3000);
     });
 
@@ -81,6 +89,7 @@
       form.reset();
       totalMileageInput.value = '';
       document.getElementById("mileage-error").textContent = '';
+      logoPreview.textContent = '';
     }
 
     function pasteToField(name) {
@@ -105,9 +114,7 @@
         const match = line.trim().match(/^([A-Z]{2,3})\s+(\d+(?:\.\d+)?)/i);
         if (match) {
           const miles = parseFloat(match[2]);
-          if (!isNaN(miles)) {
-            total += miles;
-          }
+          if (!isNaN(miles)) total += miles;
         } else if (line.trim() !== '') {
           errorLines.push(line);
         }
@@ -116,10 +123,14 @@
       totalMileageInput.value = total.toFixed(2);
 
       const errorDiv = document.getElementById("mileage-error");
-      if (errorLines.length) {
-        errorDiv.textContent = "Invalid lines: " + errorLines.join(', ');
+      errorDiv.textContent = errorLines.length ? "Invalid lines: " + errorLines.join(', ') : "";
+    });
+
+    logoInput.addEventListener("change", () => {
+      if (logoInput.files.length > 0) {
+        logoPreview.textContent = "Selected logo: " + logoInput.files[0].name;
       } else {
-        errorDiv.textContent = "";
+        logoPreview.textContent = '';
       }
     });
   </script>
