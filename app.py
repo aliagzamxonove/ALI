@@ -8,6 +8,9 @@ import html
 import mimetypes
 import markdown
 import requests
+import threading
+import time
+from datetime import datetime
 from flask_mail import Mail, Message
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -28,7 +31,8 @@ app.secret_key = os.urandom(24)
 
 # -------------------- Folders --------------------
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-GENERATED_FOLDER = os.path.join(BASE_DIR, 'generated')
+GENERATED_FOLDER = os.path.join(os.path.dirname(__file__), 'generated')
+os.makedirs(GENERATED_FOLDER, exist_ok=True)
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
 INSTRUCTION_FOLDER = os.path.join(BASE_DIR, 'Instruction')
 os.makedirs(GENERATED_FOLDER, exist_ok=True)
@@ -142,13 +146,14 @@ def generate_report():
 
         for full in sorted(state_map.keys(), key=len, reverse=True):
             abbr = state_map[full]
-            normalized_text = re.sub(rf'\b{re.escape(full)}\b', abbr.lower(), normalized_text, flags=re.IGNORECASE)
+            normalized_text = re.sub(rf'\b{re.escape(full)}\b', abbr, normalized_text, flags=re.IGNORECASE)
 
         matches = re.findall(r'\(?\b([A-Z]{2})\b\)?[\s:\-]*([0-9]+(?:\.[0-9]+)?)', normalized_text.upper())
 
         mileage_data = {}
         for state, miles_str in matches:
             try:
+                state = state.upper()
                 miles = float(miles_str)
                 mileage_data[state] = mileage_data.get(state, 0) + miles
             except ValueError:
@@ -162,6 +167,7 @@ def generate_report():
             logo_temp_path = os.path.join(GENERATED_FOLDER, "temp_logo.png")
             logo_file.save(logo_temp_path)
 
+        # PDF Class
         class StyledPDF(FPDF):
             def header(self):
                 if logo_temp_path and os.path.exists(logo_temp_path):
@@ -171,10 +177,11 @@ def generate_report():
                 self.set_text_color(0, 51, 102)
                 self.ln(10)
                 self.cell(0, 10, "IFTA REPORT", ln=True, align="C")
-                self.ln(5)
+
                 self.set_font("Helvetica", "B", 16)
                 self.set_text_color(0, 0, 0)
                 self.cell(0, 10, company, ln=True, align="C")
+
                 self.set_font("Helvetica", "", 12)
                 self.cell(0, 10, f"Period: {period}", ln=True, align="C")
                 self.ln(10)
@@ -194,7 +201,7 @@ def generate_report():
                 self.ln()
                 self.set_font("Helvetica", "", 10)
 
-                for state, miles in data.items():
+                for state, miles in sorted(data.items()):
                     self.cell(col_width, 8, state, border=1)
                     self.cell(col_width, 8, f"{miles:.2f}", border=1, align="R")
                     self.ln()
@@ -208,26 +215,31 @@ def generate_report():
         pdf.add_page()
         pdf.add_table(truck_number, mileage_data, total_mileage)
 
+        # Safe filename
         safe_company = re.sub(r'[^a-zA-Z0-9_\-]', '_', company)
-        filename = f"{safe_company}_{truck_number}_IFTA_Report.pdf"
+        timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+        filename = f"{safe_company}_{truck_number}_IFTA_{timestamp}.pdf"
         filepath = os.path.join(GENERATED_FOLDER, filename)
         pdf.output(filepath)
 
+        # Safe cleanup in background thread
         @after_this_request
         def cleanup(response):
-            try:
-                if os.path.exists(filepath):
-                    os.remove(filepath)
-                if logo_temp_path and os.path.exists(logo_temp_path):
-                    os.remove(logo_temp_path)
-            except Exception as e:
-                print(f"Cleanup error: {e}")
+            def delayed_delete():
+                time.sleep(5)
+                try:
+                    if os.path.exists(filepath):
+                        os.remove(filepath)
+                    if logo_temp_path and os.path.exists(logo_temp_path):
+                        os.remove(logo_temp_path)
+                except Exception as e:
+                    print(f"Cleanup error: {e}")
+            threading.Thread(target=delayed_delete).start()
             return response
 
         return send_file(filepath, mimetype='application/pdf', as_attachment=True, download_name=filename)
 
     return render_template('generate_report.html')
-    
     
 @app.route('/eld_malfunction_letter', methods=['GET', 'POST'])
 def eld_malfunction_letter():
