@@ -470,6 +470,10 @@ def mail_page():
                     api_key=api_key
                 )
 
+            elif email_type == "promo":
+               subject = "Unlock Your 20% Discount on Lucid ELD"
+               html_message = render_template('emails/promo.html')
+
             else:
                 flash("Unknown email type!", "error")
                 return redirect(url_for('mail_page'))
