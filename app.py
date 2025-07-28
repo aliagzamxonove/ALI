@@ -18,6 +18,10 @@ from email.mime.application import MIMEApplication
 from markdown import markdown
 import smtplib
 from werkzeug.security import generate_password_hash, check_password_hash
+import imapclient
+import pyzmail36
+import telegram
+from dotenv import load_dotenv
 
 # -------------------- Setup Logger --------------------
 RECAPTCHA_SECRET_KEY = '6LcpJVsrAAAAAKOhLJdLqLHQSjkaqGUdJdSKOwij'  # Replace this with your actual secret key
@@ -44,6 +48,18 @@ USER_CREDENTIALS = {
     'username': 'admin',
     'password': generate_password_hash('Pass4%33word')
 }
+
+# Load credentials from .env
+load_dotenv()
+
+EMAIL = os.getenv('MAIL_USERNAME')
+PASSWORD = os.getenv('MAIL_PASSWORD')
+IMAP_SERVER = 'imap.gmail.com'
+
+TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_API_KEY')
+TELEGRAM_CHAT_ID = os.getenv('CHAT_ID')
+
+bot = telegram.Bot(token=TELEGRAM_BOT_TOKEN)
 
 # -------------------- Mail Configuration --------------------
 app.config.update(
@@ -550,6 +566,34 @@ def lucidtypist():
 @app.route('/check')
 def check():
     return render_template('check.html')
+
+@app.route('/check-email')
+def check_email():
+    try:
+        with imapclient.IMAPClient(IMAP_SERVER) as client:
+            client.login(EMAIL, PASSWORD)
+            client.select_folder('INBOX', readonly=True)
+
+            messages = client.search(['UNSEEN'])
+            if not messages:
+                return 'No new emails.'
+
+            for uid in messages:
+                raw_message = client.fetch([uid], ['BODY[]', 'FLAGS'])[uid][b'BODY[]']
+                message = pyzmail36.PyzMessage.factory(raw_message)
+                subject = message.get_subject()
+                body = message.text_part.get_payload().decode(message.text_part.charset)
+
+                # Send to Telegram
+                bot.send_message(
+                    chat_id=TELEGRAM_CHAT_ID,
+                    text=f"📧 New Email:\n\nSubject: {subject}\n\n{body[:1000]}"
+                )
+
+        return f"{len(messages)} new email(s) forwarded to Telegram."
+
+    except Exception as e:
+        return f"Error: {str(e)}"
 
 @app.route('/logout')
 def logout():
