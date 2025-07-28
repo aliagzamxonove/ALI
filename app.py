@@ -567,34 +567,6 @@ def lucidtypist():
 def check():
     return render_template('check.html')
 
-@app.route('/check-email')
-def check_email():
-    try:
-        with imapclient.IMAPClient(IMAP_SERVER) as client:
-            client.login(EMAIL, PASSWORD)
-            client.select_folder('INBOX', readonly=True)
-
-            messages = client.search(['UNSEEN'])
-            if not messages:
-                return 'No new emails.'
-
-            for uid in messages:
-                raw_message = client.fetch([uid], ['BODY[]', 'FLAGS'])[uid][b'BODY[]']
-                message = pyzmail36.PyzMessage.factory(raw_message)
-                subject = message.get_subject()
-                body = message.text_part.get_payload().decode(message.text_part.charset)
-
-                # Send to Telegram
-                bot.send_message(
-                    chat_id=TELEGRAM_CHAT_ID,
-                    text=f"📧 New Email:\n\nSubject: {subject}\n\n{body[:1000]}"
-                )
-
-        return f"{len(messages)} new email(s) forwarded to Telegram."
-
-    except Exception as e:
-        return f"Error: {str(e)}"
-
 @app.route('/logout')
 def logout():
     session.pop('username', None)
