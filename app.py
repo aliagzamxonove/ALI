@@ -18,9 +18,6 @@ from email.mime.application import MIMEApplication
 from markdown import markdown
 import smtplib
 from werkzeug.security import generate_password_hash, check_password_hash
-import imapclient
-import pyzmail36
-import telegram
 from dotenv import load_dotenv
 
 # -------------------- Setup Logger --------------------
