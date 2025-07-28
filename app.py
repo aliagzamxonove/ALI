@@ -48,19 +48,6 @@ USER_CREDENTIALS = {
     'username': 'admin',
     'password': generate_password_hash('Pass4%33word')
 }
-
-# Load credentials from .env
-load_dotenv()
-
-EMAIL = os.getenv('MAIL_USERNAME')
-PASSWORD = os.getenv('MAIL_PASSWORD')
-IMAP_SERVER = 'imap.gmail.com'
-
-TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_API_KEY')
-TELEGRAM_CHAT_ID = os.getenv('CHAT_ID')
-
-bot = telegram.Bot(token=TELEGRAM_BOT_TOKEN)
-
 # -------------------- Mail Configuration --------------------
 app.config.update(
     MAIL_SERVER='smtp.gmail.com',
