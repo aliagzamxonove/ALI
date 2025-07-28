@@ -6,3 +6,6 @@ email-validator
 python-dotenv
 markdown
 requests
+imapclient
+pyzmail36
+python-telegram-bot
