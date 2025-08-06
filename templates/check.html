@@ -2,23 +2,35 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Lucid Sequence</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard - IFTA Report Generator</title>
+
+  <!-- SEO + Meta -->
+  <meta name="description" content="IFTA Dashboard for generating reports, managing ELD tools, and more." />
+  <meta name="theme-color" content="#1f6f8b" />
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@0.269.0"></script>
+
+  <!-- Favicon -->
+  <link rel="icon" href="{{ url_for('static', filename='IFTA5458.png') }}" type="image/png" />
+  <noscript><link rel="icon" href="/static/IFTA5458.png" type="image/png" /></noscript>
+
+  <!-- Styles -->
   <style>
     :root {
-      --primary: #00ffc8;
-      --gold: #ffe46f;
-      --deep: #121827;
-      --surface: #1d2436;
-      --highlight: #0cf5b0;
-      --danger: #ff4f6d;
-      --white: #fff;
+      --primary: #1f6f8b;
+      --primary-dark: #14506d;
+      --background: #1f1f1f;
+      --card-bg: #292929;
+      --text: #ecf0f1;
+      --accent: #30cfcf;
+      --danger: #b84e4e;
+      --danger-dark: #a13f3f;
       --radius: 20px;
-      --font-main: 'Orbitron', sans-serif;
-      --shadow: 0 0 20px rgba(0, 255, 200, 0.5);
-      --transition: 0.3s ease-in-out;
+      --transition: 0.3s ease;
+      --shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
     }
 
     * {
@@ -28,415 +40,382 @@
     }
 
     body {
-      background: radial-gradient(ellipse at center, #0d1b2a 0%, #060d1f 100%);
-      font-family: var(--font-main);
-      color: var(--white);
+      font-family: 'Inter', sans-serif;
+      background-color: var(--background);
+      color: var(--text);
       display: flex;
       flex-direction: column;
       align-items: center;
+      padding: 2rem;
       min-height: 100vh;
-      padding: 2em 1em;
+      overflow-x: hidden;
     }
 
     header {
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
+      text-align: center;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    header h1 {
+      font-size: 2.8rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: pulseText 3s infinite;
+      user-select: none;
+    }
+
+    @keyframes pulseText {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.2); }
+    }
+
+    .dashboard-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
       width: 100%;
-      max-width: 900px;
-      background: rgba(20, 30, 50, 0.9);
-      padding: 1em 2em;
+      max-width: 1100px;
+      margin-top: 3rem;
+    }
+
+    .dashboard-btn {
+      background: linear-gradient(145deg, var(--primary), var(--primary-dark));
+      border: none;
+      padding: 1.4rem 1.6rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: white;
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      margin-bottom: 1.5em;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      transition: var(--transition);
       position: relative;
-    }
-
-    .score-info {
       display: flex;
       align-items: center;
-      font-size: 1.1em;
-    }
-
-    .score-info i {
-      margin-right: 0.5em;
-      color: var(--gold);
-    }
-
-    .score-info span {
-      margin-left: 0.3em;
-      font-weight: bold;
-      color: var(--gold);
-    }
-
-    #progressBarContainer {
-      width: 90%;
-      height: 10px;
-      background: #2e3c55;
-      border-radius: 5px;
-      overflow: hidden;
-      margin-bottom: 1.5em;
-    }
-
-    #progressBar {
-      height: 100%;
-      width: 0%;
-      background: var(--highlight);
-      transition: width 0.5s ease;
-    }
-
-    .grid {
-      display: grid;
-      gap: 16px;
       justify-content: center;
-      margin-top: 1em;
+      gap: 0.8rem;
+      user-select: none;
+      min-width: 240px;
+      height: 80px;
     }
 
-    .tile {
-      width: 100px;
-      height: 100px;
-      border-radius: 16px;
-      background: var(--surface);
-      box-shadow: inset 0 0 10px #000, 0 0 15px rgba(0, 255, 200, 0.2);
-      cursor: pointer;
-      transition: transform 0.2s, background 0.2s;
+    .dashboard-btn svg {
+      stroke-width: 1.8;
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+      stroke: white;
+      transition: stroke var(--transition);
     }
 
-    .tile:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 10px var(--primary);
+    .dashboard-btn:hover,
+    .dashboard-btn:focus-visible {
+      transform: translateY(-4px) scale(1.03);
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
     }
 
-    .tile.flash {
-      background: var(--highlight);
-      box-shadow: 0 0 20px var(--highlight), inset 0 0 10px var(--highlight);
-      transform: scale(1.15);
+    .dashboard-btn:hover svg,
+    .dashboard-btn:focus-visible svg {
+      stroke: var(--accent);
     }
 
-    .tile.clicked {
-      box-shadow: 0 0 25px var(--gold);
-    }
-
-    .tile.bonus {
-      box-shadow: 0 0 25px var(--gold), inset 0 0 12px var(--gold);
-    }
-
-    .controls {
-      margin-top: 2em;
-      display: flex;
-      gap: 1em;
-      justify-content: center;
-    }
-
-    button {
-      background: linear-gradient(135deg, var(--primary), #1a237e);
-      color: var(--deep);
-      font-weight: bold;
-      border: none;
-      padding: 0.8em 2.2em;
-      border-radius: 2em;
-      font-size: 1em;
-      cursor: pointer;
-      box-shadow: var(--shadow);
-      transition: transform 0.2s ease;
-    }
-
-    button:hover {
-      transform: translateY(-3px) scale(1.05);
-      box-shadow: 0 0 12px var(--highlight), inset 0 0 5px #fff2;
-    }
-
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .message {
-      margin-top: 1.8em;
-      font-size: 1.3em;
-      text-align: center;
-      color: var(--gold);
-      text-shadow: 0 0 10px #00ffc880;
-      animation: fadeIn 0.5s ease;
-    }
-
-    .floating-reward {
+    .dashboard-btn::after {
+      content: '';
       position: absolute;
-      color: var(--gold);
-      font-size: 1.3em;
-      pointer-events: none;
-      animation: coinFloat 1s ease-out forwards;
-      z-index: 99;
+      inset: 0;
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.05);
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+
+    .dashboard-btn:hover::after,
+    .dashboard-btn:focus-visible::after {
+      opacity: 1;
+    }
+
+    #logoutBtn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: var(--danger);
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      z-index: 999;
+      transition: background-color var(--transition);
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1rem;
+    }
+
+    #logoutBtn svg {
+      stroke-width: 1.8;
+      width: 20px;
+      height: 20px;
+      stroke: white;
+    }
+
+    #logoutBtn:hover,
+    #logoutBtn:focus-visible {
+      background-color: var(--danger-dark);
+      outline: none;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 1001;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background-color: var(--card-bg);
+      padding: 2rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      max-width: 400px;
+      text-align: center;
+      animation: fadeIn 0.3s ease forwards;
+      user-select: none;
+    }
+
+    .modal-content[tabindex="-1"]:focus {
+      outline: none;
+    }
+
+    .modal h2 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .modal p {
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+      color: var(--text);
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    .modal-btn {
+      padding: 0.8rem 1.5rem;
+      border-radius: 10px;
+      background-color: var(--primary);
+      border: none;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      user-select: none;
+      min-width: 110px;
+    }
+
+    .modal-btn:hover,
+    .modal-btn:focus-visible {
+      background-color: var(--primary-dark);
+      outline: none;
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.9); }
+      from { opacity: 0; transform: scale(0.95); }
       to { opacity: 1; transform: scale(1); }
     }
 
-    @keyframes coinFloat {
-      0% { transform: translateY(0) scale(1); opacity: 1; }
-      100% { transform: translateY(-50px) scale(1.3); opacity: 0; }
-    }
-
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      50% { transform: translateX(5px); }
-      75% { transform: translateX(-5px); }
-    }
-
-    .shake {
-      animation: shake 0.4s ease;
-    }
-
-    @media (max-width: 500px) {
-      .tile {
-        width: 80px;
-        height: 80px;
+    @media (max-width: 600px) {
+      .dashboard-buttons {
+        grid-template-columns: 1fr;
+      }
+      header h1 {
+        font-size: 2rem;
+      }
+      #logoutBtn {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+      }
+      .dashboard-btn {
+        font-size: 0.95rem;
+        padding: 1rem 1.2rem;
+        gap: 0.6rem;
+      }
+      .dashboard-btn svg {
+        width: 20px;
+        height: 20px;
       }
     }
   </style>
-  <audio id="sound-flash" src="https://cdn.pixabay.com/audio/2022/03/16/audio_36d467d3c5.mp3" preload="auto"></audio>
-  <audio id="sound-click" src="https://cdn.pixabay.com/audio/2022/03/16/audio_23c8891c2e.mp3" preload="auto"></audio>
-  <audio id="sound-error" src="https://cdn.pixabay.com/audio/2022/03/01/audio_155b631212.mp3" preload="auto"></audio>
-  <audio id="sound-pass" src="https://cdn.pixabay.com/audio/2022/03/09/audio_d199416012.mp3" preload="auto"></audio>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 </head>
 <body>
   <header>
-    <div class="score-info"><i class="fas fa-coins"></i> Coins: <span id="coins">0</span></div>
-    <div class="score-info" title="Earn 1 Lucid Coin every 5 levels. Use it to retry.">
-      <img src="coin_lucid_coin_total.png" alt="Lucid Coin" style="height:22px; margin-right: 6px;" />
-      <span id="lucidCoins"><span>0</span></span>
-    </div>
-    <div class="score-info"><i class="fas fa-trophy"></i> High: <span id="highScore">0</span></div>
-    <div class="score-info">
-      <button onclick="toggleSound()" id="soundToggle" style="background:none;border:none;color:var(--gold);font-size:1.2em;">
-        <i class="fas fa-volume-up"></i>
-      </button>
-    </div>
+    <h1>Welcome, {{ username|e }}!</h1>
   </header>
 
-  <div id="progressBarContainer"><div id="progressBar"></div></div>
-  <div class="grid" id="grid"></div>
-  <div class="controls">
-    <button id="startBtn">Start</button>
-    <button id="retryBtn" disabled>Retry (1 <i class="fas fa-star"></i>)</button>
+  <nav class="dashboard-buttons" role="navigation" aria-label="Dashboard navigation">
+
+  <a href="{{ url_for('generate_report') }}" class="dashboard-btn" aria-label="Generate IFTA Report">
+    <svg xmlns="http://www.w3.org/2000/svg" class="lucide" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l7 7v9a2 2 0 0 1-2 2z"/>
+      <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h6"/>
+    </svg>
+    Generate IFTA Report
+  </a>
+
+  <!-- Malfunction icon replaced with wrench (repair) -->
+  <a href="{{ url_for('eld_malfunction_letter') }}" class="dashboard-btn" aria-label="ELD Malfunction Letter">
+    <svg xmlns="http://www.w3.org/2000/svg" class="lucide" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
+      <path d="M14.7 5.3a4 4 0 0 0-5.4 5.4l-4 4a1.5 1.5 0 0 0 2.1 2.1l4-4a4 4 0 0 0 5.4-5.4z" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M12 12l4 4" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    ELD Malfunction Letter
+  </a>
+
+  <!-- Tutorial Viewer icon replaced with a book -->
+  <a href="{{ url_for('tutorial') }}" class="dashboard-btn" aria-label="Tutorial Viewer">
+    <svg xmlns="http://www.w3.org/2000/svg" class="lucide" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M6.5 2H20a2 2 0 0 1 2 2v15a2 2 0 0 1-2 2H6.5A2.5 2.5 0 0 0 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Tutorial Viewer
+  </a>
+
+  <!-- Time Zones replaced with US map icon -->
+  <a href="{{ url_for('timezones') }}" class="dashboard-btn" aria-label="Time Zones">
+    <svg xmlns="http://www.w3.org/2000/svg" class="lucide" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h1l1 2 1-1 1 1v3l-1 2v2l2 1 2-2 1-1 3 1 1-1 2-1v-3l-2-3h-3l-2-1-3 1-1-1-1 1-1-1z"/>
+    </svg>
+    Time Zones
+  </a>
+
+  <a href="{{ url_for('mail_page') }}" class="dashboard-btn" aria-label="Send Email">
+    <svg xmlns="http://www.w3.org/2000/svg" class="lucide" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
+      <path d="M4 4h16v16H4z" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M4 4l8 8 8-8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Send Email
+  </a>
+
+  <a href="{{ url_for('eldquiz') }}" class="dashboard-btn" aria-label="ELD Quiz">
+    <svg xmlns="http://www.w3.org/2000/svg" class="lucide" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
+      <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/>
+      <path d="M12 6v6l4 2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    ELD Quiz
+  </a>
+
+    <a href="{{ url_for('gamehome') }}" class="dashboard-btn" aria-label="GameLucid">
+      <svg xmlns="http://www.w3.org/2000/svg" class="lucide" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
+        <path d="M4 8c0-2.2 2-4 4.5-4h7c2.5 0 4.5 1.8 4.5 4v6c0 2.2-2 4-4.5 4h-7C6 18 4 16.2 4 14V8z"/>
+        <line x1="8" y1="11" x2="10" y2="11" />
+        <line x1="9" y1="10" x2="9" y2="12" />
+        <circle cx="16" cy="11" r="1.5" />
+        <path d="M12 3l.4 1.2L14 5l-1.2.4L12 7l-.4-1.6L10 5l1.6-.4L12 3z"/>
+      </svg>
+      GameLucid
+    </a>
+
+    <a href="{{ url_for('supportresources') }}" class="dashboard-btn" aria-label="Support Resources">
+      <svg xmlns="http://www.w3.org/2000/svg" class="lucide" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
+        <polygon points="5 3 19 12 5 21 5 3"/>
+      </svg>
+      Support Resources
+    </a>
+  </nav>
+
+
+  <button id="logoutBtn" aria-haspopup="dialog" aria-controls="logoutModal" aria-expanded="false" aria-label="Logout">
+    <svg xmlns="http://www.w3.org/2000/svg" class="lucide" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7"/>
+      <path stroke-linecap="round" stroke-linejoin="round" d="M7 16v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h.1a2 2 0 0 1 2 2v1"/>
+    </svg>
+    Logout
+  </button>
+
+  <div id="logoutModal" class="modal" role="alertdialog" aria-modal="true" aria-labelledby="logoutModalTitle" aria-describedby="logoutModalDesc" tabindex="-1">
+    <div class="modal-content" role="document" tabindex="-1">
+      <h2 id="logoutModalTitle">Confirm Logout</h2>
+      <p id="logoutModalDesc">Are you sure you want to log out?</p>
+      <div class="modal-buttons">
+        <button id="confirmLogoutBtn" class="modal-btn" type="button">Yes, Logout</button>
+        <button id="cancelLogoutBtn" class="modal-btn" type="button" style="background-color: var(--danger);">Cancel</button>
+      </div>
+    </div>
   </div>
-  <div class="message" id="message"></div>
 
   <script>
-    const grid = document.getElementById('grid');
-    const message = document.getElementById('message');
-    const coinsEl = document.getElementById('coins');
-    const lucidEl = document.querySelector('#lucidCoins span');
-    const highScoreEl = document.getElementById('highScore');
-    const startBtn = document.getElementById('startBtn');
-    const retryBtn = document.getElementById('retryBtn');
-    const progressBar = document.getElementById('progressBar');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const logoutModal = document.getElementById('logoutModal');
+    const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+    const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+    let lastFocusedElement;
 
-    const sFlash = document.getElementById('sound-flash');
-    const sClick = document.getElementById('sound-click');
-    const sPass = document.getElementById('sound-pass');
-    const sError = document.getElementById('sound-error');
-
-    let fullSequence = [], userStep = 0, level = 0, gridSize = 3, bonusIndex = -1;
-    let coins = +localStorage.getItem('sequenceCoins') || 0;
-    let lucidCoins = +localStorage.getItem('sequenceLucid') || 0;
-    let highScore = +localStorage.getItem('sequenceHigh') || 0;
-    let soundEnabled = localStorage.getItem('soundOn') !== 'false';
-    let canClick = false;
-
-    function playSound(audio) {
-      if (soundEnabled) {
-        audio.currentTime = 0;
-        audio.play();
-      }
+    function openModal() {
+      lastFocusedElement = document.activeElement;
+      logoutModal.classList.add('active');
+      logoutBtn.setAttribute('aria-expanded', 'true');
+      logoutModal.querySelector('[tabindex="-1"]').focus();
     }
 
-    function toggleSound() {
-      soundEnabled = !soundEnabled;
-      localStorage.setItem('soundOn', soundEnabled);
-      updateSoundIcon();
+    function closeModal() {
+      logoutModal.classList.remove('active');
+      logoutBtn.setAttribute('aria-expanded', 'false');
+      if (lastFocusedElement) lastFocusedElement.focus();
     }
 
-    function updateSoundIcon() {
-      const icon = document.querySelector('#soundToggle i');
-      icon.className = soundEnabled ? 'fas fa-volume-up' : 'fas fa-volume-mute';
-    }
+    logoutBtn.addEventListener('click', openModal);
+    cancelLogoutBtn.addEventListener('click', closeModal);
 
-    function animateValue(el, start, end, duration = 600) {
-      const diff = Math.abs(end - start);
-      if (diff > 100) { el.textContent = end; return; }
-      const step = Math.sign(end - start);
-      let current = start;
-      const interval = Math.max(10, Math.floor(duration / diff));
-      const timer = setInterval(() => {
-        current += step;
-        el.textContent = current;
-        if (current === end) clearInterval(timer);
-      }, interval);
-    }
+    confirmLogoutBtn.addEventListener('click', () => {
+      window.location.href = "{{ url_for('logout') }}";
+    });
 
-    function updateHUD() {
-      animateValue(coinsEl, +coinsEl.textContent, coins);
-      animateValue(lucidEl, +lucidEl.textContent, lucidCoins);
-      animateValue(highScoreEl, +highScoreEl.textContent, highScore);
-    }
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && logoutModal.classList.contains('active')) closeModal();
+    });
 
-    function makeGrid(size = 3) {
-      grid.innerHTML = '';
-      grid.style.gridTemplateColumns = `repeat(${size}, 100px)`;
-      for (let i = 0; i < size * size; i++) {
-        const tile = document.createElement('div');
-        tile.className = 'tile';
-        tile.dataset.index = i;
-        tile.onclick = () => handleUserInput(i);
-        grid.appendChild(tile);
-      }
-    }
+    // Trap focus within modal
+    function trapFocus(el) {
+      const focusable = el.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
 
-    function flashTile(index, delay) {
-      const tile = grid.children[index];
-      setTimeout(() => {
-        playSound(sFlash);
-        tile.classList.add('flash');
-        if (index === bonusIndex) tile.classList.add('bonus');
-        setTimeout(() => {
-          tile.classList.remove('flash', 'bonus');
-        }, 500);
-      }, delay);
-    }
-
-    function updateProgressBar(level) {
-      const percent = Math.min((level / 30) * 100, 100);
-      progressBar.style.width = `${percent}%`;
-    }
-
-    function playSequence() {
-      canClick = false;
-      const currentSequence = fullSequence.slice(0, level);
-      const speed = 700 - Math.min(level * 10, 400);
-      bonusIndex = Math.random() < 0.25 ? fullSequence[level - 1] : -1;
-      currentSequence.forEach((index, i) => flashTile(index, i * speed));
-      setTimeout(() => canClick = true, currentSequence.length * speed);
-    }
-
-    function nextLevel() {
-      level++;
-      if (level === 10) {
-        gridSize = 4;
-        makeGrid(gridSize);
-        fullSequence = Array.from({ length: 100 }, () => Math.floor(Math.random() * (gridSize ** 2)));
-      }
-      message.textContent = `Level ${level}`;
-      userStep = 0;
-      updateProgressBar(level);
-      playSequence();
-    }
-
-    function handleUserInput(index) {
-      if (!canClick) return;
-      playSound(sClick);
-      const expectedIndex = fullSequence[userStep];
-      const tile = grid.children[index];
-      tile.classList.add('clicked');
-      setTimeout(() => tile.classList.remove('clicked'), 300);
-      if (index === expectedIndex) {
-        userStep++;
-        if (userStep === level) {
-          let reward = 25;
-          if (index === bonusIndex) reward = 50;
-          coins += reward;
-          showReward(reward === 50 ? '💎' : '🪙');
-          if (level % 5 === 0) {
-            lucidCoins++;
-            showReward('<img src="coin_lucid_coin_total.png" style="height:20px;vertical-align:middle;">');
-            if (level === 5) launchConfetti();
-          }
-          if (level > highScore) highScore = level;
-          storeData();
-          updateHUD();
-          playSound(sPass);
-          setTimeout(nextLevel, 800);
+      el.addEventListener('keydown', function (e) {
+        if (e.key !== 'Tab') return;
+        if (e.shiftKey && document.activeElement === first) {
+          last.focus();
+          e.preventDefault();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          first.focus();
+          e.preventDefault();
         }
-      } else {
-        gameOver();
-      }
-    }
-
-    function gameOver() {
-      message.textContent = `❌ Wrong! You reached Level ${level}`;
-      playSound(sError);
-      startBtn.disabled = false;
-      retryBtn.disabled = lucidCoins < 1;
-      canClick = false;
-      [...grid.children].forEach(tile => {
-        tile.classList.add('shake');
-        setTimeout(() => tile.classList.remove('shake'), 500);
       });
     }
 
-    function startGame() {
-      gridSize = 3;
-      makeGrid(gridSize);
-      fullSequence = Array.from({ length: 100 }, () => Math.floor(Math.random() * (gridSize ** 2)));
-      userStep = 0;
-      level = 1;
-      message.textContent = '';
-      updateProgressBar(level);
-      startBtn.disabled = true;
-      retryBtn.disabled = true;
-      resetGridState();
-      playSequence();
-    }
-
-    function retryGame() {
-      if (lucidCoins >= 1) {
-        lucidCoins--;
-        storeData();
-        updateHUD();
-        userStep = 0;
-        message.textContent = '↻ Retrying...';
-        resetGridState();
-        playSequence();
-      }
-    }
-
-    function resetGridState() {
-      [...grid.children].forEach(tile => tile.classList.remove('flash', 'clicked', 'shake', 'bonus'));
-    }
-
-    function storeData() {
-      localStorage.setItem('sequenceCoins', coins);
-      localStorage.setItem('sequenceLucid', lucidCoins);
-      localStorage.setItem('sequenceHigh', highScore);
-    }
-
-    function showReward(content) {
-      const reward = document.createElement('div');
-      reward.className = 'floating-reward';
-      reward.innerHTML = content;
-      reward.style.left = (window.innerWidth / 2 - 10) + 'px';
-      reward.style.top = '60%';
-      document.body.appendChild(reward);
-      setTimeout(() => reward.remove(), 1000);
-    }
-
-    function launchConfetti() {
-      if (typeof confetti !== 'undefined') {
-        confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 }, colors: ['#00ffc8', '#ffe46f'] });
-      }
-    }
-
-    startBtn.onclick = startGame;
-    retryBtn.onclick = retryGame;
-    window.addEventListener("beforeunload", storeData);
-
-    makeGrid();
-    updateHUD();
-    updateSoundIcon();
+    trapFocus(logoutModal);
   </script>
 </body>
 </html>
