@@ -1,421 +1,934 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dashboard - IFTA Report Generator</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Pro Document Studio — Prototype</title>
 
-  <!-- SEO + Meta -->
-  <meta name="description" content="IFTA Dashboard for generating reports, managing ELD tools, and more." />
-  <meta name="theme-color" content="#1f6f8b" />
-
-  <!-- Fonts & Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
-  <script src="https://unpkg.com/lucide@0.269.0"></script>
-
-  <!-- Favicon -->
-  <link rel="icon" href="{{ url_for('static', filename='IFTA5458.png') }}" type="image/png" />
-  <noscript><link rel="icon" href="/static/IFTA5458.png" type="image/png" /></noscript>
-
-  <!-- Styles -->
-  <style>
-    :root {
-      --primary: #1f6f8b;
-      --primary-dark: #14506d;
-      --background: #1f1f1f;
-      --card-bg: #292929;
-      --text: #ecf0f1;
-      --accent: #30cfcf;
-      --danger: #b84e4e;
-      --danger-dark: #a13f3f;
-      --radius: 20px;
-      --transition: 0.3s ease;
-      --shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: var(--background);
-      color: var(--text);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2rem;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    header {
-      text-align: center;
-      margin-top: 2rem;
-      margin-bottom: 1rem;
-    }
-
-    header h1 {
-      font-size: 2.8rem;
-      font-weight: 700;
-      background: linear-gradient(90deg, var(--primary), var(--accent));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: pulseText 3s infinite;
-      user-select: none;
-    }
-
-    @keyframes pulseText {
-      0%, 100% { filter: brightness(1); }
-      50% { filter: brightness(1.2); }
-    }
-
-    .dashboard-buttons {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 24px;
-      width: 100%;
-      max-width: 1100px;
-      margin-top: 3rem;
-    }
-
-    .dashboard-btn {
-      background: linear-gradient(145deg, var(--primary), var(--primary-dark));
-      border: none;
-      padding: 1.4rem 1.6rem;
-      font-size: 1rem;
-      font-weight: 600;
-      color: white;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      cursor: pointer;
-      text-align: center;
-      text-decoration: none;
-      transition: var(--transition);
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.8rem;
-      user-select: none;
-      min-width: 240px;
-      height: 80px;
-    }
-
-    .dashboard-btn svg {
-      stroke-width: 1.8;
-      width: 24px;
-      height: 24px;
-      flex-shrink: 0;
-      stroke: white;
-      transition: stroke var(--transition);
-    }
-
-    .dashboard-btn:hover,
-    .dashboard-btn:focus-visible {
-      transform: translateY(-4px) scale(1.03);
-      outline: 2px solid var(--accent);
-      outline-offset: 4px;
-    }
-
-    .dashboard-btn:hover svg,
-    .dashboard-btn:focus-visible svg {
-      stroke: var(--accent);
-    }
-
-    .dashboard-btn::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: var(--radius);
-      background: rgba(255, 255, 255, 0.05);
-      opacity: 0;
-      transition: opacity var(--transition);
-    }
-
-    .dashboard-btn:hover::after,
-    .dashboard-btn:focus-visible::after {
-      opacity: 1;
-    }
-
-    #logoutBtn {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background-color: var(--danger);
-      color: white;
-      padding: 12px 24px;
-      border: none;
-      border-radius: 12px;
-      font-weight: 600;
-      box-shadow: var(--shadow);
-      cursor: pointer;
-      z-index: 999;
-      transition: background-color var(--transition);
-      user-select: none;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 1rem;
-    }
-
-    #logoutBtn svg {
-      stroke-width: 1.8;
-      width: 20px;
-      height: 20px;
-      stroke: white;
-    }
-
-    #logoutBtn:hover,
-    #logoutBtn:focus-visible {
-      background-color: var(--danger-dark);
-      outline: none;
-    }
-
-    .modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background-color: rgba(0, 0, 0, 0.7);
-      z-index: 1001;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .modal.active {
-      display: flex;
-    }
-
-    .modal-content {
-      background-color: var(--card-bg);
-      padding: 2rem;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      max-width: 400px;
-      text-align: center;
-      animation: fadeIn 0.3s ease forwards;
-      user-select: none;
-    }
-
-    .modal-content[tabindex="-1"]:focus {
-      outline: none;
-    }
-
-    .modal h2 {
-      font-size: 1.8rem;
-      margin-bottom: 1rem;
-      font-weight: 700;
-      color: var(--accent);
-    }
-
-    .modal p {
-      font-size: 1rem;
-      margin-bottom: 1.5rem;
-      color: var(--text);
-    }
-
-    .modal-buttons {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-    }
-
-    .modal-btn {
-      padding: 0.8rem 1.5rem;
-      border-radius: 10px;
-      background-color: var(--primary);
-      border: none;
-      color: white;
-      font-weight: 600;
-      cursor: pointer;
-      transition: var(--transition);
-      user-select: none;
-      min-width: 110px;
-    }
-
-    .modal-btn:hover,
-    .modal-btn:focus-visible {
-      background-color: var(--primary-dark);
-      outline: none;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.95); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    @media (max-width: 600px) {
-      .dashboard-buttons {
-        grid-template-columns: 1fr;
-      }
-      header h1 {
-        font-size: 2rem;
-      }
-      #logoutBtn {
-        padding: 10px 16px;
-        font-size: 0.9rem;
-      }
-      .dashboard-btn {
-        font-size: 0.95rem;
-        padding: 1rem 1.2rem;
-        gap: 0.6rem;
-      }
-      .dashboard-btn svg {
-        width: 20px;
-        height: 20px;
-      }
-    }
-  </style>
+<!-- Minimal reset & professional UI -->
+<style>
+  :root{
+    --bg:#f4f6f8; --card:#fff; --accent:#2563eb; --accent-2:#1e40af;
+    --muted:#6b7280; --radius:10px; --gap:12px; --max-width:1400px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:var(--bg);font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+  .app{max-width:var(--max-width);margin:20px auto;padding:16px;display:grid;grid-template-columns:220px 1fr 340px;gap:16px;}
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:0 8px 30px rgba(15,23,42,0.06);padding:12px;}
+  /* Left: Pages */
+  .pages {display:flex;flex-direction:column;gap:8px;height:calc(100vh - 80px);overflow:auto;padding:8px;}
+  .pages .top {display:flex;gap:8px;align-items:center;justify-content:space-between;padding:6px}
+  .thumbs {display:flex;flex-direction:column;gap:8px;padding:6px;}
+  .thumb {display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;cursor:pointer;border:1px solid transparent;}
+  .thumb.active{border-color:rgba(37,99,235,0.14);background:linear-gradient(180deg,rgba(37,99,235,0.02),transparent)}
+  .thumb canvas{width:160px;height:auto;border-radius:6px;box-shadow:0 6px 18px rgba(12,20,40,0.04);}
+  .page-controls{display:flex;gap:6px;flex-wrap:wrap;}
+  .btn{height:36px;padding:0 12px;border-radius:8px;border:none;background:var(--accent);color:#fff;cursor:pointer;font-weight:600}
+  .btn.ghost{background:transparent;color:var(--muted);border:1px solid #e6e8eb}
+  .btn.small{height:32px;padding:0 8px;font-size:13px}
+  /* Center: Canvas */
+  .studio{display:flex;flex-direction:column;align-items:center;gap:10px;padding:10px;height:calc(100vh - 80px);overflow:auto}
+  .stage{background:#edf2ff;border-radius:8px;padding:14px;display:flex;justify-content:center;align-items:center;box-shadow:inset 0 1px 0 rgba(255,255,255,0.6)}
+  canvas#fabricCanvas{border-radius:8px;border:1px solid #e6e8eb;background:#fff;max-width:100%;height:auto}
+  .drop-hint{font-size:13px;color:var(--muted);margin-top:6px}
+  /* Right: Tools */
+  .tools{display:flex;flex-direction:column;gap:10px;height:calc(100vh - 80px);overflow:auto;padding:12px}
+  .section{border-radius:8px;padding:10px;border:1px solid #eef2f6;background:linear-gradient(180deg,#fff, #fbfdff)}
+  .section h3{margin:0 0 8px;font-size:14px}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .input, select {height:34px;padding:6px 8px;border-radius:8px;border:1px solid #e6e8eb;}
+  .range {width:180px}
+  .tool-btn{height:36px;padding:6px 10px;border-radius:8px;border:1px solid #e6e8eb;background:#fff;cursor:pointer}
+  .tool-btn.primary{background:var(--accent);color:#fff;border:none}
+  footer{grid-column:1/4;text-align:center;color:var(--muted);padding:8px 0;font-size:13px}
+  .muted{color:var(--muted);font-size:13px}
+  /* mobile */
+  @media (max-width:1100px){
+    .app{grid-template-columns:1fr;grid-auto-rows:auto;padding:10px}
+    .pages{order:3;height:auto}
+    .tools{order:2}
+    .studio{order:1}
+  }
+</style>
 </head>
 <body>
-  <header>
-    <h1>Welcome, {{ username|e }}!</h1>
-  </header>
 
-  <nav class="dashboard-buttons" role="navigation" aria-label="Dashboard navigation">
-
-  <a href="{{ url_for('generate_report') }}" class="dashboard-btn" aria-label="Generate IFTA Report">
-    <svg xmlns="http://www.w3.org/2000/svg" class="lucide" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l7 7v9a2 2 0 0 1-2 2z"/>
-      <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h6"/>
-    </svg>
-    Generate IFTA Report
-  </a>
-
-  <!-- Malfunction icon replaced with wrench (repair) -->
-  <a href="{{ url_for('eld_malfunction_letter') }}" class="dashboard-btn" aria-label="ELD Malfunction Letter">
-    <svg xmlns="http://www.w3.org/2000/svg" class="lucide" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
-      <path d="M14.7 5.3a4 4 0 0 0-5.4 5.4l-4 4a1.5 1.5 0 0 0 2.1 2.1l4-4a4 4 0 0 0 5.4-5.4z" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M12 12l4 4" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    ELD Malfunction Letter
-  </a>
-
-  <!-- Tutorial Viewer icon replaced with a book -->
-  <a href="{{ url_for('tutorial') }}" class="dashboard-btn" aria-label="Tutorial Viewer">
-    <svg xmlns="http://www.w3.org/2000/svg" class="lucide" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
-      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M6.5 2H20a2 2 0 0 1 2 2v15a2 2 0 0 1-2 2H6.5A2.5 2.5 0 0 0 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    Tutorial Viewer
-  </a>
-
-  <!-- Time Zones replaced with US map icon -->
-  <a href="{{ url_for('timezones') }}" class="dashboard-btn" aria-label="Time Zones">
-    <svg xmlns="http://www.w3.org/2000/svg" class="lucide" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h1l1 2 1-1 1 1v3l-1 2v2l2 1 2-2 1-1 3 1 1-1 2-1v-3l-2-3h-3l-2-1-3 1-1-1-1 1-1-1z"/>
-    </svg>
-    Time Zones
-  </a>
-
-  <a href="{{ url_for('mail_page') }}" class="dashboard-btn" aria-label="Send Email">
-    <svg xmlns="http://www.w3.org/2000/svg" class="lucide" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
-      <path d="M4 4h16v16H4z" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M4 4l8 8 8-8" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    Send Email
-  </a>
-
-  <a href="{{ url_for('eldquiz') }}" class="dashboard-btn" aria-label="ELD Quiz">
-    <svg xmlns="http://www.w3.org/2000/svg" class="lucide" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
-      <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/>
-      <path d="M12 6v6l4 2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    ELD Quiz
-  </a>
-
-    <a href="{{ url_for('gamehome') }}" class="dashboard-btn" aria-label="GameLucid">
-      <svg xmlns="http://www.w3.org/2000/svg" class="lucide" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
-        <path d="M4 8c0-2.2 2-4 4.5-4h7c2.5 0 4.5 1.8 4.5 4v6c0 2.2-2 4-4.5 4h-7C6 18 4 16.2 4 14V8z"/>
-        <line x1="8" y1="11" x2="10" y2="11" />
-        <line x1="9" y1="10" x2="9" y2="12" />
-        <circle cx="16" cy="11" r="1.5" />
-        <path d="M12 3l.4 1.2L14 5l-1.2.4L12 7l-.4-1.6L10 5l1.6-.4L12 3z"/>
-      </svg>
-      GameLucid
-    </a>
-
-    <a href="{{ url_for('supportresources') }}" class="dashboard-btn" aria-label="Support Resources">
-      <svg xmlns="http://www.w3.org/2000/svg" class="lucide" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
-        <polygon points="5 3 19 12 5 21 5 3"/>
-      </svg>
-      Support Resources
-    </a>
-  </nav>
-
-
-  <button id="logoutBtn" aria-haspopup="dialog" aria-controls="logoutModal" aria-expanded="false" aria-label="Logout">
-    <svg xmlns="http://www.w3.org/2000/svg" class="lucide" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7"/>
-      <path stroke-linecap="round" stroke-linejoin="round" d="M7 16v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h.1a2 2 0 0 1 2 2v1"/>
-    </svg>
-    Logout
-  </button>
-
-  <div id="logoutModal" class="modal" role="alertdialog" aria-modal="true" aria-labelledby="logoutModalTitle" aria-describedby="logoutModalDesc" tabindex="-1">
-    <div class="modal-content" role="document" tabindex="-1">
-      <h2 id="logoutModalTitle">Confirm Logout</h2>
-      <p id="logoutModalDesc">Are you sure you want to log out?</p>
-      <div class="modal-buttons">
-        <button id="confirmLogoutBtn" class="modal-btn" type="button">Yes, Logout</button>
-        <button id="cancelLogoutBtn" class="modal-btn" type="button" style="background-color: var(--danger);">Cancel</button>
+<div class="app">
+  <!-- LEFT: Pages -->
+  <div class="card pages" aria-label="Pages panel">
+    <div class="top">
+      <div style="font-weight:700">Pages</div>
+      <div class="page-controls">
+        <button class="btn small" id="addPageBtn" title="Add blank page">+ Page</button>
+        <button class="btn small ghost" id="importBtn" title="Import images">Import</button>
       </div>
     </div>
+
+    <div style="margin:8px 0">
+      <input id="fileInput" type="file" accept="image/*,application/pdf" multiple style="display:none" />
+      <div style="display:flex;gap:8px">
+        <button class="btn ghost small" id="dragDropToggle">Drag & Drop: ON</button>
+        <button class="btn ghost small" id="cameraBtn">Camera</button>
+      </div>
+    </div>
+
+    <div class="thumbs" id="thumbs"></div>
+    <div style="margin-top:12px" class="muted">Tip: Drag images into the stage, reorder pages by dragging thumbnails.</div>
   </div>
 
-  <script>
-    const logoutBtn = document.getElementById('logoutBtn');
-    const logoutModal = document.getElementById('logoutModal');
-    const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
-    const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
-    let lastFocusedElement;
+  <!-- CENTER: Studio -->
+  <div class="card studio" role="main">
+    <div class="stage" id="stageHost">
+      <!-- Fabric canvas will be inserted here -->
+      <canvas id="fabricCanvas" width="900" height="1200"></canvas>
+    </div>
 
-    function openModal() {
-      lastFocusedElement = document.activeElement;
-      logoutModal.classList.add('active');
-      logoutBtn.setAttribute('aria-expanded', 'true');
-      logoutModal.querySelector('[tabindex="-1"]').focus();
-    }
+    <div style="display:flex;gap:8px;align-items:center">
+      <div class="muted">Active page: <strong id="activeIndex">—</strong></div>
+      <div style="flex:1"></div>
+      <button class="btn ghost small" id="undoBtn" title="Undo (Ctrl+Z)">Undo</button>
+      <button class="btn ghost small" id="redoBtn" title="Redo (Ctrl+Y)">Redo</button>
+      <button class="btn" id="exportPdfBtn">Export PDF</button>
+      <button class="btn" id="exportPngBtn">Export PNG</button>
+    </div>
 
-    function closeModal() {
-      logoutModal.classList.remove('active');
-      logoutBtn.setAttribute('aria-expanded', 'false');
-      if (lastFocusedElement) lastFocusedElement.focus();
-    }
+    <div class="drop-hint muted" id="dropHint">Drop images here or click Import. Use the right panel to edit.</div>
+  </div>
 
-    logoutBtn.addEventListener('click', openModal);
-    cancelLogoutBtn.addEventListener('click', closeModal);
+  <!-- RIGHT: Tools -->
+  <div class="card tools" aria-label="Tools panel">
+    <div class="section">
+      <h3>Selection & Edit</h3>
+      <div class="row" style="gap:6px">
+        <button class="tool-btn" id="selectTool">Select</button>
+        <button class="tool-btn" id="boxTool">Box</button>
+        <button class="tool-btn" id="freehandTool">Draw</button>
+        <button class="tool-btn" id="textTool">Text</button>
+        <button class="tool-btn" id="rectTool">Rect</button>
+        <button class="tool-btn" id="eraseTool">Erase</button>
+      </div>
 
-    confirmLogoutBtn.addEventListener('click', () => {
-      window.location.href = "{{ url_for('logout') }}";
+      <div style="margin-top:8px" class="row">
+        <button class="tool-btn" id="cropBtn">Crop</button>
+        <button class="tool-btn" id="autoCropBtn">Auto-Crop</button>
+        <button class="tool-btn" id="copyBtn">Copy</button>
+        <button class="tool-btn" id="pasteBtn">Paste</button>
+      </div>
+      <div style="margin-top:8px" class="row">
+        <button class="tool-btn" id="bringFront">Bring</button>
+        <button class="tool-btn" id="sendBack">Send</button>
+        <button class="tool-btn" id="deleteObj">Delete</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Filters & Adjust</h3>
+      <div class="row"><label class="muted">Brightness</label><input id="brightness" class="range" type="range" min="-100" max="100" value="0"></div>
+      <div class="row"><label class="muted">Contrast</label><input id="contrast" class="range" type="range" min="-100" max="100" value="0"></div>
+      <div class="row"><label class="muted">B&W Strength</label><input id="bwStrength" class="range" type="range" min="0" max="100" value="60"></div>
+      <div class="row" style="margin-top:6px">
+        <button class="tool-btn" id="applyFilter">Apply</button>
+        <button class="tool-btn" id="resetFilter">Reset</button>
+      </div>
+      <div style="margin-top:8px" class="muted">Sharpen (experimental):</div>
+      <div class="row" style="margin-top:6px">
+        <input id="sharpen" type="range" class="range" min="0" max="100" value="0">
+        <button class="tool-btn small" id="applySharpen">Apply</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Page Actions</h3>
+      <div class="row">
+        <button class="btn ghost small" id="addBlank">Add Blank</button>
+        <button class="btn ghost small" id="duplicatePage">Duplicate</button>
+        <button class="btn ghost small" id="deletePage">Delete Page</button>
+      </div>
+      <div style="margin-top:8px" class="row">
+        <button class="btn small" id="rotateLeft">Rotate L</button>
+        <button class="btn small" id="rotateRight">Rotate R</button>
+        <button class="btn small" id="fitToView">Fit</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Advanced</h3>
+      <div class="row">
+        <button class="tool-btn" id="ocrBtn">OCR (placeholder)</button>
+        <button class="tool-btn" id="smartEraseBtn">Smart Erase (stub)</button>
+      </div>
+      <div style="margin-top:8px" class="muted">Pro notes: Full OCR & AI erase would be implemented via cloud microservices; here are placeholders for UX flows.</div>
+    </div>
+
+  </div>
+
+  <footer class="muted">Pro Document Studio — prototype • Built with Fabric.js & jsPDF • Keyboard: C=crop, V=paste, B=box, D=draw, T=text, Z=undo</footer>
+</div>
+
+<!-- Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+/* =============================================
+   Pro Document Studio — JavaScript Core
+   ============================================= */
+
+/* ---------- App State ---------- */
+const pages = []; // each page: { backing: HTMLCanvasElement, fabricImageObj?, fabricState?, history:[], historyIndex:0, width, height }
+let activeIndex = -1;
+const DEFAULT_PAGE = { w: 2480, h: 3508 }; // default A4 at 300dpi ~ (use px as large canvas)
+
+/* ---------- DOM refs ---------- */
+const thumbsEl = document.getElementById('thumbs');
+const fileInput = document.getElementById('fileInput');
+const addPageBtn = document.getElementById('addPageBtn');
+const importBtn = document.getElementById('importBtn');
+const dropHint = document.getElementById('dropHint');
+const activeIndexEl = document.getElementById('activeIndex');
+
+const fabricCanvasEl = document.getElementById('fabricCanvas');
+const stageHost = document.getElementById('stageHost');
+
+const undoBtn = document.getElementById('undoBtn'), redoBtn = document.getElementById('redoBtn');
+const exportPdfBtn = document.getElementById('exportPdfBtn'), exportPngBtn = document.getElementById('exportPngBtn');
+
+/* Tools */
+const selectToolBtn = document.getElementById('selectTool');
+const boxToolBtn = document.getElementById('boxTool');
+const freehandBtn = document.getElementById('freehandTool');
+const textBtn = document.getElementById('textTool');
+const rectBtn = document.getElementById('rectTool');
+const eraseBtn = document.getElementById('eraseTool');
+const cropBtn = document.getElementById('cropBtn');
+const autoCropBtn = document.getElementById('autoCropBtn');
+const copyBtn = document.getElementById('copyBtn');
+const pasteBtn = document.getElementById('pasteBtn');
+const bringFrontBtn = document.getElementById('bringFront');
+const sendBackBtn = document.getElementById('sendBack');
+const deleteObjBtn = document.getElementById('deleteObj');
+
+const brightnessSlider = document.getElementById('brightness');
+const contrastSlider = document.getElementById('contrast');
+const bwSlider = document.getElementById('bwStrength');
+const applyFilterBtn = document.getElementById('applyFilter');
+const resetFilterBtn = document.getElementById('resetFilter');
+const sharpenSlider = document.getElementById('sharpen');
+const applySharpenBtn = document.getElementById('applySharpen');
+
+const addBlankBtn = document.getElementById('addBlank');
+const duplicatePageBtn = document.getElementById('duplicatePage');
+const deletePageBtn = document.getElementById('deletePage');
+const rotateLeftBtn = document.getElementById('rotateLeft');
+const rotateRightBtn = document.getElementById('rotateRight');
+const fitToViewBtn = document.getElementById('fitToView');
+
+const dragDropToggle = document.getElementById('dragDropToggle');
+const cameraBtn = document.getElementById('cameraBtn');
+
+/* ---------- Fabric Setup ---------- */
+const canvas = new fabric.Canvas('fabricCanvas', { preserveObjectStacking:true, backgroundColor:'#fff' });
+canvas.selection = true;
+canvas.renderOnAddRemove = true;
+canvas.preserveObjectStacking = true;
+
+/* Active tool */
+let currentTool = 'select';
+let selectionRect = null;
+let copiedDataURL = null;
+
+/* Drag & Drop */
+let dragDropEnabled = true;
+dragDropToggle.addEventListener('click', () => {
+  dragDropEnabled = !dragDropEnabled;
+  dragDropToggle.textContent = 'Drag & Drop: ' + (dragDropEnabled ? 'ON' : 'OFF');
+});
+
+/* ---------- Utilities ---------- */
+function createBacking(w = DEFAULT_PAGE.w, h = DEFAULT_PAGE.h){
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0,0,w,h);
+  return c;
+}
+function pushHistory(page){
+  const snapshot = page.backing.toDataURL('image/png');
+  // fabric state (annotations) stringified
+  const fabricState = canvas.toJSON(['selectable']);
+  // maintain stack of up to 40
+  page.history = page.history || [];
+  page.history.splice(page.historyIndex+1); // truncate forward
+  page.history.push({ img: snapshot, fabric: fabricState });
+  page.historyIndex = page.history.length - 1;
+  updateUndoRedoButtons();
+}
+function restoreHistory(page, index){
+  if (!page.history || index < 0 || index >= page.history.length) return;
+  const item = page.history[index];
+  // restore backing bitmap
+  const img = new Image();
+  img.onload = () => {
+    const ctx = page.backing.getContext('2d');
+    ctx.clearRect(0,0,page.backing.width,page.backing.height);
+    ctx.drawImage(img,0,0,page.backing.width,page.backing.height);
+    // rebuild fabric layer from page.backing
+    rebuildFabricFromBacking(page).then(()=> {
+      // restore annotations
+      if (item.fabric) {
+        canvas.loadFromJSON(item.fabric, canvas.renderAll.bind(canvas), function(o,object){
+          // nothing extra
+        });
+      }
     });
+  };
+  img.src = item.img;
+  page.historyIndex = index;
+  updateThumb(page, page._thumbElIndex);
+  updateUndoRedoButtons();
+}
+function updateUndoRedoButtons(){
+  if (activeIndex<0) return;
+  const page = pages[activeIndex];
+  undoBtn.disabled = !(page.history && page.historyIndex > 0);
+  redoBtn.disabled = !(page.history && page.historyIndex < page.history.length - 1);
+}
+function dataURLToImage(d) {
+  return new Promise((res,rej)=>{
+    const i = new Image();
+    i.onload = ()=>res(i);
+    i.onerror = rej;
+    i.src = d;
+  });
+}
 
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && logoutModal.classList.contains('active')) closeModal();
+/* ---------- Page Lifecycle ---------- */
+function addBlankPage(w = DEFAULT_PAGE.w, h = DEFAULT_PAGE.h, atIndex = pages.length){
+  const backing = createBacking(w,h);
+  const page = { backing, width:w, height:h, history:[], historyIndex:-1 };
+  pages.splice(atIndex,0,page);
+  renderThumbs();
+  setActivePage(atIndex);
+  pushHistory(page);
+  return page;
+}
+
+async function importImageFile(file, atIndex = pages.length){
+  // Use native Image and create a backing canvas scaled to natural size
+  const url = URL.createObjectURL(file);
+  const img = await dataURLToImage(url).catch(()=>null);
+  URL.revokeObjectURL(url);
+  if (!img) return;
+  const w = img.naturalWidth || img.width;
+  const h = img.naturalHeight || img.height;
+  const backing = createBacking(w,h);
+  const ctx = backing.getContext('2d');
+  ctx.drawImage(img,0,0,w,h);
+  const page = { backing, width:w, height:h, history:[], historyIndex:-1 };
+  pages.splice(atIndex,0,page);
+  renderThumbs();
+  setActivePage(atIndex);
+  pushHistory(page);
+}
+
+/* Rebuild fabric main image from page.backing */
+async function rebuildFabricFromBacking(page){
+  // remove previous background image objects (we treat first fabric image as background)
+  const fabricObjects = canvas.getObjects();
+  for (let obj of fabricObjects.slice()){
+    if (obj._isBackgroundImage) canvas.remove(obj);
+  }
+  // create fabric.Image from page.backing
+  return new Promise(resolve => {
+    const url = page.backing.toDataURL('image/png');
+    fabric.Image.fromURL(url, img => {
+      img.selectable = false;
+      img.evented = false;
+      img._isBackgroundImage = true;
+      // scale to fit canvas size (we'll fit to fabricCanvas dimensions)
+      const targetW = canvas.getWidth() * 0.98;
+      img.scaleToWidth(targetW);
+      img.left = (canvas.getWidth() - img.getScaledWidth())/2;
+      img.top = 20;
+      canvas.add(img);
+      canvas.sendToBack(img);
+      canvas.renderAll();
+      resolve();
     });
+  });
+}
 
-    // Trap focus within modal
-    function trapFocus(el) {
-      const focusable = el.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
+/* Render thumbnails */
+function renderThumbs(){
+  thumbsEl.innerHTML = '';
+  pages.forEach((p,i)=>{
+    const div = document.createElement('div');
+    div.className = 'thumb' + (i===activeIndex ? ' active' : '');
+    div.draggable = true;
+    div.dataset.index = i;
+    const canvasThumb = document.createElement('canvas');
+    // create small scaled thumbnail
+    const thumbW = 320;
+    const scale = Math.min(thumbW / p.width, 1);
+    canvasThumb.width = Math.floor(p.width * scale);
+    canvasThumb.height = Math.floor(p.height * scale);
+    const ctx = canvasThumb.getContext('2d');
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0,0,canvasThumb.width,canvasThumb.height);
+    ctx.drawImage(p.backing, 0, 0, p.width, p.height, 0, 0, canvasThumb.width, canvasThumb.height);
+    const info = document.createElement('div');
+    info.style.flex = '1';
+    info.innerHTML = `<div style="font-weight:600">Page ${i+1}</div><div style="color:var(--muted);font-size:12px">${Math.round(p.width)}×${Math.round(p.height)}</div>`;
+    div.appendChild(canvasThumb);
+    div.appendChild(info);
+    div.addEventListener('click', ()=>setActivePage(i));
+    // drag reorder
+    div.addEventListener('dragstart', e => {
+      e.dataTransfer.setData('text/plain', i);
+    });
+    div.addEventListener('dragover', e => e.preventDefault());
+    div.addEventListener('drop', e => {
+      const src = parseInt(e.dataTransfer.getData('text/plain'),10);
+      const dest = i;
+      if (!isNaN(src)) reorderPages(src, dest);
+    });
+    div._thumbCanvas = canvasThumb;
+    div._index = i;
+    p._thumbElIndex = i;
+    thumbsEl.appendChild(div);
+  });
+}
 
-      el.addEventListener('keydown', function (e) {
-        if (e.key !== 'Tab') return;
-        if (e.shiftKey && document.activeElement === first) {
-          last.focus();
-          e.preventDefault();
-        } else if (!e.shiftKey && document.activeElement === last) {
-          first.focus();
-          e.preventDefault();
+/* Set active page */
+async function setActivePage(i){
+  if (i < 0 || i >= pages.length) return;
+  // save current page fabric annotations into history before switching
+  if (activeIndex >= 0) pushCurrentStateToPage(activeIndex);
+  activeIndex = i;
+  activeIndexEl.textContent = `${i+1} / ${pages.length}`;
+  // clear fabric canvas annotations, then rebuild
+  canvas.clear();
+  canvas.setHeight(window.innerHeight * 0.72);
+  canvas.setWidth(Math.min(1100, window.innerWidth * 0.72));
+  await rebuildFabricFromBacking(pages[i]);
+  // load any saved annotations from last history item
+  // If last history item contains fabric state, try to load it (optional)
+  const lastFabric = pages[i].history && pages[i].history[pages[i].historyIndex] && pages[i].history[pages[i].historyIndex].fabric;
+  if (lastFabric) {
+    canvas.loadFromJSON(lastFabric, canvas.renderAll.bind(canvas));
+  }
+  renderThumbs();
+  updateUndoRedoButtons();
+}
+
+/* Save current canvas annotations into page (not pushing history) */
+function pushCurrentStateToPage(index){
+  if (index < 0) return;
+  const page = pages[index];
+  // snapshot backing always in page.history when actions happen (we manage via pushHistory)
+  // save fabric annotations state into current history item if exists
+  if (!page.history || page.history.length === 0) return;
+  page.history[page.historyIndex].fabric = canvas.toJSON(['selectable']);
+}
+
+/* Reorder pages */
+function reorderPages(src, dest){
+  if (src === dest) return;
+  const item = pages.splice(src,1)[0];
+  pages.splice(dest,0,item);
+  renderThumbs();
+  // adjust active index
+  if (activeIndex === src) setActivePage(dest);
+  else if (activeIndex > src && activeIndex <= dest) activeIndex--;
+  else if (activeIndex < src && activeIndex >= dest) activeIndex++;
+  renderThumbs();
+}
+
+/* Duplicate page */
+function duplicatePage(index){
+  if (index < 0) return;
+  const p = pages[index];
+  const cloneBacking = document.createElement('canvas');
+  cloneBacking.width = p.backing.width; cloneBacking.height = p.backing.height;
+  cloneBacking.getContext('2d').drawImage(p.backing, 0, 0);
+  const clone = { backing: cloneBacking, width: p.width, height: p.height, history:[], historyIndex:-1 };
+  pages.splice(index+1,0,clone);
+  renderThumbs();
+  setActivePage(index+1);
+  pushHistory(clone);
+}
+
+/* Delete page */
+function deletePage(index){
+  if (index < 0) return;
+  pages.splice(index,1);
+  if (pages.length === 0) addBlankPage();
+  const newIndex = Math.max(0, Math.min(index, pages.length-1));
+  renderThumbs();
+  setActivePage(newIndex);
+}
+
+/* ---------- Canvas Actions & Tools ---------- */
+
+// selection and tool toggles
+function setTool(tool){
+  currentTool = tool;
+  canvas.isDrawingMode = false;
+  canvas.selection = true;
+  if (selectionRect) { canvas.remove(selectionRect); selectionRect = null; }
+  // UI feedback (simple)
+  [selectToolBtn, boxToolBtn, freehandBtn, textBtn, rectBtn, eraseBtn].forEach(b => b.classList.remove('primary'));
+  if (tool === 'select') selectToolBtn.classList.add('primary');
+  if (tool === 'box') boxToolBtn.classList.add('primary');
+  if (tool === 'draw') freehandBtn.classList.add('primary');
+  if (tool === 'text') textBtn.classList.add('primary');
+  if (tool === 'rect') rectBtn.classList.add('primary');
+  if (tool === 'erase') eraseBtn.classList.add('primary');
+
+  if (tool === 'draw') {
+    canvas.isDrawingMode = true;
+    canvas.freeDrawingBrush.width = 3;
+  }
+}
+
+selectToolBtn.addEventListener('click', ()=>setTool('select'));
+boxToolBtn.addEventListener('click', ()=>setTool('box'));
+freehandBtn.addEventListener('click', ()=>setTool('draw'));
+textBtn.addEventListener('click', ()=>setTool('text'));
+rectBtn.addEventListener('click', ()=>setTool('rect'));
+eraseBtn.addEventListener('click', ()=>setTool('erase'));
+
+/* Box: create or enable selection rect manipulation */
+boxToolBtn.addEventListener('click', ()=> {
+  setTool('box');
+  if (!selectionRect){
+    selectionRect = new fabric.Rect({
+      left: 80, top:80, width:300, height:200, fill:'rgba(37,99,235,0.08)', stroke:'#2563eb', strokeWidth:2, cornerColor:'#2563eb', transparentCorners:false
+    });
+    canvas.add(selectionRect);
+    canvas.setActiveObject(selectionRect);
+  }
+});
+
+/* Draw: handled by canvas.isDrawingMode */
+
+/* Text tool */
+textBtn.addEventListener('click', ()=> {
+  setTool('text');
+  const t = new fabric.IText('Text', { left: 120, top: 120, fontSize:28, fill:'#111827' });
+  canvas.add(t);
+  canvas.setActiveObject(t);
+});
+
+/* Rect tool */
+rectBtn.addEventListener('click', ()=> {
+  setTool('rect');
+  const r = new fabric.Rect({ left: 120, top: 120, width:200, height:120, fill:'rgba(255,255,255,0.65)', stroke:'#00000022', strokeWidth:1 });
+  canvas.add(r);
+  canvas.setActiveObject(r);
+});
+
+/* Erase object (delete selection) */
+deleteObjBtn.addEventListener('click', ()=> {
+  const obj = canvas.getActiveObject();
+  if (obj) {
+    canvas.remove(obj);
+    pushHistory(pages[activeIndex]);
+  }
+});
+
+/* Bring/Send */
+bringFrontBtn.addEventListener('click', ()=> { const o = canvas.getActiveObject(); if (o) canvas.bringToFront(o); });
+sendBackBtn.addEventListener('click', ()=> { const o = canvas.getActiveObject(); if (o) canvas.sendToBack(o); });
+
+/* Copy/Paste */
+copyBtn.addEventListener('click', async ()=> {
+  if (!pages[activeIndex]) return;
+  // copy box or selected object region
+  const sel = canvas.getActiveObject();
+  if (selectionRect) {
+    const region = getBoxOnBacking(selectionRect);
+    const t = document.createElement('canvas');
+    t.width = region.w; t.height = region.h;
+    t.getContext('2d').drawImage(pages[activeIndex].backing, region.x, region.y, region.w, region.h, 0,0,region.w,region.h);
+    copiedDataURL = t.toDataURL('image/png');
+    alert('Region copied to internal clipboard.');
+    return;
+  }
+  if (sel && sel.toDataURL) {
+    copiedDataURL = sel.toDataURL();
+    alert('Selected object copied.');
+    return;
+  }
+  alert('Nothing selected to copy.');
+});
+pasteBtn.addEventListener('click', ()=> {
+  if (!copiedDataURL) return alert('Clipboard empty.');
+  fabric.Image.fromURL(copiedDataURL, img => {
+    img.left = 100; img.top = 100; img.scaleToWidth(Math.min(600, canvas.getWidth()*0.6));
+    img.set({ selectable:true });
+    canvas.add(img);
+    canvas.setActiveObject(img);
+    canvas.renderAll();
+    pushHistory(pages[activeIndex]);
+  });
+});
+
+/* Crop Button */
+cropBtn.addEventListener('click', async ()=>{
+  if (!selectionRect || !pages[activeIndex]) return alert('Place the blue selection box first.');
+  const region = getBoxOnBacking(selectionRect);
+  const cropped = document.createElement('canvas');
+  cropped.width = region.w; cropped.height = region.h;
+  cropped.getContext('2d').drawImage(pages[activeIndex].backing, region.x, region.y, region.w, region.h, 0,0,region.w,region.h);
+  pages[activeIndex].backing = cropped;
+  pages[activeIndex].width = region.w; pages[activeIndex].height = region.h;
+  canvas.remove(selectionRect); selectionRect = null;
+  await rebuildFabricFromBacking(pages[activeIndex]);
+  pushHistory(pages[activeIndex]);
+  renderThumbs();
+});
+
+/* Auto-Crop: simple bounding-box of non-white pixels */
+autoCropBtn.addEventListener('click', ()=>{
+  if (!pages[activeIndex]) return;
+  const p = pages[activeIndex];
+  const ctx = p.backing.getContext('2d');
+  const w = p.backing.width, h = p.backing.height;
+  const data = ctx.getImageData(0,0,w,h).data;
+  let minX=w, minY=h, maxX=0, maxY=0;
+  for (let y=0;y<h;y++){
+    for (let x=0;x<w;x++){
+      const idx = (y*w + x)*4;
+      const r = data[idx], g = data[idx+1], b = data[idx+2];
+      // measure 'ink' by luminance
+      const lum = 0.299*r + 0.587*g + 0.114*b;
+      if (lum < 245){ // threshold near white
+        if (x < minX) minX = x;
+        if (y < minY) minY = y;
+        if (x > maxX) maxX = x;
+        if (y > maxY) maxY = y;
+      }
+    }
+  }
+  if (maxX <= minX || maxY <= minY) { alert('Auto-crop found no content.'); return; }
+  const pad = 20;
+  const rx = Math.max(0,minX-pad), ry = Math.max(0,minY-pad);
+  const rw = Math.min(w - rx, (maxX - minX) + pad*2), rh = Math.min(h - ry, (maxY - minY) + pad*2);
+  const cropped = document.createElement('canvas'); cropped.width = rw; cropped.height = rh;
+  cropped.getContext('2d').drawImage(p.backing, rx, ry, rw, rh, 0, 0, rw, rh);
+  p.backing = cropped; p.width = rw; p.height = rh;
+  rebuildFabricFromBacking(p).then(()=> {
+    pushHistory(p);
+    renderThumbs();
+  });
+});
+
+/* getBoxOnBacking converts rect (fabric coords) to backing coords using background image transform */
+function getBackgroundTransform(){
+  // find background image object
+  const objs = canvas.getObjects();
+  for (let o of objs){
+    if (o._isBackgroundImage) return o;
+  }
+  return null;
+}
+function getBoxOnBacking(rectObj){
+  const bg = getBackgroundTransform();
+  if (!bg) return { x:0,y:0,w:rectObj.width*rectObj.scaleX, h:rectObj.height*rectObj.scaleY };
+  const scale = bg.getScaledWidth() / (pages[activeIndex].backing.width || bg.width);
+  const offX = bg.left, offY = bg.top;
+  const x = Math.round((rectObj.left - offX) / scale);
+  const y = Math.round((rectObj.top - offY) / scale);
+  const w = Math.round(rectObj.width * rectObj.scaleX / scale);
+  const h = Math.round(rectObj.height * rectObj.scaleY / scale);
+  const clamped = {
+    x: Math.max(0, Math.min(x, pages[activeIndex].backing.width - 1)),
+    y: Math.max(0, Math.min(y, pages[activeIndex].backing.height - 1)),
+    w: Math.max(1, Math.min(w, pages[activeIndex].backing.width)),
+    h: Math.max(1, Math.min(h, pages[activeIndex].backing.height))
+  };
+  return clamped;
+}
+
+/* Apply Filters: brightness/contrast/bw */
+applyFilterBtn.addEventListener('click', async ()=> {
+  if (!pages[activeIndex]) return;
+  const page = pages[activeIndex];
+  const b = parseInt(brightnessSlider.value,10)/100;
+  const c = parseInt(contrastSlider.value,10)/100;
+  const bw = parseInt(bwSlider.value,10)/100;
+  const ctx = page.backing.getContext('2d');
+  const imgData = ctx.getImageData(0,0,page.backing.width,page.backing.height);
+  const data = imgData.data;
+  // Apply brightness & contrast in-place
+  // contrast factor formula
+  const factor = (259*(c*255 + 255))/(255*(259 - c*255) || 1);
+  for (let i=0;i<data.length;i+=4){
+    let r = data[i], g = data[i+1], bl = data[i+2];
+    // brightness
+    r = r + b*255; g = g + b*255; bl = bl + b*255;
+    // contrast
+    r = factor * (r - 128) + 128;
+    g = factor * (g - 128) + 128;
+    bl = factor * (bl - 128) + 128;
+    // if bw requested, convert to grayscale and threshold by bw strength
+    if (bw > 0) {
+      const avg = 0.299*r + 0.587*g + 0.114*bl;
+      const val = avg > (255 * (1 - bw)) ? 255 : 0;
+      r = g = bl = val;
+    }
+    data[i] = Math.max(0,Math.min(255,Math.round(r)));
+    data[i+1] = Math.max(0,Math.min(255,Math.round(g)));
+    data[i+2] = Math.max(0,Math.min(255,Math.round(bl)));
+  }
+  ctx.putImageData(imgData,0,0);
+  await rebuildFabricFromBacking(page);
+  pushHistory(page);
+  renderThumbs();
+});
+resetFilterBtn.addEventListener('click', async ()=>{
+  // redraw from last saved history snapshot if exists, else do nothing
+  const page = pages[activeIndex];
+  if (!page || !page.history || page.history.length === 0) return;
+  // find earliest snapshot
+  const first = page.history[0];
+  if (!first) return;
+  const img = new Image();
+  img.onload = ()=> {
+    const ctx = page.backing.getContext('2d');
+    ctx.clearRect(0,0,page.backing.width,page.backing.height);
+    ctx.drawImage(img,0,0,page.backing.width,page.backing.height);
+    rebuildFabricFromBacking(page);
+  };
+  img.src = first.img;
+});
+
+/* Sharpen (simple convolution) */
+applySharpenBtn.addEventListener('click', ()=>{
+  if (!pages[activeIndex]) return;
+  const page = pages[activeIndex];
+  const k = parseInt(sharpenSlider.value,10)/100; // 0..1
+  if (k <= 0) return;
+  const kernel = [
+    0, -k, 0,
+    -k, 1 + 4*k, -k,
+    0, -k, 0
+  ];
+  const ctx = page.backing.getContext('2d');
+  const w = page.backing.width, h = page.backing.height;
+  const src = ctx.getImageData(0,0,w,h);
+  const dst = ctx.createImageData(w,h);
+  const s = src.data, d = dst.data;
+  const kernelSize = 3;
+  for (let y=1;y<h-1;y++){
+    for (let x=1;x<w-1;x++){
+      let r=0,g=0,b=0,a=0;
+      let ki=0;
+      for (let ky=-1;ky<=1;ky++){
+        for (let kx=-1;kx<=1;kx++){
+          const px = x + kx, py = y + ky;
+          const idx = (py * w + px) * 4;
+          const kval = kernel[ki++];
+          r += s[idx] * kval; g += s[idx+1]*kval; b += s[idx+2]*kval;
         }
-      });
+      }
+      const di = (y*w + x) * 4;
+      d[di] = Math.min(255, Math.max(0, Math.round(r)));
+      d[di+1] = Math.min(255, Math.max(0, Math.round(g)));
+      d[di+2] = Math.min(255, Math.max(0, Math.round(b)));
+      d[di+3] = 255;
     }
+  }
+  ctx.putImageData(dst,0,0);
+  rebuildFabricFromBacking(page).then(()=> pushHistory(page));
+});
 
-    trapFocus(logoutModal);
-  </script>
+/* Undo/Redo */
+undoBtn.addEventListener('click', ()=> {
+  if (activeIndex<0) return;
+  const page = pages[activeIndex];
+  if (!page.history) return;
+  const idx = Math.max(0, page.historyIndex - 1);
+  restoreHistory(page, idx);
+});
+redoBtn.addEventListener('click', ()=> {
+  if (activeIndex<0) return;
+  const page = pages[activeIndex];
+  if (!page.history) return;
+  const idx = Math.min(page.history.length - 1, page.historyIndex + 1);
+  restoreHistory(page, idx);
+});
+
+/* Fit to view */
+fitToViewBtn.addEventListener('click', ()=> {
+  canvas.setZoom(1);
+  canvas.renderAll();
+});
+
+/* Rotate */
+rotateLeftBtn.addEventListener('click', ()=> rotateActive(270));
+rotateRightBtn.addEventListener('click', ()=> rotateActive(90));
+function rotateActive(deg){
+  if (activeIndex<0) return;
+  const p = pages[activeIndex];
+  // rotate backing
+  const tmp = document.createElement('canvas');
+  tmp.width = p.height; tmp.height = p.width;
+  const tctx = tmp.getContext('2d');
+  tctx.translate(tmp.width/2, tmp.height/2);
+  tctx.rotate(deg * Math.PI/180);
+  tctx.drawImage(p.backing, -p.width/2, -p.height/2);
+  p.backing = tmp;
+  const oldW = p.width; p.width = p.height; p.height = oldW;
+  rebuildFabricFromBacking(p).then(()=> {
+    pushHistory(p);
+    renderThumbs();
+  });
+}
+
+/* Page Controls: add, duplicate, delete */
+addPageBtn.addEventListener('click', ()=> addBlankPage());
+addBlankBtn.addEventListener('click', ()=> addBlankPage());
+duplicatePageBtn.addEventListener('click', ()=> duplicatePage(activeIndex));
+deletePageBtn.addEventListener('click', ()=> {
+  if (confirm('Delete this page?')) deletePage(activeIndex);
+});
+
+/* Copy/Paste Canvas keyboard */
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); undoBtn.click(); }
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') { e.preventDefault(); redoBtn.click(); }
+  if (e.key.toLowerCase() === 'c') { setTool('box'); }
+  if (e.key.toLowerCase() === 'd') { setTool('draw'); }
+  if (e.key.toLowerCase() === 't') { setTool('text'); }
+});
+
+/* Exporting */
+exportPngBtn.addEventListener('click', ()=> {
+  if (activeIndex<0) return;
+  const p = pages[activeIndex];
+  const link = document.createElement('a');
+  link.download = `page-${activeIndex+1}.png`;
+  link.href = p.backing.toDataURL('image/png');
+  link.click();
+});
+
+/* Multi-page PDF export using jsPDF */
+exportPdfBtn.addEventListener('click', async ()=>{
+  if (pages.length === 0) return;
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({ unit: 'pt', format: 'a4' });
+  // A4 points
+  const a4w = 595.28, a4h = 841.89;
+  for (let i=0;i<pages.length;i++){
+    const p = pages[i];
+    // convert backing to image and fit into A4, keeping aspect ratio
+    const dataUrl = p.backing.toDataURL('image/jpeg', 0.95);
+    const img = await dataURLToImage(dataUrl);
+    const ratio = Math.min(a4w / img.width, a4h / img.height);
+    const drawW = img.width * ratio, drawH = img.height * ratio;
+    const marginX = (a4w - drawW) / 2, marginY = (a4h - drawH) /2;
+    if (i > 0) pdf.addPage();
+    pdf.addImage(dataUrl, 'JPEG', marginX, marginY, drawW, drawH);
+  }
+  pdf.save('document.pdf');
+});
+
+/* ---------- File import & Drag/drop ---------- */
+importBtn.addEventListener('click', ()=> fileInput.click());
+fileInput.addEventListener('change', async (e) => {
+  const files = Array.from(e.target.files || []);
+  for (let f of files) {
+    await importImageFile(f);
+  }
+  fileInput.value = '';
+});
+
+window.addEventListener('dragover', e => {
+  e.preventDefault();
+});
+window.addEventListener('drop', async (e) => {
+  e.preventDefault();
+  if (!dragDropEnabled) return;
+  const dt = e.dataTransfer;
+  if (dt && dt.files && dt.files.length) {
+    const files = Array.from(dt.files);
+    for (let f of files) {
+      if (f.type.startsWith('image/')) await importImageFile(f);
+    }
+  }
+});
+
+/* Camera capture (simple snapshot) */
+cameraBtn.addEventListener('click', async ()=> {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video:true });
+    const video = document.createElement('video');
+    video.autoplay = true;
+    video.srcObject = stream;
+    video.style.maxWidth = '100%';
+    const modal = document.createElement('div');
+    Object.assign(modal.style, { position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:9999 });
+    const box = document.createElement('div'); box.className='card'; box.style.padding='10px';
+    const captureBtn = document.createElement('button'); captureBtn.className='btn'; captureBtn.textContent='Capture';
+    const cancelBtn = document.createElement('button'); cancelBtn.className='btn ghost small'; cancelBtn.textContent='Cancel';
+    box.appendChild(video);
+    box.appendChild(document.createElement('br'));
+    box.appendChild(captureBtn); box.appendChild(cancelBtn);
+    modal.appendChild(box); document.body.appendChild(modal);
+    video.play();
+    captureBtn.addEventListener('click', ()=> {
+      const w = video.videoWidth, h = video.videoHeight;
+      const c = document.createElement('canvas'); c.width = w; c.height = h;
+      c.getContext('2d').drawImage(video,0,0,w,h);
+      // stop stream
+      stream.getTracks().forEach(t=>t.stop());
+      document.body.removeChild(modal);
+      // add page from captured image
+      const data = c.toDataURL('image/png');
+      const blob = dataURLToBlob(data);
+      const f = new File([blob], 'capture.png', { type: 'image/png' });
+      importImageFile(f);
+    });
+    cancelBtn.addEventListener('click', ()=> {
+      stream.getTracks().forEach(t=>t.stop());
+      document.body.removeChild(modal);
+    });
+  } catch (err) {
+    alert('Camera not available or permission denied.');
+  }
+});
+
+/* Helper */
+function dataURLToBlob(dataurl) {
+  const parts = dataurl.split(','), mime = parts[0].match(/:(.*?);/)[1];
+  const bstr = atob(parts[1]); let n = bstr.length; const u8 = new Uint8Array(n);
+  while(n--) u8[n] = bstr.charCodeAt(n);
+  return new Blob([u8], { type: mime });
+}
+
+/* ---------- Initial Boot ---------- */
+(function init(){
+  // initial blank page
+  addBlankPage();
+  // fit canvas to host
+  canvas.setHeight(Math.min(1200, window.innerHeight * 0.72));
+  canvas.setWidth(Math.min(900, window.innerWidth * 0.72));
+  setTool('select');
+})();
+
+/* Make sure to save a history snapshot when significant actions occur */
+canvas.on('object:modified', ()=> { if (activeIndex>=0) pushHistory(pages[activeIndex]); });
+canvas.on('object:added', ()=> { if (activeIndex>=0) pushHistory(pages[activeIndex]); });
+
+/* When user resizes window, keep canvas size reasonable */
+window.addEventListener('resize', ()=> {
+  canvas.setHeight(Math.min(1200, window.innerHeight * 0.72));
+  canvas.setWidth(Math.min(1100, window.innerWidth * 0.72));
+  canvas.requestRenderAll();
+});
+</script>
 </body>
 </html>
