@@ -1,123 +1,143 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Pro Document Studio — Prototype</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Pro Document Studio — Master Edition</title>
 
-<!-- Minimal reset & professional UI -->
+<!-- ===== Libraries (CDN) =====
+ - Fabric.js for rich canvas objects
+ - jsPDF for PDF export
+ - pdf.js (optional: to preview PDF pages when user imports a PDF)
+-->
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.8.162/pdf.min.js"></script>
+
 <style>
   :root{
-    --bg:#f4f6f8; --card:#fff; --accent:#2563eb; --accent-2:#1e40af;
-    --muted:#6b7280; --radius:10px; --gap:12px; --max-width:1400px;
+    --bg:#f4f6f8; --card:#ffffff; --accent:#0f62fe; --accent-2:#0530a3;
+    --muted:#6b7280; --radius:10px; --gap:12px; --max-width:1500px;
+    --shadow: 0 10px 30px rgba(12,20,40,0.06);
   }
   *{box-sizing:border-box}
-  html,body{height:100%;margin:0;background:var(--bg);font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;}
-  .app{max-width:var(--max-width);margin:20px auto;padding:16px;display:grid;grid-template-columns:220px 1fr 340px;gap:16px;}
-  .card{background:var(--card);border-radius:var(--radius);box-shadow:0 8px 30px rgba(15,23,42,0.06);padding:12px;}
-  /* Left: Pages */
-  .pages {display:flex;flex-direction:column;gap:8px;height:calc(100vh - 80px);overflow:auto;padding:8px;}
-  .pages .top {display:flex;gap:8px;align-items:center;justify-content:space-between;padding:6px}
-  .thumbs {display:flex;flex-direction:column;gap:8px;padding:6px;}
-  .thumb {display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;cursor:pointer;border:1px solid transparent;}
-  .thumb.active{border-color:rgba(37,99,235,0.14);background:linear-gradient(180deg,rgba(37,99,235,0.02),transparent)}
-  .thumb canvas{width:160px;height:auto;border-radius:6px;box-shadow:0 6px 18px rgba(12,20,40,0.04);}
-  .page-controls{display:flex;gap:6px;flex-wrap:wrap;}
+  html,body{height:100%;margin:0;background:var(--bg);font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;color:#111}
+  .app{max-width:var(--max-width);margin:18px auto;padding:14px;display:grid;grid-template-columns:260px 1fr 360px;gap:16px}
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:12px}
+  .header{grid-column:1/4;display:flex;align-items:center;gap:12px;padding:10px 14px;margin-bottom:6px;border-radius:10px}
+  .logo{width:46px;height:46px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;color:white;font-weight:700}
+  .title{font-size:18px;font-weight:700}
+  /* LEFT: pages */
+  .pages{display:flex;flex-direction:column;gap:8px;height:calc(100vh - 160px);overflow:auto}
+  .pages .top{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:6px}
+  .thumbs{display:flex;flex-direction:column;gap:8px;padding:6px}
+  .thumb{display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;cursor:pointer;border:1px solid transparent}
+  .thumb.active{border-color:rgba(15,98,254,0.12);background:linear-gradient(180deg,rgba(15,98,254,0.02),transparent)}
+  .thumb canvas{width:120px;height:auto;border-radius:6px;box-shadow:0 6px 18px rgba(12,20,40,0.04)}
+  .page-controls{display:flex;gap:6px;flex-wrap:wrap}
   .btn{height:36px;padding:0 12px;border-radius:8px;border:none;background:var(--accent);color:#fff;cursor:pointer;font-weight:600}
   .btn.ghost{background:transparent;color:var(--muted);border:1px solid #e6e8eb}
-  .btn.small{height:32px;padding:0 8px;font-size:13px}
-  /* Center: Canvas */
-  .studio{display:flex;flex-direction:column;align-items:center;gap:10px;padding:10px;height:calc(100vh - 80px);overflow:auto}
-  .stage{background:#edf2ff;border-radius:8px;padding:14px;display:flex;justify-content:center;align-items:center;box-shadow:inset 0 1px 0 rgba(255,255,255,0.6)}
-  canvas#fabricCanvas{border-radius:8px;border:1px solid #e6e8eb;background:#fff;max-width:100%;height:auto}
+  .btn.small{height:34px;padding:0 10px;font-size:13px}
+  /* CENTER: stage */
+  .studio{display:flex;flex-direction:column;align-items:center;gap:10px;padding:10px;height:calc(100vh - 160px);overflow:auto}
+  .stage{background:#f8fbff;border-radius:8px;padding:14px;display:flex;justify-content:center;align-items:center;box-shadow:inset 0 1px 0 rgba(255,255,255,0.6);min-width:320px}
+  canvas#fabricCanvas{border-radius:6px;border:1px solid #e6e8eb;background:#fff;display:block;max-width:100%;height:auto}
   .drop-hint{font-size:13px;color:var(--muted);margin-top:6px}
-  /* Right: Tools */
-  .tools{display:flex;flex-direction:column;gap:10px;height:calc(100vh - 80px);overflow:auto;padding:12px}
-  .section{border-radius:8px;padding:10px;border:1px solid #eef2f6;background:linear-gradient(180deg,#fff, #fbfdff)}
+  .controls-row{display:flex;gap:8px;align-items:center;width:100%}
+  .muted{color:var(--muted);font-size:13px}
+  /* RIGHT: tools */
+  .tools{display:flex;flex-direction:column;gap:10px;height:calc(100vh - 160px);overflow:auto;padding:12px}
+  .section{border-radius:8px;padding:10px;border:1px solid #eef2f6;background:linear-gradient(180deg,#fff,#fbfdff)}
   .section h3{margin:0 0 8px;font-size:14px}
   .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .input, select {height:34px;padding:6px 8px;border-radius:8px;border:1px solid #e6e8eb;}
-  .range {width:180px}
-  .tool-btn{height:36px;padding:6px 10px;border-radius:8px;border:1px solid #e6e8eb;background:#fff;cursor:pointer}
-  .tool-btn.primary{background:var(--accent);color:#fff;border:none}
-  footer{grid-column:1/4;text-align:center;color:var(--muted);padding:8px 0;font-size:13px}
-  .muted{color:var(--muted);font-size:13px}
-  /* mobile */
-  @media (max-width:1100px){
+  input[type=range]{width:160px}
+  input[type=file]{display:none}
+  footer{grid-column:1/4;text-align:center;color:var(--muted);padding:8px 0;font-size:13px;margin-top:10px}
+  @media (max-width:1200px){
     .app{grid-template-columns:1fr;grid-auto-rows:auto;padding:10px}
     .pages{order:3;height:auto}
     .tools{order:2}
     .studio{order:1}
+    .header{flex-direction:column;align-items:flex-start}
   }
 </style>
 </head>
 <body>
 
-<div class="app">
+<div class="app" id="appRoot" aria-live="polite">
+  <div class="header card">
+    <div class="logo">PDS</div>
+    <div>
+      <div class="title">Pro Document Studio — Master Edition</div>
+      <div class="muted">Professional document editing — crop, filters, OCR hooks, multi-page export</div>
+    </div>
+    <div style="margin-left:auto" class="muted">v1.0 • Secure & Local-first • For production use integrate server-side OCR & storage</div>
+  </div>
+
   <!-- LEFT: Pages -->
   <div class="card pages" aria-label="Pages panel">
     <div class="top">
       <div style="font-weight:700">Pages</div>
       <div class="page-controls">
         <button class="btn small" id="addPageBtn" title="Add blank page">+ Page</button>
-        <button class="btn small ghost" id="importBtn" title="Import images">Import</button>
+        <button class="btn small ghost" id="importBtn" title="Import files">Import</button>
       </div>
     </div>
 
     <div style="margin:8px 0">
-      <input id="fileInput" type="file" accept="image/*,application/pdf" multiple style="display:none" />
-      <div style="display:flex;gap:8px">
+      <input id="fileInput" type="file" accept="image/*,.pdf" multiple />
+      <div style="display:flex;gap:8px;align-items:center">
         <button class="btn ghost small" id="dragDropToggle">Drag & Drop: ON</button>
-        <button class="btn ghost small" id="cameraBtn">Camera</button>
+        <button class="btn ghost small" id="cameraBtn" title="Camera">Camera</button>
       </div>
     </div>
 
-    <div class="thumbs" id="thumbs"></div>
-    <div style="margin-top:12px" class="muted">Tip: Drag images into the stage, reorder pages by dragging thumbnails.</div>
+    <div class="thumbs" id="thumbs" aria-live="polite"></div>
+    <div style="margin-top:12px" class="muted">Tip: Drop images/PDF pages to import. Reorder pages by dragging thumbnails. Use Fit, Zoom, and Pan for precise edits.</div>
   </div>
 
   <!-- CENTER: Studio -->
   <div class="card studio" role="main">
     <div class="stage" id="stageHost">
-      <!-- Fabric canvas will be inserted here -->
-      <canvas id="fabricCanvas" width="900" height="1200"></canvas>
+      <canvas id="fabricCanvas" width="900" height="1200" aria-label="Document canvas"></canvas>
     </div>
 
-    <div style="display:flex;gap:8px;align-items:center">
+    <div style="width:100%;display:flex;gap:8px;align-items:center">
       <div class="muted">Active page: <strong id="activeIndex">—</strong></div>
       <div style="flex:1"></div>
-      <button class="btn ghost small" id="undoBtn" title="Undo (Ctrl+Z)">Undo</button>
-      <button class="btn ghost small" id="redoBtn" title="Redo (Ctrl+Y)">Redo</button>
-      <button class="btn" id="exportPdfBtn">Export PDF</button>
-      <button class="btn" id="exportPngBtn">Export PNG</button>
+      <button class="btn ghost small" id="undoBtn" title="Undo (Ctrl+Z)" disabled>Undo</button>
+      <button class="btn ghost small" id="redoBtn" title="Redo (Ctrl+Y)" disabled>Redo</button>
+      <button class="btn" id="exportPdfBtn" title="Export multi-page PDF">Export PDF</button>
+      <button class="btn" id="exportPngBtn" title="Export current page PNG">Export PNG</button>
     </div>
 
-    <div class="drop-hint muted" id="dropHint">Drop images here or click Import. Use the right panel to edit.</div>
+    <div class="drop-hint muted" id="dropHint">Drop files here or click Import. Zoom with mouse wheel. Pan by dragging while holding spacebar.</div>
   </div>
 
   <!-- RIGHT: Tools -->
   <div class="card tools" aria-label="Tools panel">
     <div class="section">
-      <h3>Selection & Edit</h3>
+      <h3>Selection & Tools</h3>
       <div class="row" style="gap:6px">
-        <button class="tool-btn" id="selectTool">Select</button>
-        <button class="tool-btn" id="boxTool">Box</button>
-        <button class="tool-btn" id="freehandTool">Draw</button>
-        <button class="tool-btn" id="textTool">Text</button>
-        <button class="tool-btn" id="rectTool">Rect</button>
-        <button class="tool-btn" id="eraseTool">Erase</button>
+        <button class="btn small" id="selectTool">Select</button>
+        <button class="btn small ghost" id="boxTool">Box</button>
+        <button class="btn small ghost" id="drawTool">Draw</button>
+        <button class="btn small ghost" id="textTool">Text</button>
+        <button class="btn small ghost" id="eraseTool">Erase</button>
       </div>
 
-      <div style="margin-top:8px" class="row">
-        <button class="tool-btn" id="cropBtn">Crop</button>
-        <button class="tool-btn" id="autoCropBtn">Auto-Crop</button>
-        <button class="tool-btn" id="copyBtn">Copy</button>
-        <button class="tool-btn" id="pasteBtn">Paste</button>
+      <div style="margin-top:10px" class="row">
+        <button class="btn small ghost" id="cropBtn">Crop</button>
+        <button class="btn small ghost" id="autoCropBtn">Auto-Crop</button>
+        <button class="btn small ghost" id="copyBtn">Copy</button>
+        <button class="btn small ghost" id="pasteBtn">Paste</button>
       </div>
-      <div style="margin-top:8px" class="row">
-        <button class="tool-btn" id="bringFront">Bring</button>
-        <button class="tool-btn" id="sendBack">Send</button>
-        <button class="tool-btn" id="deleteObj">Delete</button>
+
+      <div style="margin-top:10px" class="row">
+        <button class="btn small ghost" id="bringFront">Bring</button>
+        <button class="btn small ghost" id="sendBack">Send</button>
+        <button class="btn small ghost" id="deleteObj">Delete</button>
       </div>
     </div>
 
@@ -125,15 +145,15 @@
       <h3>Filters & Adjust</h3>
       <div class="row"><label class="muted">Brightness</label><input id="brightness" class="range" type="range" min="-100" max="100" value="0"></div>
       <div class="row"><label class="muted">Contrast</label><input id="contrast" class="range" type="range" min="-100" max="100" value="0"></div>
-      <div class="row"><label class="muted">B&W Strength</label><input id="bwStrength" class="range" type="range" min="0" max="100" value="60"></div>
-      <div class="row" style="margin-top:6px">
-        <button class="tool-btn" id="applyFilter">Apply</button>
-        <button class="tool-btn" id="resetFilter">Reset</button>
+      <div class="row"><label class="muted">B&W</label><input id="bwStrength" class="range" type="range" min="0" max="100" value="0"></div>
+      <div class="row" style="margin-top:8px">
+        <button class="btn small" id="applyFilter">Apply</button>
+        <button class="btn small ghost" id="resetFilter">Reset</button>
       </div>
-      <div style="margin-top:8px" class="muted">Sharpen (experimental):</div>
+      <div style="margin-top:8px" class="muted">Sharpen (convolution)</div>
       <div class="row" style="margin-top:6px">
         <input id="sharpen" type="range" class="range" min="0" max="100" value="0">
-        <button class="tool-btn small" id="applySharpen">Apply</button>
+        <button class="btn small" id="applySharpen">Apply</button>
       </div>
     </div>
 
@@ -145,39 +165,38 @@
         <button class="btn ghost small" id="deletePage">Delete Page</button>
       </div>
       <div style="margin-top:8px" class="row">
-        <button class="btn small" id="rotateLeft">Rotate L</button>
-        <button class="btn small" id="rotateRight">Rotate R</button>
+        <button class="btn small ghost" id="rotateLeft">Rotate L</button>
+        <button class="btn small ghost" id="rotateRight">Rotate R</button>
         <button class="btn small" id="fitToView">Fit</button>
       </div>
     </div>
 
     <div class="section">
-      <h3>Advanced</h3>
+      <h3>Advanced / Integrations</h3>
       <div class="row">
-        <button class="tool-btn" id="ocrBtn">OCR (placeholder)</button>
-        <button class="tool-btn" id="smartEraseBtn">Smart Erase (stub)</button>
+        <button class="btn small ghost" id="ocrBtn">OCR (placeholder)</button>
+        <button class="btn small ghost" id="smartEraseBtn">Smart Erase (placeholder)</button>
       </div>
-      <div style="margin-top:8px" class="muted">Pro notes: Full OCR & AI erase would be implemented via cloud microservices; here are placeholders for UX flows.</div>
+      <div style="margin-top:8px" class="muted">Pro note: OCR and AI inpainting should be done server-side (Tesseract, Google Vision, Azure, AWS). This UI includes the integration hooks.</div>
     </div>
-
   </div>
 
-  <footer class="muted">Pro Document Studio — prototype • Built with Fabric.js & jsPDF • Keyboard: C=crop, V=paste, B=box, D=draw, T=text, Z=undo</footer>
+  <footer class="muted">Pro Document Studio — Master • Built with Fabric.js & jsPDF • Keyboard: C=crop, V=paste, B=box, D=draw, T=text, Z=undo • Local-first editing</footer>
 </div>
 
-<!-- Libraries -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
+<!-- ========== JavaScript: Master-level App ========== -->
 <script>
-/* =============================================
-   Pro Document Studio — JavaScript Core
-   ============================================= */
+/*  Professional Document Studio — Master Script
+    - Highly modular
+    - Defensive and production-minded
+    - Comments explain intent and tradeoffs
+*/
 
-/* ---------- App State ---------- */
-const pages = []; // each page: { backing: HTMLCanvasElement, fabricImageObj?, fabricState?, history:[], historyIndex:0, width, height }
+/* ---------- App state ---------- */
+const pages = []; // { backing: HTMLCanvasElement, width, height, history:[], historyIndex }
 let activeIndex = -1;
-const DEFAULT_PAGE = { w: 2480, h: 3508 }; // default A4 at 300dpi ~ (use px as large canvas)
+const DEFAULT_PAGE = { w: 2480, h: 3508 }; // A4 @ 300dpi approx
+const HISTORY_LIMIT = 80;
 
 /* ---------- DOM refs ---------- */
 const thumbsEl = document.getElementById('thumbs');
@@ -193,13 +212,12 @@ const stageHost = document.getElementById('stageHost');
 const undoBtn = document.getElementById('undoBtn'), redoBtn = document.getElementById('redoBtn');
 const exportPdfBtn = document.getElementById('exportPdfBtn'), exportPngBtn = document.getElementById('exportPngBtn');
 
-/* Tools */
+/* tools */
 const selectToolBtn = document.getElementById('selectTool');
 const boxToolBtn = document.getElementById('boxTool');
-const freehandBtn = document.getElementById('freehandTool');
-const textBtn = document.getElementById('textTool');
-const rectBtn = document.getElementById('rectTool');
-const eraseBtn = document.getElementById('eraseTool');
+const drawToolBtn = document.getElementById('drawTool');
+const textToolBtn = document.getElementById('textTool');
+const eraseToolBtn = document.getElementById('eraseTool');
 const cropBtn = document.getElementById('cropBtn');
 const autoCropBtn = document.getElementById('autoCropBtn');
 const copyBtn = document.getElementById('copyBtn');
@@ -226,75 +244,40 @@ const fitToViewBtn = document.getElementById('fitToView');
 const dragDropToggle = document.getElementById('dragDropToggle');
 const cameraBtn = document.getElementById('cameraBtn');
 
+let dragDropEnabled = true;
+
 /* ---------- Fabric Setup ---------- */
-const canvas = new fabric.Canvas('fabricCanvas', { preserveObjectStacking:true, backgroundColor:'#fff' });
+const canvas = new fabric.Canvas('fabricCanvas', { preserveObjectStacking:true, backgroundColor:'#fff', allowTouchScrolling: false });
 canvas.selection = true;
 canvas.renderOnAddRemove = true;
-canvas.preserveObjectStacking = true;
+// responsive display size (kept separate from backing resolution)
+function refreshDisplaySize(){
+  const maxH = Math.min(1200, window.innerHeight * 0.72);
+  const maxW = Math.min(1200, window.innerWidth * 0.72);
+  canvas.setHeight(maxH);
+  canvas.setWidth(Math.min(maxW, 1100));
+  canvas.requestRenderAll();
+}
+window.addEventListener('resize', refreshDisplaySize);
+refreshDisplaySize();
 
-/* Active tool */
+/* active tool */
 let currentTool = 'select';
 let selectionRect = null;
 let copiedDataURL = null;
 
-/* Drag & Drop */
-let dragDropEnabled = true;
-dragDropToggle.addEventListener('click', () => {
-  dragDropEnabled = !dragDropEnabled;
-  dragDropToggle.textContent = 'Drag & Drop: ' + (dragDropEnabled ? 'ON' : 'OFF');
-});
-
 /* ---------- Utilities ---------- */
 function createBacking(w = DEFAULT_PAGE.w, h = DEFAULT_PAGE.h){
   const c = document.createElement('canvas');
-  c.width = w; c.height = h;
+  c.width = Math.max(1, Math.floor(w));
+  c.height = Math.max(1, Math.floor(h));
   const ctx = c.getContext('2d');
   ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0,0,w,h);
+  ctx.fillRect(0,0,c.width,c.height);
   return c;
 }
-function pushHistory(page){
-  const snapshot = page.backing.toDataURL('image/png');
-  // fabric state (annotations) stringified
-  const fabricState = canvas.toJSON(['selectable']);
-  // maintain stack of up to 40
-  page.history = page.history || [];
-  page.history.splice(page.historyIndex+1); // truncate forward
-  page.history.push({ img: snapshot, fabric: fabricState });
-  page.historyIndex = page.history.length - 1;
-  updateUndoRedoButtons();
-}
-function restoreHistory(page, index){
-  if (!page.history || index < 0 || index >= page.history.length) return;
-  const item = page.history[index];
-  // restore backing bitmap
-  const img = new Image();
-  img.onload = () => {
-    const ctx = page.backing.getContext('2d');
-    ctx.clearRect(0,0,page.backing.width,page.backing.height);
-    ctx.drawImage(img,0,0,page.backing.width,page.backing.height);
-    // rebuild fabric layer from page.backing
-    rebuildFabricFromBacking(page).then(()=> {
-      // restore annotations
-      if (item.fabric) {
-        canvas.loadFromJSON(item.fabric, canvas.renderAll.bind(canvas), function(o,object){
-          // nothing extra
-        });
-      }
-    });
-  };
-  img.src = item.img;
-  page.historyIndex = index;
-  updateThumb(page, page._thumbElIndex);
-  updateUndoRedoButtons();
-}
-function updateUndoRedoButtons(){
-  if (activeIndex<0) return;
-  const page = pages[activeIndex];
-  undoBtn.disabled = !(page.history && page.historyIndex > 0);
-  redoBtn.disabled = !(page.history && page.historyIndex < page.history.length - 1);
-}
-function dataURLToImage(d) {
+
+function dataURLToImage(d){
   return new Promise((res,rej)=>{
     const i = new Image();
     i.onload = ()=>res(i);
@@ -303,7 +286,68 @@ function dataURLToImage(d) {
   });
 }
 
-/* ---------- Page Lifecycle ---------- */
+function dataURLToBlob(dataurl) {
+  const parts = dataurl.split(','), mime = (parts[0].match(/:(.*?);/)||[])[1] || 'image/png';
+  const bstr = atob(parts[1]); let n = bstr.length; const u8 = new Uint8Array(n);
+  while(n--) u8[n] = bstr.charCodeAt(n);
+  return new Blob([u8], { type: mime });
+}
+
+/* ---------- History management (backing + fabric state) ---------- */
+function snapshotForHistory(page){
+  // store backing as dataURL (could be large, but required for a full undo)
+  return { img: page.backing.toDataURL('image/png'), fabric: canvas.toJSON(['selectable','id']) };
+}
+
+function pushHistory(page){
+  page.history = page.history || [];
+  // if last snapshot identical to current backing, update fabric only
+  const snap = snapshotForHistory(page);
+  const last = page.history[page.history.length - 1];
+  if (last && last.img === snap.img) {
+    last.fabric = snap.fabric;
+  } else {
+    // prune forward history if necessary
+    if (page.historyIndex < page.history.length - 1) page.history.splice(page.historyIndex + 1);
+    page.history.push(snap);
+    if (page.history.length > HISTORY_LIMIT) page.history.shift();
+    page.historyIndex = page.history.length - 1;
+  }
+  updateUndoRedoButtons();
+}
+
+function restoreHistory(page, index){
+  if (!page || !page.history || index < 0 || index >= page.history.length) return;
+  const item = page.history[index];
+  const img = new Image();
+  img.onload = () => {
+    page.backing.width = img.width; page.backing.height = img.height;
+    const ctx = page.backing.getContext('2d');
+    ctx.clearRect(0,0,page.backing.width,page.backing.height);
+    ctx.drawImage(img,0,0);
+    rebuildFabricFromBacking(page).then(()=> {
+      if (item.fabric) {
+        try { canvas.loadFromJSON(item.fabric, canvas.renderAll.bind(canvas)); } catch(e){ console.warn('loadFromJSON failed',e); }
+      }
+      page.historyIndex = index;
+      updateUndoRedoButtons();
+      renderThumbs();
+    });
+  };
+  img.onerror = ()=> console.warn('Failed to restore history image');
+  img.src = item.img;
+}
+
+function updateUndoRedoButtons(){
+  if (activeIndex < 0 || !pages[activeIndex]) {
+    undoBtn.disabled = true; redoBtn.disabled = true; return;
+  }
+  const page = pages[activeIndex];
+  undoBtn.disabled = !(page.history && page.historyIndex > 0);
+  redoBtn.disabled = !(page.history && page.historyIndex < page.history.length - 1);
+}
+
+/* ---------- Page lifecycle ---------- */
 function addBlankPage(w = DEFAULT_PAGE.w, h = DEFAULT_PAGE.h, atIndex = pages.length){
   const backing = createBacking(w,h);
   const page = { backing, width:w, height:h, history:[], historyIndex:-1 };
@@ -314,48 +358,83 @@ function addBlankPage(w = DEFAULT_PAGE.w, h = DEFAULT_PAGE.h, atIndex = pages.le
   return page;
 }
 
-async function importImageFile(file, atIndex = pages.length){
-  // Use native Image and create a backing canvas scaled to natural size
-  const url = URL.createObjectURL(file);
-  const img = await dataURLToImage(url).catch(()=>null);
-  URL.revokeObjectURL(url);
-  if (!img) return;
-  const w = img.naturalWidth || img.width;
-  const h = img.naturalHeight || img.height;
-  const backing = createBacking(w,h);
-  const ctx = backing.getContext('2d');
-  ctx.drawImage(img,0,0,w,h);
-  const page = { backing, width:w, height:h, history:[], historyIndex:-1 };
-  pages.splice(atIndex,0,page);
-  renderThumbs();
-  setActivePage(atIndex);
-  pushHistory(page);
+async function importImageFileBlob(blob, atIndex = pages.length){
+  // read as image and create page
+  try {
+    const url = URL.createObjectURL(blob);
+    const img = await dataURLToImage(url);
+    URL.revokeObjectURL(url);
+    const w = img.naturalWidth || img.width;
+    const h = img.naturalHeight || img.height;
+    const backing = createBacking(w,h);
+    const ctx = backing.getContext('2d');
+    ctx.drawImage(img,0,0,w,h);
+    const page = { backing, width:w, height:h, history:[], historyIndex:-1 };
+    pages.splice(atIndex,0,page);
+    renderThumbs();
+    setActivePage(atIndex);
+    pushHistory(page);
+  } catch(e){
+    console.error('importImageFileBlob failed', e);
+    alert('Failed to import file.');
+  }
 }
 
-/* Rebuild fabric main image from page.backing */
-async function rebuildFabricFromBacking(page){
-  // remove previous background image objects (we treat first fabric image as background)
-  const fabricObjects = canvas.getObjects();
-  for (let obj of fabricObjects.slice()){
-    if (obj._isBackgroundImage) canvas.remove(obj);
+async function importImageFile(file, atIndex = pages.length){
+  // support image and pdf (first page)
+  try {
+    if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
+      // Use PDF.js to extract first page as image (best-effort)
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      const page1 = await pdf.getPage(1);
+      const viewport = page1.getViewport({ scale: 2 }); // increase quality
+      const tmp = document.createElement('canvas');
+      tmp.width = Math.ceil(viewport.width); tmp.height = Math.ceil(viewport.height);
+      const ctx2 = tmp.getContext('2d');
+      const renderContext = { canvasContext: ctx2, viewport: viewport };
+      await page1.render(renderContext).promise;
+      const dataUrl = tmp.toDataURL('image/png');
+      const blob = dataURLToBlob(dataUrl);
+      await importImageFileBlob(blob, atIndex);
+      return;
+    }
+    if (file.type && file.type.startsWith('image/')) {
+      await importImageFileBlob(file, atIndex);
+      return;
+    }
+    alert('Unsupported file type.');
+  } catch (e) {
+    console.error('importImageFile error', e);
+    alert('Failed to import file. If it is a PDF, try saving as image first.');
   }
-  // create fabric.Image from page.backing
+}
+
+/* Rebuild fabric background image from page.backing (display-scaled) */
+async function rebuildFabricFromBacking(page){
+  // remove any existing background image object(s)
+  const objs = canvas.getObjects();
+  for (let o of objs.slice()){
+    if (o._isBackgroundImage) canvas.remove(o);
+  }
+  // create fabric.Image from page.backing, scale to fit canvas display width
   return new Promise(resolve => {
     const url = page.backing.toDataURL('image/png');
     fabric.Image.fromURL(url, img => {
+      // background image should not be interactive
       img.selectable = false;
       img.evented = false;
       img._isBackgroundImage = true;
-      // scale to fit canvas size (we'll fit to fabricCanvas dimensions)
-      const targetW = canvas.getWidth() * 0.98;
-      img.scaleToWidth(targetW);
-      img.left = (canvas.getWidth() - img.getScaledWidth())/2;
-      img.top = 20;
+      // compute scale to fit display canvas width while preserving backing pixel mapping
+      const displayW = canvas.getWidth() * 0.96;
+      img.scaleToWidth(displayW);
+      img.left = (canvas.getWidth() - img.getScaledWidth()) / 2;
+      img.top = (canvas.getHeight() - img.getScaledHeight()) / 2;
       canvas.add(img);
       canvas.sendToBack(img);
       canvas.renderAll();
       resolve();
-    });
+    }, { crossOrigin: 'Anonymous' });
   });
 }
 
@@ -368,11 +447,10 @@ function renderThumbs(){
     div.draggable = true;
     div.dataset.index = i;
     const canvasThumb = document.createElement('canvas');
-    // create small scaled thumbnail
-    const thumbW = 320;
+    const thumbW = 220;
     const scale = Math.min(thumbW / p.width, 1);
-    canvasThumb.width = Math.floor(p.width * scale);
-    canvasThumb.height = Math.floor(p.height * scale);
+    canvasThumb.width = Math.max(1, Math.floor(p.width * scale));
+    canvasThumb.height = Math.max(1, Math.floor(p.height * scale));
     const ctx = canvasThumb.getContext('2d');
     ctx.fillStyle = '#fff';
     ctx.fillRect(0,0,canvasThumb.width,canvasThumb.height);
@@ -384,52 +462,55 @@ function renderThumbs(){
     div.appendChild(info);
     div.addEventListener('click', ()=>setActivePage(i));
     // drag reorder
-    div.addEventListener('dragstart', e => {
-      e.dataTransfer.setData('text/plain', i);
-    });
+    div.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', i); });
     div.addEventListener('dragover', e => e.preventDefault());
     div.addEventListener('drop', e => {
       const src = parseInt(e.dataTransfer.getData('text/plain'),10);
       const dest = i;
       if (!isNaN(src)) reorderPages(src, dest);
     });
-    div._thumbCanvas = canvasThumb;
-    div._index = i;
-    p._thumbElIndex = i;
     thumbsEl.appendChild(div);
   });
+  activeIndexEl.textContent = activeIndex < 0 ? '—' : `${activeIndex+1} / ${pages.length}`;
 }
 
-/* Set active page */
+/* Set active page (save annotations then load) */
 async function setActivePage(i){
   if (i < 0 || i >= pages.length) return;
-  // save current page fabric annotations into history before switching
-  if (activeIndex >= 0) pushCurrentStateToPage(activeIndex);
+  // save current annotations into current page
+  if (activeIndex >= 0) saveCurrentAnnotationsToPage(activeIndex);
   activeIndex = i;
   activeIndexEl.textContent = `${i+1} / ${pages.length}`;
-  // clear fabric canvas annotations, then rebuild
   canvas.clear();
-  canvas.setHeight(window.innerHeight * 0.72);
+  // choose display dims then rebuild background
+  refreshDisplaySize();
+  canvas.setHeight(Math.min(1200, window.innerHeight * 0.72));
   canvas.setWidth(Math.min(1100, window.innerWidth * 0.72));
   await rebuildFabricFromBacking(pages[i]);
-  // load any saved annotations from last history item
-  // If last history item contains fabric state, try to load it (optional)
-  const lastFabric = pages[i].history && pages[i].history[pages[i].historyIndex] && pages[i].history[pages[i].historyIndex].fabric;
-  if (lastFabric) {
-    canvas.loadFromJSON(lastFabric, canvas.renderAll.bind(canvas));
+  // load last saved fabric state if available
+  const page = pages[i];
+  const last = page.history && page.history[page.historyIndex];
+  if (last && last.fabric) {
+    try { canvas.loadFromJSON(last.fabric, canvas.renderAll.bind(canvas)); } catch(e){ console.warn('Failed to load fabric JSON', e); }
   }
   renderThumbs();
   updateUndoRedoButtons();
 }
 
 /* Save current canvas annotations into page (not pushing history) */
-function pushCurrentStateToPage(index){
+function saveCurrentAnnotationsToPage(index){
   if (index < 0) return;
   const page = pages[index];
-  // snapshot backing always in page.history when actions happen (we manage via pushHistory)
-  // save fabric annotations state into current history item if exists
-  if (!page.history || page.history.length === 0) return;
-  page.history[page.historyIndex].fabric = canvas.toJSON(['selectable']);
+  if (!page) return;
+  // store current fabric state into the latest snapshot or create one
+  if (!page.history || page.history.length === 0) {
+    const snapshot = page.backing.toDataURL('image/png');
+    page.history = page.history || [];
+    page.history.push({ img: snapshot, fabric: canvas.toJSON(['selectable']) });
+    page.historyIndex = page.history.length - 1;
+  } else {
+    page.history[page.historyIndex].fabric = canvas.toJSON(['selectable']);
+  }
 }
 
 /* Reorder pages */
@@ -437,12 +518,12 @@ function reorderPages(src, dest){
   if (src === dest) return;
   const item = pages.splice(src,1)[0];
   pages.splice(dest,0,item);
-  renderThumbs();
   // adjust active index
-  if (activeIndex === src) setActivePage(dest);
+  if (activeIndex === src) activeIndex = dest;
   else if (activeIndex > src && activeIndex <= dest) activeIndex--;
   else if (activeIndex < src && activeIndex >= dest) activeIndex++;
   renderThumbs();
+  setActivePage(activeIndex);
 }
 
 /* Duplicate page */
@@ -469,67 +550,51 @@ function deletePage(index){
   setActivePage(newIndex);
 }
 
-/* ---------- Canvas Actions & Tools ---------- */
+/* ---------- Tools and actions ---------- */
 
-// selection and tool toggles
+/* Set tool state and UI */
 function setTool(tool){
   currentTool = tool;
   canvas.isDrawingMode = false;
-  canvas.selection = true;
+  canvas.selection = (tool === 'select' || tool === 'box');
   if (selectionRect) { canvas.remove(selectionRect); selectionRect = null; }
   // UI feedback (simple)
-  [selectToolBtn, boxToolBtn, freehandBtn, textBtn, rectBtn, eraseBtn].forEach(b => b.classList.remove('primary'));
+  [selectToolBtn, boxToolBtn, drawToolBtn, textToolBtn, eraseToolBtn].forEach(b => b.classList.remove('primary'));
   if (tool === 'select') selectToolBtn.classList.add('primary');
   if (tool === 'box') boxToolBtn.classList.add('primary');
-  if (tool === 'draw') freehandBtn.classList.add('primary');
-  if (tool === 'text') textBtn.classList.add('primary');
-  if (tool === 'rect') rectBtn.classList.add('primary');
-  if (tool === 'erase') eraseBtn.classList.add('primary');
+  if (tool === 'draw') drawToolBtn.classList.add('primary');
+  if (tool === 'text') textToolBtn.classList.add('primary');
+  if (tool === 'erase') eraseToolBtn.classList.add('primary');
 
   if (tool === 'draw') {
     canvas.isDrawingMode = true;
-    canvas.freeDrawingBrush.width = 3;
+    canvas.freeDrawingBrush = canvas.freeDrawingBrush || new fabric.PencilBrush(canvas);
+    canvas.freeDrawingBrush.width = 2.5;
+    canvas.freeDrawingBrush.color = '#e11d48';
   }
 }
 
 selectToolBtn.addEventListener('click', ()=>setTool('select'));
-boxToolBtn.addEventListener('click', ()=>setTool('box'));
-freehandBtn.addEventListener('click', ()=>setTool('draw'));
-textBtn.addEventListener('click', ()=>setTool('text'));
-rectBtn.addEventListener('click', ()=>setTool('rect'));
-eraseBtn.addEventListener('click', ()=>setTool('erase'));
-
-/* Box: create or enable selection rect manipulation */
 boxToolBtn.addEventListener('click', ()=> {
   setTool('box');
   if (!selectionRect){
     selectionRect = new fabric.Rect({
-      left: 80, top:80, width:300, height:200, fill:'rgba(37,99,235,0.08)', stroke:'#2563eb', strokeWidth:2, cornerColor:'#2563eb', transparentCorners:false
+      left: 80, top:80, width:300, height:200, fill:'rgba(15,98,254,0.04)', stroke:'#0f62fe', strokeWidth:2, cornerColor:'#0f62fe', transparentCorners:false
     });
     canvas.add(selectionRect);
     canvas.setActiveObject(selectionRect);
   }
 });
-
-/* Draw: handled by canvas.isDrawingMode */
-
-/* Text tool */
-textBtn.addEventListener('click', ()=> {
+drawToolBtn.addEventListener('click', ()=>setTool('draw'));
+textToolBtn.addEventListener('click', ()=> {
   setTool('text');
-  const t = new fabric.IText('Text', { left: 120, top: 120, fontSize:28, fill:'#111827' });
+  const t = new fabric.IText('Text', { left: 120, top: 120, fontSize:22, fill:'#111827', editable:true });
   canvas.add(t);
   canvas.setActiveObject(t);
 });
+eraseToolBtn.addEventListener('click', ()=> setTool('erase'));
 
-/* Rect tool */
-rectBtn.addEventListener('click', ()=> {
-  setTool('rect');
-  const r = new fabric.Rect({ left: 120, top: 120, width:200, height:120, fill:'rgba(255,255,255,0.65)', stroke:'#00000022', strokeWidth:1 });
-  canvas.add(r);
-  canvas.setActiveObject(r);
-});
-
-/* Erase object (delete selection) */
+/* Delete object */
 deleteObjBtn.addEventListener('click', ()=> {
   const obj = canvas.getActiveObject();
   if (obj) {
@@ -542,10 +607,9 @@ deleteObjBtn.addEventListener('click', ()=> {
 bringFrontBtn.addEventListener('click', ()=> { const o = canvas.getActiveObject(); if (o) canvas.bringToFront(o); });
 sendBackBtn.addEventListener('click', ()=> { const o = canvas.getActiveObject(); if (o) canvas.sendToBack(o); });
 
-/* Copy/Paste */
+/* Copy/Paste (internal clipboard) */
 copyBtn.addEventListener('click', async ()=> {
-  if (!pages[activeIndex]) return;
-  // copy box or selected object region
+  if (activeIndex < 0) return alert('No active page.');
   const sel = canvas.getActiveObject();
   if (selectionRect) {
     const region = getBoxOnBacking(selectionRect);
@@ -557,8 +621,24 @@ copyBtn.addEventListener('click', async ()=> {
     return;
   }
   if (sel && sel.toDataURL) {
-    copiedDataURL = sel.toDataURL();
-    alert('Selected object copied.');
+    try {
+      const group = new fabric.Group([sel.clone()]);
+      const temp = document.createElement('canvas');
+      temp.width = Math.min(2000, Math.max(50, Math.round(group.width*group.scaleX)));
+      temp.height = Math.min(2000, Math.max(50, Math.round(group.height*group.scaleY)));
+      const data = group.toDataURL({ format: 'png', multiplier:1 });
+      copiedDataURL = data;
+      alert('Selected object copied.');
+    } catch(e){
+      try {
+        const bbox = sel.getBoundingRect();
+        const off = canvas.toDataURL({ left: bbox.left, top: bbox.top, width: bbox.width, height: bbox.height });
+        copiedDataURL = off;
+        alert('Selected object copied (fallback).');
+      } catch(ex){
+        alert('Copy failed.');
+      }
+    }
     return;
   }
   alert('Nothing selected to copy.');
@@ -572,13 +652,14 @@ pasteBtn.addEventListener('click', ()=> {
     canvas.setActiveObject(img);
     canvas.renderAll();
     pushHistory(pages[activeIndex]);
-  });
+  }, { crossOrigin: 'Anonymous' });
 });
 
-/* Crop Button */
-cropBtn.addEventListener('click', async ()=>{
-  if (!selectionRect || !pages[activeIndex]) return alert('Place the blue selection box first.');
+/* Crop (map selection rect to backing) */
+cropBtn.addEventListener('click', async ()=> {
+  if (!selectionRect || !pages[activeIndex]) return alert('Place the selection box first (Box tool).');
   const region = getBoxOnBacking(selectionRect);
+  if (!region) return alert('Crop region invalid.');
   const cropped = document.createElement('canvas');
   cropped.width = region.w; cropped.height = region.h;
   cropped.getContext('2d').drawImage(pages[activeIndex].backing, region.x, region.y, region.w, region.h, 0,0,region.w,region.h);
@@ -590,44 +671,47 @@ cropBtn.addEventListener('click', async ()=>{
   renderThumbs();
 });
 
-/* Auto-Crop: simple bounding-box of non-white pixels */
-autoCropBtn.addEventListener('click', ()=>{
+/* AutoCrop: bounding box of non-white pixels (fast) */
+autoCropBtn.addEventListener('click', ()=> {
   if (!pages[activeIndex]) return;
   const p = pages[activeIndex];
   const ctx = p.backing.getContext('2d');
   const w = p.backing.width, h = p.backing.height;
-  const data = ctx.getImageData(0,0,w,h).data;
-  let minX=w, minY=h, maxX=0, maxY=0;
-  for (let y=0;y<h;y++){
-    for (let x=0;x<w;x++){
-      const idx = (y*w + x)*4;
-      const r = data[idx], g = data[idx+1], b = data[idx+2];
-      // measure 'ink' by luminance
-      const lum = 0.299*r + 0.587*g + 0.114*b;
-      if (lum < 245){ // threshold near white
-        if (x < minX) minX = x;
-        if (y < minY) minY = y;
-        if (x > maxX) maxX = x;
-        if (y > maxY) maxY = y;
+  try {
+    const imgData = ctx.getImageData(0,0,w,h);
+    const data = imgData.data;
+    let minX=w, minY=h, maxX=0, maxY=0;
+    for (let y=0;y<h;y++){
+      for (let x=0;x<w;x++){
+        const idx = (y*w + x)*4;
+        const r = data[idx], g = data[idx+1], b = data[idx+2];
+        const lum = 0.299*r + 0.587*g + 0.114*b;
+        if (lum < 250){
+          if (x < minX) minX = x;
+          if (y < minY) minY = y;
+          if (x > maxX) maxX = x;
+          if (y > maxY) maxY = y;
+        }
       }
     }
+    if (maxX <= minX || maxY <= minY) { alert('Auto-crop found no content.'); return; }
+    const pad = Math.round(Math.max(w,h) * 0.01) + 8;
+    const rx = Math.max(0,minX-pad), ry = Math.max(0,minY-pad);
+    const rw = Math.min(w - rx, (maxX - minX) + pad*2), rh = Math.min(h - ry, (maxY - minY) + pad*2);
+    const cropped = document.createElement('canvas'); cropped.width = rw; cropped.height = rh;
+    cropped.getContext('2d').drawImage(p.backing, rx, ry, rw, rh, 0, 0, rw, rh);
+    p.backing = cropped; p.width = rw; p.height = rh;
+    rebuildFabricFromBacking(p).then(()=> {
+      pushHistory(p);
+      renderThumbs();
+    });
+  } catch(e){
+    alert('Auto-crop failed (maybe due to CORS or large file).');
   }
-  if (maxX <= minX || maxY <= minY) { alert('Auto-crop found no content.'); return; }
-  const pad = 20;
-  const rx = Math.max(0,minX-pad), ry = Math.max(0,minY-pad);
-  const rw = Math.min(w - rx, (maxX - minX) + pad*2), rh = Math.min(h - ry, (maxY - minY) + pad*2);
-  const cropped = document.createElement('canvas'); cropped.width = rw; cropped.height = rh;
-  cropped.getContext('2d').drawImage(p.backing, rx, ry, rw, rh, 0, 0, rw, rh);
-  p.backing = cropped; p.width = rw; p.height = rh;
-  rebuildFabricFromBacking(p).then(()=> {
-    pushHistory(p);
-    renderThumbs();
-  });
 });
 
-/* getBoxOnBacking converts rect (fabric coords) to backing coords using background image transform */
+/* Map selection rect coordinates to backing pixels */
 function getBackgroundTransform(){
-  // find background image object
   const objs = canvas.getObjects();
   for (let o of objs){
     if (o._isBackgroundImage) return o;
@@ -636,134 +720,153 @@ function getBackgroundTransform(){
 }
 function getBoxOnBacking(rectObj){
   const bg = getBackgroundTransform();
-  if (!bg) return { x:0,y:0,w:rectObj.width*rectObj.scaleX, h:rectObj.height*rectObj.scaleY };
-  const scale = bg.getScaledWidth() / (pages[activeIndex].backing.width || bg.width);
+  if (!bg || activeIndex<0) return null;
+  const page = pages[activeIndex];
+  // displayed bg scaled to fit display. Determine scale factor between displayed bg and backing
+  const dispW = bg.getScaledWidth();
+  const dispH = bg.getScaledHeight();
+  const scaleX = page.backing.width / dispW;
+  const scaleY = page.backing.height / dispH;
+  // compute object position relative to bg top-left
   const offX = bg.left, offY = bg.top;
-  const x = Math.round((rectObj.left - offX) / scale);
-  const y = Math.round((rectObj.top - offY) / scale);
-  const w = Math.round(rectObj.width * rectObj.scaleX / scale);
-  const h = Math.round(rectObj.height * rectObj.scaleY / scale);
-  const clamped = {
-    x: Math.max(0, Math.min(x, pages[activeIndex].backing.width - 1)),
-    y: Math.max(0, Math.min(y, pages[activeIndex].backing.height - 1)),
-    w: Math.max(1, Math.min(w, pages[activeIndex].backing.width)),
-    h: Math.max(1, Math.min(h, pages[activeIndex].backing.height))
+  const left = rectObj.left, top = rectObj.top;
+  const x = Math.round((left - offX) * scaleX);
+  const y = Math.round((top - offY) * scaleY);
+  const w = Math.round((rectObj.width * rectObj.scaleX) * scaleX);
+  const h = Math.round((rectObj.height * rectObj.scaleY) * scaleY);
+  return {
+    x: Math.max(0, Math.min(page.backing.width-1, x)),
+    y: Math.max(0, Math.min(page.backing.height-1, y)),
+    w: Math.max(1, Math.min(page.backing.width, w)),
+    h: Math.max(1, Math.min(page.backing.height, h))
   };
-  return clamped;
 }
 
-/* Apply Filters: brightness/contrast/bw */
-applyFilterBtn.addEventListener('click', async ()=> {
-  if (!pages[activeIndex]) return;
+/* ---------- Image filters (pixel-level) ---------- */
+async function applyFiltersToBacking(page, { brightness=0, contrast=0, bw=0 }){
+  try {
+    const url = page.backing.toDataURL('image/png');
+    const img = await dataURLToImage(url);
+    const tmp = document.createElement('canvas');
+    tmp.width = img.width; tmp.height = img.height;
+    const tmpCtx = tmp.getContext('2d');
+    tmpCtx.drawImage(img,0,0);
+    const imgData = tmpCtx.getImageData(0,0,tmp.width,tmp.height);
+    const data = imgData.data;
+    // convert sliders to factors
+    const b = brightness; // -1..1
+    const c = contrast;   // -1..1
+    // contrast formula
+    const contrastFactor = (259*(c*255 + 255))/(255*(259 - c*255) || 1);
+    for (let i=0;i<data.length;i+=4){
+      let r = data[i], g = data[i+1], bl = data[i+2];
+      r = r + b*255; g = g + b*255; bl = bl + b*255;
+      r = contrastFactor * (r - 128) + 128;
+      g = contrastFactor * (g - 128) + 128;
+      bl = contrastFactor * (bl - 128) + 128;
+      if (bw > 0) {
+        const avg = 0.299*r + 0.587*g + 0.114*bl;
+        const val = avg > (255 * (1 - bw)) ? 255 : 0;
+        r = g = bl = val;
+      }
+      data[i] = Math.max(0,Math.min(255,Math.round(r)));
+      data[i+1] = Math.max(0,Math.min(255,Math.round(g)));
+      data[i+2] = Math.max(0,Math.min(255,Math.round(bl)));
+    }
+    tmpCtx.putImageData(imgData,0,0);
+    page.backing = tmp;
+    page.width = tmp.width; page.height = tmp.height;
+    return true;
+  } catch(e){
+    console.error('Filter apply failed', e);
+    return false;
+  }
+}
+
+applyFilterBtn.addEventListener('click', async ()=>{
+  if (activeIndex < 0) return;
   const page = pages[activeIndex];
   const b = parseInt(brightnessSlider.value,10)/100;
   const c = parseInt(contrastSlider.value,10)/100;
   const bw = parseInt(bwSlider.value,10)/100;
-  const ctx = page.backing.getContext('2d');
-  const imgData = ctx.getImageData(0,0,page.backing.width,page.backing.height);
-  const data = imgData.data;
-  // Apply brightness & contrast in-place
-  // contrast factor formula
-  const factor = (259*(c*255 + 255))/(255*(259 - c*255) || 1);
-  for (let i=0;i<data.length;i+=4){
-    let r = data[i], g = data[i+1], bl = data[i+2];
-    // brightness
-    r = r + b*255; g = g + b*255; bl = bl + b*255;
-    // contrast
-    r = factor * (r - 128) + 128;
-    g = factor * (g - 128) + 128;
-    bl = factor * (bl - 128) + 128;
-    // if bw requested, convert to grayscale and threshold by bw strength
-    if (bw > 0) {
-      const avg = 0.299*r + 0.587*g + 0.114*bl;
-      const val = avg > (255 * (1 - bw)) ? 255 : 0;
-      r = g = bl = val;
-    }
-    data[i] = Math.max(0,Math.min(255,Math.round(r)));
-    data[i+1] = Math.max(0,Math.min(255,Math.round(g)));
-    data[i+2] = Math.max(0,Math.min(255,Math.round(bl)));
+  dropHint.textContent = 'Applying filters — working...';
+  const ok = await applyFiltersToBacking(page, { brightness: b, contrast: c, bw: bw/100 });
+  if (ok) {
+    await rebuildFabricFromBacking(page);
+    pushHistory(page);
+    renderThumbs();
+    dropHint.textContent = 'Filters applied.';
+  } else {
+    dropHint.textContent = 'Filter failed.';
   }
-  ctx.putImageData(imgData,0,0);
-  await rebuildFabricFromBacking(page);
-  pushHistory(page);
-  renderThumbs();
-});
-resetFilterBtn.addEventListener('click', async ()=>{
-  // redraw from last saved history snapshot if exists, else do nothing
-  const page = pages[activeIndex];
-  if (!page || !page.history || page.history.length === 0) return;
-  // find earliest snapshot
-  const first = page.history[0];
-  if (!first) return;
-  const img = new Image();
-  img.onload = ()=> {
-    const ctx = page.backing.getContext('2d');
-    ctx.clearRect(0,0,page.backing.width,page.backing.height);
-    ctx.drawImage(img,0,0,page.backing.width,page.backing.height);
-    rebuildFabricFromBacking(page);
-  };
-  img.src = first.img;
 });
 
-/* Sharpen (simple convolution) */
-applySharpenBtn.addEventListener('click', ()=>{
-  if (!pages[activeIndex]) return;
+resetFilterBtn.addEventListener('click', async ()=> {
+  if (activeIndex < 0) return;
   const page = pages[activeIndex];
-  const k = parseInt(sharpenSlider.value,10)/100; // 0..1
-  if (k <= 0) return;
-  const kernel = [
-    0, -k, 0,
-    -k, 1 + 4*k, -k,
-    0, -k, 0
-  ];
-  const ctx = page.backing.getContext('2d');
-  const w = page.backing.width, h = page.backing.height;
-  const src = ctx.getImageData(0,0,w,h);
-  const dst = ctx.createImageData(w,h);
-  const s = src.data, d = dst.data;
-  const kernelSize = 3;
-  for (let y=1;y<h-1;y++){
-    for (let x=1;x<w-1;x++){
-      let r=0,g=0,b=0,a=0;
-      let ki=0;
-      for (let ky=-1;ky<=1;ky++){
-        for (let kx=-1;kx<=1;kx++){
-          const px = x + kx, py = y + ky;
-          const idx = (py * w + px) * 4;
-          const kval = kernel[ki++];
-          r += s[idx] * kval; g += s[idx+1]*kval; b += s[idx+2]*kval;
+  if (!page.history || page.history.length === 0) return alert('No history to reset to.');
+  // restore first snapshot
+  restoreHistory(page, 0);
+});
+
+/* Sharpen (convolution) */
+applySharpenBtn.addEventListener('click', ()=> {
+  if (activeIndex<0) return;
+  const page = pages[activeIndex];
+  const k = parseInt(sharpenSlider.value,10)/100;
+  if (k <= 0) return alert('Increase sharpen value first.');
+  const kernel = [0, -k, 0, -k, 1 + 4*k, -k, 0, -k, 0];
+  try {
+    const ctx = page.backing.getContext('2d');
+    const w = page.backing.width, h = page.backing.height;
+    const src = ctx.getImageData(0,0,w,h);
+    const dst = ctx.createImageData(w,h);
+    const s = src.data, d = dst.data;
+    for (let y=1;y<h-1;y++){
+      for (let x=1;x<w-1;x++){
+        let r=0,g=0,b=0;
+        let ki=0;
+        for (let ky=-1;ky<=1;ky++){
+          for (let kx=-1;kx<=1;kx++){
+            const px = x + kx, py = y + ky;
+            const idx = (py * w + px) * 4;
+            const kval = kernel[ki++];
+            r += s[idx] * kval; g += s[idx+1]*kval; b += s[idx+2]*kval;
+          }
         }
+        const di = (y*w + x) * 4;
+        d[di] = Math.min(255, Math.max(0, Math.round(r)));
+        d[di+1] = Math.min(255, Math.max(0, Math.round(g)));
+        d[di+2] = Math.min(255, Math.max(0, Math.round(b)));
+        d[di+3] = 255;
       }
-      const di = (y*w + x) * 4;
-      d[di] = Math.min(255, Math.max(0, Math.round(r)));
-      d[di+1] = Math.min(255, Math.max(0, Math.round(g)));
-      d[di+2] = Math.min(255, Math.max(0, Math.round(b)));
-      d[di+3] = 255;
     }
+    ctx.putImageData(dst,0,0);
+    rebuildFabricFromBacking(page).then(()=> pushHistory(page));
+  } catch(e){
+    alert('Sharpen failed (large image or CORS).');
   }
-  ctx.putImageData(dst,0,0);
-  rebuildFabricFromBacking(page).then(()=> pushHistory(page));
 });
 
 /* Undo/Redo */
 undoBtn.addEventListener('click', ()=> {
   if (activeIndex<0) return;
   const page = pages[activeIndex];
-  if (!page.history) return;
+  if (!page || !page.history) return;
   const idx = Math.max(0, page.historyIndex - 1);
   restoreHistory(page, idx);
 });
 redoBtn.addEventListener('click', ()=> {
   if (activeIndex<0) return;
   const page = pages[activeIndex];
-  if (!page.history) return;
+  if (!page || !page.history) return;
   const idx = Math.min(page.history.length - 1, page.historyIndex + 1);
   restoreHistory(page, idx);
 });
 
-/* Fit to view */
+/* Fit to view resets zoom and pan */
 fitToViewBtn.addEventListener('click', ()=> {
-  canvas.setZoom(1);
+  canvas.setViewportTransform([1,0,0,1,0,0]);
   canvas.renderAll();
 });
 
@@ -773,7 +876,6 @@ rotateRightBtn.addEventListener('click', ()=> rotateActive(90));
 function rotateActive(deg){
   if (activeIndex<0) return;
   const p = pages[activeIndex];
-  // rotate backing
   const tmp = document.createElement('canvas');
   tmp.width = p.height; tmp.height = p.width;
   const tctx = tmp.getContext('2d');
@@ -788,7 +890,7 @@ function rotateActive(deg){
   });
 }
 
-/* Page Controls: add, duplicate, delete */
+/* Page Controls */
 addPageBtn.addEventListener('click', ()=> addBlankPage());
 addBlankBtn.addEventListener('click', ()=> addBlankPage());
 duplicatePageBtn.addEventListener('click', ()=> duplicatePage(activeIndex));
@@ -796,35 +898,41 @@ deletePageBtn.addEventListener('click', ()=> {
   if (confirm('Delete this page?')) deletePage(activeIndex);
 });
 
-/* Copy/Paste Canvas keyboard */
+/* Keyboard shortcuts (production-friendly) */
 document.addEventListener('keydown', (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); undoBtn.click(); }
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') { e.preventDefault(); redoBtn.click(); }
   if (e.key.toLowerCase() === 'c') { setTool('box'); }
   if (e.key.toLowerCase() === 'd') { setTool('draw'); }
   if (e.key.toLowerCase() === 't') { setTool('text'); }
+  // pan when space held: set cursor
+  if (e.code === 'Space') { canvas.defaultCursor = 'grab'; }
 });
+document.addEventListener('keyup', (e) => { if (e.code === 'Space') canvas.defaultCursor = 'default'; });
 
-/* Exporting */
+/* Export PNG */
 exportPngBtn.addEventListener('click', ()=> {
-  if (activeIndex<0) return;
+  if (activeIndex<0) return alert('No active page to export.');
   const p = pages[activeIndex];
-  const link = document.createElement('a');
-  link.download = `page-${activeIndex+1}.png`;
-  link.href = p.backing.toDataURL('image/png');
-  link.click();
+  // Ensure any annotations are committed to backing before export (flatten)
+  saveAnnotationsToBacking(activeIndex).then(() => {
+    const link = document.createElement('a');
+    link.download = `page-${activeIndex+1}.png`;
+    link.href = p.backing.toDataURL('image/png');
+    link.click();
+  });
 });
 
 /* Multi-page PDF export using jsPDF */
-exportPdfBtn.addEventListener('click', async ()=>{
-  if (pages.length === 0) return;
+exportPdfBtn.addEventListener('click', async ()=> {
+  if (pages.length === 0) return alert('No pages to export.');
+  // commit all page annotations before export
+  await Promise.all(pages.map((_, idx) => saveAnnotationsToBacking(idx)));
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF({ unit: 'pt', format: 'a4' });
-  // A4 points
   const a4w = 595.28, a4h = 841.89;
   for (let i=0;i<pages.length;i++){
     const p = pages[i];
-    // convert backing to image and fit into A4, keeping aspect ratio
     const dataUrl = p.backing.toDataURL('image/jpeg', 0.95);
     const img = await dataURLToImage(dataUrl);
     const ratio = Math.min(a4w / img.width, a4h / img.height);
@@ -848,30 +956,39 @@ fileInput.addEventListener('change', async (e) => {
 
 window.addEventListener('dragover', e => {
   e.preventDefault();
+  if (!dragDropEnabled) return;
+  dropHint.textContent = 'Drop files to import';
 });
 window.addEventListener('drop', async (e) => {
   e.preventDefault();
+  dropHint.textContent = '';
   if (!dragDropEnabled) return;
   const dt = e.dataTransfer;
   if (dt && dt.files && dt.files.length) {
     const files = Array.from(dt.files);
-    for (let f of files) {
-      if (f.type.startsWith('image/')) await importImageFile(f);
-    }
+    for (let f of files) { await importImageFile(f); }
   }
 });
+dragDropToggle.addEventListener('click', ()=> {
+  dragDropEnabled = !dragDropEnabled;
+  dragDropToggle.textContent = 'Drag & Drop: ' + (dragDropEnabled ? 'ON' : 'OFF');
+});
 
-/* Camera capture (simple snapshot) */
+/* Camera capture (prefers rear camera when available) */
 cameraBtn.addEventListener('click', async ()=> {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    return alert('Camera API not supported in this browser.');
+  }
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ video:true });
+    const constraints = { video: { facingMode: { ideal: "environment" } } };
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
     const video = document.createElement('video');
     video.autoplay = true;
     video.srcObject = stream;
     video.style.maxWidth = '100%';
     const modal = document.createElement('div');
-    Object.assign(modal.style, { position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:9999 });
-    const box = document.createElement('div'); box.className='card'; box.style.padding='10px';
+    Object.assign(modal.style, { position:'fixed', inset:0, background:'rgba(0,0,0,0.6)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:9999 });
+    const box = document.createElement('div'); box.className='card'; box.style.padding='10px'; box.style.maxWidth='90%';
     const captureBtn = document.createElement('button'); captureBtn.className='btn'; captureBtn.textContent='Capture';
     const cancelBtn = document.createElement('button'); cancelBtn.className='btn ghost small'; cancelBtn.textContent='Cancel';
     box.appendChild(video);
@@ -886,49 +1003,151 @@ cameraBtn.addEventListener('click', async ()=> {
       // stop stream
       stream.getTracks().forEach(t=>t.stop());
       document.body.removeChild(modal);
-      // add page from captured image
       const data = c.toDataURL('image/png');
       const blob = dataURLToBlob(data);
-      const f = new File([blob], 'capture.png', { type: 'image/png' });
-      importImageFile(f);
-    });
+      importImageFile(new File([blob], 'capture.png', { type: 'image/png' }));
+    }, { once:true });
     cancelBtn.addEventListener('click', ()=> {
       stream.getTracks().forEach(t=>t.stop());
       document.body.removeChild(modal);
-    });
+    }, { once:true });
   } catch (err) {
     alert('Camera not available or permission denied.');
   }
 });
 
-/* Helper */
-function dataURLToBlob(dataurl) {
-  const parts = dataurl.split(','), mime = parts[0].match(/:(.*?);/)[1];
-  const bstr = atob(parts[1]); let n = bstr.length; const u8 = new Uint8Array(n);
-  while(n--) u8[n] = bstr.charCodeAt(n);
-  return new Blob([u8], { type: mime });
+/* ---------- Annotations -> backing helpers ---------- */
+/* Save current fabric annotations into the backing canvas for a given page */
+async function saveAnnotationsToBacking(index){
+  if (index < 0 || !pages[index]) return;
+  const page = pages[index];
+  // if the active page, ensure the displayed fabric objects (except background) are rendered to backing
+  // strategy: create a temp canvas at backing resolution, draw backing, then render each fabric object scaled into backing space
+  const bgObj = getBackgroundTransform();
+  if (!bgObj) return;
+  const dispW = bgObj.getScaledWidth(), dispH = bgObj.getScaledHeight();
+  const scaleX = page.backing.width / dispW;
+  const scaleY = page.backing.height / dispH;
+  // create temp
+  const tmp = document.createElement('canvas');
+  tmp.width = page.backing.width; tmp.height = page.backing.height;
+  const tmpCtx = tmp.getContext('2d');
+  // draw original backing
+  tmpCtx.drawImage(page.backing, 0, 0);
+  // render fabric objects (excluding background) by exporting each object to dataURL at display scale and drawing scaled
+  const objects = canvas.getObjects().filter(o => !o._isBackgroundImage);
+  for (let obj of objects){
+    // create clone and render to temp using toDataURL trick
+    const clone = fabric.util.object.clone(obj);
+    const origLeft = obj.left, origTop = obj.top;
+    // render clone to an intermediate canvas at object's bbox size
+    const bbox = obj.getBoundingRect(true, true);
+    const exportCanvas = document.createElement('canvas');
+    exportCanvas.width = Math.max(1, Math.round(bbox.width * obj.scaleX || bbox.width));
+    exportCanvas.height = Math.max(1, Math.round(bbox.height * obj.scaleY || bbox.height));
+    const exportCtx = exportCanvas.getContext('2d');
+    // temporarily create a small fabric.StaticCanvas to render the object
+    const s = new fabric.StaticCanvas(null, { width: exportCanvas.width, height: exportCanvas.height, renderOnAddRemove: false });
+    clone.set({ left: exportCanvas.width/2 - (bbox.width/2), top: exportCanvas.height/2 - (bbox.height/2) });
+    s.add(clone);
+    s.renderAll();
+    try {
+      const data = s.toDataURL({ format: 'png' });
+      const img = await dataURLToImage(data);
+      // compute where on backing to draw
+      const x = Math.round((obj.left - bgObj.left) * scaleX);
+      const y = Math.round((obj.top - bgObj.top) * scaleY);
+      const w = Math.round(img.width * scaleX * (obj.scaleX || 1));
+      const h = Math.round(img.height * scaleY * (obj.scaleY || 1));
+      tmpCtx.drawImage(img, x, y, w, h);
+    } catch(err){
+      // best-effort fallback: ignore object if render fails
+      console.warn('Failed to render object into backing:', err);
+    } finally {
+      s.clear(); s.dispose && s.dispose();
+    }
+  }
+  // replace page backing with tmp
+  page.backing = tmp;
+  page.width = tmp.width; page.height = tmp.height;
+  // rebuild display background
+  if (index === activeIndex) await rebuildFabricFromBacking(page);
+  pushHistory(page);
 }
 
-/* ---------- Initial Boot ---------- */
+/* When switching page we call saveCurrentAnnotationsToPage which just stores fabric state */
+function saveCurrentAnnotationsToPage(index){
+  if (index < 0) return;
+  const page = pages[index];
+  if (!page) return;
+  if (!page.history || page.history.length === 0) {
+    const snapshot = page.backing.toDataURL('image/png');
+    page.history = page.history || [];
+    page.history.push({ img: snapshot, fabric: canvas.toJSON(['selectable']) });
+    page.historyIndex = page.history.length - 1;
+  } else {
+    page.history[page.historyIndex].fabric = canvas.toJSON(['selectable']);
+  }
+}
+
+/* ---------- Viewport: zoom & pan ---------- */
+// mouse wheel zoom (centered at cursor), pan with space + drag
+let lastZoom = 1;
+canvas.on('mouse:wheel', function(opt) {
+  const delta = opt.e.deltaY;
+  let zoom = canvas.getZoom();
+  zoom *= 0.999 ** delta;
+  zoom = Math.max(0.1, Math.min(8, zoom));
+  canvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, zoom);
+  opt.e.preventDefault();
+  opt.e.stopPropagation();
+});
+let isPanning = false;
+canvas.on('mouse:down', function(opt) {
+  const event = opt.e;
+  if (event.spaceKey || event.button === 1 || (event.shiftKey && currentTool !== 'draw')) {
+    isPanning = true;
+    canvas.setCursor('grabbing');
+    canvas.renderAll();
+  }
+});
+canvas.on('mouse:move', function(opt) {
+  if (isPanning) {
+    const e = opt.e;
+    const delta = new fabric.Point(e.movementX, e.movementY);
+    canvas.relativePan(delta);
+  }
+});
+canvas.on('mouse:up', function(opt) {
+  if (isPanning) {
+    isPanning = false;
+    canvas.setCursor('default');
+    canvas.renderAll();
+  }
+});
+// set space key flag (for panning)
+document.addEventListener('keydown', (e)=>{ if (e.code === 'Space') { e.preventDefault(); canvas.defaultCursor = 'grab'; e.spaceKey=true; } });
+document.addEventListener('keyup', (e)=>{ if (e.code === 'Space') { canvas.defaultCursor = 'default'; e.spaceKey=false; } });
+
+/* ---------- Initialization ---------- */
 (function init(){
-  // initial blank page
+  // boot with a single blank page
   addBlankPage();
-  // fit canvas to host
-  canvas.setHeight(Math.min(1200, window.innerHeight * 0.72));
-  canvas.setWidth(Math.min(900, window.innerWidth * 0.72));
   setTool('select');
+  // wire essential events that change history
+  canvas.on('object:modified', ()=> { if (activeIndex>=0) pushHistory(pages[activeIndex]); });
+  canvas.on('object:added', ()=> { if (activeIndex>=0) pushHistory(pages[activeIndex]); });
+  canvas.on('object:removed', ()=> { if (activeIndex>=0) pushHistory(pages[activeIndex]); });
 })();
 
-/* Make sure to save a history snapshot when significant actions occur */
-canvas.on('object:modified', ()=> { if (activeIndex>=0) pushHistory(pages[activeIndex]); });
-canvas.on('object:added', ()=> { if (activeIndex>=0) pushHistory(pages[activeIndex]); });
-
-/* When user resizes window, keep canvas size reasonable */
-window.addEventListener('resize', ()=> {
-  canvas.setHeight(Math.min(1200, window.innerHeight * 0.72));
-  canvas.setWidth(Math.min(1100, window.innerWidth * 0.72));
-  canvas.requestRenderAll();
+/* ---------- Stubs & UX for advanced features ---------- */
+document.getElementById('ocrBtn').addEventListener('click', ()=> {
+  alert('OCR placeholder — integrate server-side OCR (Tesseract or Cloud) and call with page image. This UI provides the hook to send the page backing to the server.');
 });
+document.getElementById('smartEraseBtn').addEventListener('click', ()=> {
+  alert('Smart Erase placeholder — integrate an inpainting / background removal API and replace pixels returned by the service.');
+});
+
 </script>
 </body>
 </html>
