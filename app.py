@@ -474,7 +474,7 @@ def mail_page():
                subject = "Unlock Your 20% Discount on Lucid ELD"
                html_message = render_template('emails/promo.html')
 
-            elif email_type == "White-Label":
+            elif email_type == "white-label":
                 subject = "Ready to Launch Your Own ELD Brand?"
                 html_message = render_template('emails/white-label.html')
 
@@ -562,4 +562,5 @@ def logout():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
+
 
